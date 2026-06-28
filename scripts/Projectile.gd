@@ -7,14 +7,29 @@ extends RigidBody2D
 @export var lifetime: float = 6.0              ## Sekunden bis zur automatischen Entfernung
 
 var _alive_time: float = 0.0
+var _has_splatted: bool = false
+
+@onready var _splat_player: AudioStreamPlayer = $SplatPlayer
 
 
 func _ready() -> void:
-	# Kontaktüberwachung erlauben, falls für Effekte benötigt
+	# Kontaktüberwachung erlauben, damit der Aufprall erkannt wird
 	contact_monitor = true
 	max_contacts_reported = 4
+	# Platsch-Sound prozedural erzeugen (F133)
+	_splat_player.stream = SoundGen.splat()
+	body_entered.connect(_on_body_entered)
 	# Sicherstellen, dass der Haufen gezeichnet wird
 	queue_redraw()
+
+
+## Spielt beim ersten Aufprall (Boden oder Männchen) den Platsch-Sound.
+func _on_body_entered(_body: Node) -> void:
+	if _has_splatted:
+		return
+	_has_splatted = true
+	if _splat_player.stream != null:
+		_splat_player.play()
 
 
 func _process(delta: float) -> void:

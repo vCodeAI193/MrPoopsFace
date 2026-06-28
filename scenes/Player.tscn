@@ -6,3 +6,5 @@
 [node name="Player" type="Node2D"]
 script = ExtResource("1_player")
 projectile_scene = ExtResource("2_proj")
+
+[node name="WhooshPlayer" type="AudioStreamPlayer" parent="."]

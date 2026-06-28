@@ -13,3 +13,5 @@ script = ExtResource("1_proj")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_poop")
+
+[node name="SplatPlayer" type="AudioStreamPlayer" parent="."]

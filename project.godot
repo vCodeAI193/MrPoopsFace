@@ -8,7 +8,7 @@ config_version=5
 
 config/name="Stinky Toss"
 config/description="Wirf Kackhaufen auf Strichmännchen! Ein lustiges Casual-Physik-Spiel."
-run/main_scene="res://scenes/Main.tscn"
+run/main_scene="res://scenes/MainMenu.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
 boot_splash/bg_color=Color(0.53, 0.81, 0.92, 1)

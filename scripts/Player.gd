@@ -15,8 +15,12 @@ var _aiming: bool = false
 var _touch_index: int = -1                     ## Aktiv verfolgter Finger
 var _drag_current: Vector2 = Vector2.ZERO      ## Aktuelle Zugposition (lokal)
 
+@onready var _whoosh_player: AudioStreamPlayer = $WhooshPlayer
+
 
 func _ready() -> void:
+	# Wurf-Whoosh prozedural erzeugen (F132)
+	_whoosh_player.stream = SoundGen.whoosh()
 	queue_redraw()
 
 
@@ -57,6 +61,8 @@ func _release_throw() -> void:
 	# Zu kurze Züge ignorieren (versehentliche Tipper)
 	if launch_impulse.length() > 50.0:
 		_spawn_projectile(launch_impulse)
+		if _whoosh_player.stream != null:
+			_whoosh_player.play()
 
 	_drag_current = Vector2.ZERO
 	queue_redraw()

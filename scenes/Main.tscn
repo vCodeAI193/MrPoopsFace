@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://a0main0stinkytoss0"]
+[gd_scene load_steps=10 format=3 uid="uid://a0main0stinkytoss0"]
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://d0player0slingshot0" path="res://scenes/Player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://c0maennchen0stick0" path="res://scenes/Maennchen.tscn" id="3_maen"]
 [ext_resource type="PackedScene" uid="uid://e0gameover0screen0" path="res://scenes/GameOver.tscn" id="4_over"]
+[ext_resource type="PackedScene" uid="uid://p0pausemenu0overlay0" path="res://scenes/PauseMenu.tscn" id="5_pause"]
 
 [sub_resource type="Gradient" id="Gradient_sky"]
 offsets = PackedFloat32Array(0, 1)
@@ -42,6 +43,9 @@ shape = SubResource("RectangleShape2D_floor")
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(320, 920)
 
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(960, 600)
+
 [node name="SpawnTimer" type="Timer" parent="."]
 wait_time = 1.4
 
@@ -67,5 +71,17 @@ visible = false
 text = "Combo x2!"
 theme_override_colors/font_color = Color(1, 0.55, 0.1, 1)
 theme_override_font_sizes/font_size = 60
+
+[node name="PauseButton" type="Button" parent="HUD"]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -190.0
+offset_top = 24.0
+offset_right = -30.0
+offset_bottom = 116.0
+text = "II"
+theme_override_font_sizes/font_size = 48
+
+[node name="PauseMenu" parent="." instance=ExtResource("5_pause")]
 
 [node name="GameOver" parent="." instance=ExtResource("4_over")]

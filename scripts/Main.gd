@@ -9,10 +9,20 @@ extends Node2D
 @export var spawn_x_min: float = 500.0          ## Linker Spawn-Rand
 @export var spawn_x_max: float = 1820.0         ## Rechter Spawn-Rand
 
+# --- Screen-Shake (F144) ---
+@export var shake_per_hit: float = 7.0          ## Stärkezuwachs pro Treffer
+@export var shake_max: float = 26.0             ## Maximale Erschütterung
+@export var shake_decay: float = 45.0           ## Abklinggeschwindigkeit
+
 @onready var _spawn_timer: Timer = $SpawnTimer
 @onready var _score_label: Label = $HUD/TopBar/ScoreLabel
 @onready var _time_label: Label = $HUD/TopBar/TimeLabel
 @onready var _combo_label: Label = $HUD/TopBar/ComboLabel
+@onready var _pause_button: Button = $HUD/PauseButton
+@onready var _pause_menu: CanvasLayer = $PauseMenu
+@onready var _camera: Camera2D = $Camera2D
+
+var _shake_strength: float = 0.0
 
 
 func _ready() -> void:
@@ -22,6 +32,10 @@ func _ready() -> void:
 	GameManager.score_changed.connect(_on_score_changed)
 	GameManager.time_changed.connect(_on_time_changed)
 	GameManager.combo_changed.connect(_on_combo_changed)
+	GameManager.hit_registered.connect(_on_hit_registered)
+
+	# Pause-Knopf verbinden (F114)
+	_pause_button.pressed.connect(_on_pause_pressed)
 
 	# Spawn-Timer einrichten
 	_spawn_timer.wait_time = spawn_rate
@@ -33,6 +47,26 @@ func _ready() -> void:
 	_on_score_changed(0)
 	_on_time_changed(GameManager.time_left)
 	_on_combo_changed(0)
+
+
+func _process(delta: float) -> void:
+	# Screen-Shake abklingen lassen und auf die Kamera anwenden (F144)
+	if _shake_strength > 0.0:
+		_camera.offset = Vector2(
+			randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * _shake_strength
+		_shake_strength = maxf(_shake_strength - shake_decay * delta, 0.0)
+		if _shake_strength <= 0.0:
+			_camera.offset = Vector2.ZERO
+
+
+## Reagiert auf einen Treffer mit einer Kamera-Erschütterung (F144).
+func _on_hit_registered(_points: int) -> void:
+	_shake_strength = minf(_shake_strength + shake_per_hit, shake_max)
+
+
+## Öffnet das Pause-Overlay (F114).
+func _on_pause_pressed() -> void:
+	_pause_menu.show_pause()
 
 
 ## Spawnt ein neues Strichmännchen, solange das Limit nicht erreicht ist.

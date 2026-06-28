@@ -9,6 +9,7 @@ signal combo_changed(new_combo: int)           ## Wird bei Combo-Änderung gesen
 signal time_changed(seconds_left: float)       ## Wird jede Sekunde aktualisiert
 signal game_over(final_score: int)             ## Wird beim Rundenende gesendet
 signal game_started()                          ## Wird beim Rundenstart gesendet
+signal hit_registered(points: int)             ## Wird bei jedem Treffer gesendet (für Effekte)
 
 # --- Einstellbare Werte (im Inspector / per Code anpassbar) ---
 @export var round_duration: float = 60.0       ## Rundenlänge in Sekunden
@@ -21,7 +22,17 @@ var combo: int = 0
 var time_left: float = 0.0
 var game_active: bool = false
 
+# --- Persistenz / Highscores (F168, F195) ---
+const SAVE_PATH: String = "user://stinky_toss.save"
+const MAX_HIGHSCORES: int = 10
+var highscores: Array = []                     ## Top-Punktestände (absteigend)
+var last_was_highscore: bool = false           ## Letzte Runde war neuer Rekord?
+
 var _combo_timer: float = 0.0                  ## Restzeit, in der die Combo gültig bleibt
+
+
+func _ready() -> void:
+	_load_game()
 
 
 func _process(delta: float) -> void:
@@ -62,14 +73,17 @@ func end_game() -> void:
 	if not game_active:
 		return
 	game_active = false
+	# Prüfen, ob es ein neuer Rekord ist, bevor der Score eingetragen wird
+	last_was_highscore = score > 0 and (highscores.is_empty() or score > int(highscores[0]))
+	_record_highscore(score)
 	game_over.emit(score)
 
 
 ## Registriert einen Treffer auf ein Strichmännchen und berechnet die Punkte
-## inklusive Combo-Multiplikator.
-func register_hit() -> void:
+## inklusive Combo-Multiplikator. Gibt die erzielten Punkte zurück.
+func register_hit() -> int:
 	if not game_active:
-		return
+		return 0
 
 	# Combo erhöhen, solange schnell hintereinander getroffen wird
 	combo += 1
@@ -81,6 +95,39 @@ func register_hit() -> void:
 
 	score_changed.emit(score)
 	combo_changed.emit(combo)
+	hit_registered.emit(points)
+	return points
+
+
+## Gibt den höchsten gespeicherten Punktestand zurück (0, falls keiner).
+func get_high_score() -> int:
+	return int(highscores[0]) if highscores.size() > 0 else 0
+
+
+## Trägt einen Punktestand in die Bestenliste ein und speichert.
+func _record_highscore(value: int) -> void:
+	if value <= 0:
+		return
+	highscores.append(value)
+	highscores.sort()
+	highscores.reverse()                       # absteigend sortieren
+	if highscores.size() > MAX_HIGHSCORES:
+		highscores.resize(MAX_HIGHSCORES)
+	_save_game()
+
+
+## Speichert den Spielstand persistent (F195).
+func _save_game() -> void:
+	var cfg: ConfigFile = ConfigFile.new()
+	cfg.set_value("scores", "highscores", highscores)
+	cfg.save(SAVE_PATH)
+
+
+## Lädt den Spielstand, falls vorhanden (F195).
+func _load_game() -> void:
+	var cfg: ConfigFile = ConfigFile.new()
+	if cfg.load(SAVE_PATH) == OK:
+		highscores = cfg.get_value("scores", "highscores", [])
 
 
 ## Setzt die Combo zurück (z. B. wenn das Zeitfenster abläuft).

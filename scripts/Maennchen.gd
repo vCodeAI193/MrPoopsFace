@@ -13,6 +13,10 @@ var _is_hit: bool = false
 var _direction: int = 1                          ## 1 = nach rechts, -1 = nach links
 var _walk_phase: float = 0.0                     ## Phase für die Beinanimation
 
+# Vorgeladene Effekt-Szenen
+const FLOATING_TEXT_SCENE: PackedScene = preload("res://scenes/FloatingText.tscn")
+const HIT_EFFECT_SCENE: PackedScene = preload("res://scenes/HitEffect.tscn")
+
 @onready var _fart_player: AudioStreamPlayer = $FartPlayer
 @onready var _body: Node2D = $Body                ## Wird gedreht/animiert beim Treffer
 
@@ -22,8 +26,8 @@ func _ready() -> void:
 	_direction = 1 if randf() < 0.5 else -1
 	# Treffer-Erkennung: der Kackhaufen (RigidBody2D) löst body_entered aus
 	body_entered.connect(_on_body_entered)
-	# Furzgeräusch prozedural erzeugen (keine externe Audiodatei nötig)
-	_fart_player.stream = _generate_fart_stream()
+	# Zufällige Furz-Variante zuweisen (F131)
+	_fart_player.stream = SoundGen.fart(randi() % 5)
 	queue_redraw()
 
 
@@ -55,15 +59,19 @@ func _on_body_entered(body: Node) -> void:
 	_trigger_hit()
 
 
-## Löst die Treffer-Reaktion aus: Punkte, Sound und Umfall-Animation.
+## Löst die Treffer-Reaktion aus: Punkte, Sound, Effekte und Umfall-Animation.
 func _trigger_hit() -> void:
 	_is_hit = true
-	GameManager.register_hit()
+	var points: int = GameManager.register_hit()
 	hit.emit()
 
 	# Furz abspielen
 	if _fart_player.stream != null:
 		_fart_player.play()
+
+	# Schwebenden Punkte-Text und Partikel-Spritzer erzeugen (F116, F143)
+	_spawn_floating_text(points)
+	_spawn_hit_particles()
 
 	# Lustige Umfall-Animation: kippt um und verblasst, dann entfernen
 	var tween: Tween = create_tween()
@@ -77,37 +85,16 @@ func _trigger_hit() -> void:
 	tween.chain().tween_callback(queue_free)
 
 
-## Erzeugt ein kurzes, furzartiges Audiosignal als AudioStreamWAV.
-## Tiefe, "blubbernde" Frequenz mit etwas Rauschen und Ausklang.
-func _generate_fart_stream() -> AudioStreamWAV:
-	var mix_rate: int = 22050
-	var duration: float = 0.5
-	var sample_count: int = int(mix_rate * duration)
-	var data: PackedByteArray = PackedByteArray()
-	data.resize(sample_count * 2)        # 16-Bit = 2 Bytes pro Sample
+## Erzeugt den aufsteigenden Punkte-Text über dem getroffenen Männchen (F116).
+func _spawn_floating_text(points: int) -> void:
+	var ft: Node2D = FLOATING_TEXT_SCENE.instantiate()
+	ft.setup("+%d" % points)
+	ft.global_position = global_position + Vector2(0, -120)
+	get_parent().add_child(ft)
 
-	for i in sample_count:
-		var t: float = float(i) / mix_rate
-		# Grundfrequenz fällt leicht ab (das "Auspusten")
-		var freq: float = 90.0 - 40.0 * (t / duration)
-		# Vibrato für den typischen Flatter-Effekt
-		var vibrato: float = 1.0 + 0.4 * sin(TAU * 18.0 * t)
-		# Sägezahnähnliche Welle klingt "schmutziger" als ein Sinus
-		var phase: float = fmod(freq * vibrato * t, 1.0)
-		var saw: float = 2.0 * phase - 1.0
-		# Etwas Rauschen beimischen
-		var noise: float = randf_range(-0.3, 0.3)
-		# Hüllkurve: schneller Anstieg, langsamer Ausklang
-		var env: float = clamp(t / 0.02, 0.0, 1.0) * (1.0 - t / duration)
-		var sample_f: float = clamp((saw * 0.7 + noise) * env, -1.0, 1.0)
-		var sample_i: int = int(sample_f * 32767.0)
-		# Little-Endian 16-Bit schreiben
-		data[i * 2] = sample_i & 0xFF
-		data[i * 2 + 1] = (sample_i >> 8) & 0xFF
 
-	var stream: AudioStreamWAV = AudioStreamWAV.new()
-	stream.format = AudioStreamWAV.FORMAT_16_BITS
-	stream.mix_rate = mix_rate
-	stream.stereo = false
-	stream.data = data
-	return stream
+## Erzeugt einen Partikel-Spritzer am Trefferpunkt (F143).
+func _spawn_hit_particles() -> void:
+	var fx: CPUParticles2D = HIT_EFFECT_SCENE.instantiate()
+	fx.global_position = global_position + Vector2(0, -60)
+	get_parent().add_child(fx)

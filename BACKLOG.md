@@ -142,10 +142,10 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## 🖥️ 7. UI / UX & HUD (F113–F130)
 
-- [ ] **F113** 🟢 Hauptmenü-Szene mit Start/Optionen/Beenden
-- [ ] **F114** 🟢 Pause-Menü mit Fortsetzen/Neustart/Beenden
+- [x] **F113** 🟢 Hauptmenü-Szene mit Start/Optionen/Beenden
+- [x] **F114** 🟢 Pause-Menü mit Fortsetzen/Neustart/Beenden
 - [ ] **F115** 🟡 Animierter Combo-Zähler mit Skalierung
-- [ ] **F116** 🟢 Treffer-Punktzahl als aufsteigender Text (Floating Text)
+- [x] **F116** 🟢 Treffer-Punktzahl als aufsteigender Text (Floating Text)
 - [ ] **F117** 🟡 Countdown „3-2-1-Los!" zum Rundenstart
 - [ ] **F118** 🟢 Timer wird in letzten 10 Sekunden rot/pulsiert
 - [ ] **F119** 🟡 Fortschrittsbalken zum nächsten Combo-Level
@@ -163,9 +163,9 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## 🔊 8. Audio (F131–F142)
 
-- [ ] **F131** 🟢 Mehrere Furz-Varianten (zufällig)
-- [ ] **F132** 🟢 Wurf-Soundeffekt (Schwung/Whoosh)
-- [ ] **F133** 🟢 Aufprall-Platsch-Sound
+- [x] **F131** 🟢 Mehrere Furz-Varianten (zufällig)
+- [x] **F132** 🟢 Wurf-Soundeffekt (Schwung/Whoosh)
+- [x] **F133** 🟢 Aufprall-Platsch-Sound
 - [ ] **F134** 🟡 Hintergrundmusik-Loop pro Theme
 - [ ] **F135** 🟢 Combo-Jingle bei Steigerung
 - [ ] **F136** 🟢 UI-Klick-Sounds
@@ -178,8 +178,8 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## ✨ 9. Visuelle Effekte & Polish (F143–F156)
 
-- [ ] **F143** 🟢 Treffer-Partikel (braune Spritzer)
-- [ ] **F144** 🟢 Screen-Shake bei Treffer
+- [x] **F143** 🟢 Treffer-Partikel (braune Spritzer)
+- [x] **F144** 🟢 Screen-Shake bei Treffer
 - [ ] **F145** 🟡 Slow-Motion-Effekt beim letzten Treffer der Runde
 - [ ] **F146** 🟢 Combo-Aura/Glow um den Spieler
 - [ ] **F147** 🟡 Geschoss-Trail mit Verblass-Effekt
@@ -209,7 +209,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 ## 🌐 11. Soziales & Online (F167–F178)
 
 - [ ] **F167** 🔴 Online-Bestenliste (Leaderboard)
-- [ ] **F168** 🟡 Lokale Highscore-Tabelle (Top 10)
+- [x] **F168** 🟡 Lokale Highscore-Tabelle (Top 10)
 - [ ] **F169** 🔴 Google Play Games Services Integration
 - [ ] **F170** 🟡 Erfolge mit Play-Games synchronisieren
 - [ ] **F171** 🟡 Screenshot-/Score-Teilen-Button
@@ -245,7 +245,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## 🛠️ 14. Technik, Test & Monetarisierung (F195–F200)
 
-- [ ] **F195** 🟡 Speicher-/Lade-System (ConfigFile) für Fortschritt
+- [x] **F195** 🟡 Speicher-/Lade-System (ConfigFile) für Fortschritt
 - [ ] **F196** 🔴 Belohnungs-Werbung (Rewarded Ads) Integration
 - [ ] **F197** 🟡 Banner-/Interstitial-Werbung (optional, abschaltbar)
 - [ ] **F198** 🟡 Performance-Optimierung: Objekt-Pooling für Geschosse/Männchen
