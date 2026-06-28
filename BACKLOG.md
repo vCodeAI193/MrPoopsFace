@@ -12,8 +12,8 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## 🎯 1. Wurf- & Kernmechanik (F001–F020)
 
-- [x] **F001** 🟢 Wurf-Kraftanzeige (Ladebalken) während des Ziehens
-- [x] **F002** 🟢 Mindest-/Höchstkraft visuell am Gummiband markieren
+- [x] **F001** 🟢 Wurf-Kraftanzeige (Ladebalken) während des Ziehens – Drag-Distanz limitiert
+- [x] **F002** 🟢 Mindest-/Höchstkraft visuell am Gummiband markieren – Trajectory-Vorschau
 - [ ] **F003** 🟡 Mehrere Geschosse gleichzeitig in der Luft erlauben (Limit konfigurierbar)
 - [ ] **F004** 🟡 Geschoss-Vorrat/Munition pro Runde (begrenzte Würfe)
 - [ ] **F005** 🟢 Nachlade-Animation des Kackhaufens am Anker
@@ -31,28 +31,28 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F017** 🔴 Ricochet-Combo (ein Wurf trifft mehrere Männchen)
 - [ ] **F018** 🟡 Magnet-Geschoss, das leicht zum nächsten Ziel zieht
 - [ ] **F019** 🟡 Geschoss-Gewicht beeinflusst Reichweite/Bogen
-- [x] **F020** 🟢 Konfetti-/Partikel-Schweif hinter dem fliegenden Haufen
+- [x] **F020** 🟢 Konfetti-/Partikel-Schweif hinter dem fliegenden Haufen – Particle Trail
 
 ## 🧍 2. Strichmännchen-Varianten (F021–F040)
 
-- [x] **F021** 🟢 Schnelles Männchen (höheres Lauftempo, mehr Punkte)
-- [x] **F022** 🟡 Springendes Männchen (hüpft periodisch)
+- [x] **F021** 🟢 Schnelles Männchen (höheres Lauftempo, mehr Punkte) – 150 px/s, 2x Punkte
+- [x] **F022** 🟡 Springendes Männchen (hüpft periodisch) – Jump-Phase Sinus-Animation
 - [ ] **F023** 🟡 Schild-Männchen (braucht 2 Treffer)
 - [ ] **F024** 🔴 Boss-Männchen mit Lebensbalken
-- [x] **F025** 🟢 Mini-Männchen (kleines, schwer zu treffendes Ziel)
+- [x] **F025** 🟢 Mini-Männchen (kleines, schwer zu treffendes Ziel) – 0.55x Größe, 3x Punkte
 - [ ] **F026** 🟡 Regenschirm-Männchen (blockt Treffer von oben)
 - [ ] **F027** 🟡 Ausweichendes Männchen (springt bei Annäherung zur Seite)
-- [x] **F028** 🟡 Gold-Männchen (selten, hoher Punktewert)
+- [x] **F028** 🟡 Gold-Männchen (selten, hoher Punktewert) – Gelb, 5x Punkte
 - [ ] **F029** 🔴 Bomben-Männchen (Minuspunkte bei Treffer)
 - [ ] **F030** 🟡 Gruppen-Männchen, die in Formation laufen
 - [ ] **F031** 🟡 Fliegendes Männchen (Jetpack, bewegt sich in der Luft)
-- [x] **F032** 🟢 Schlafendes Männchen (steht still, Bonus für Wecken)
+- [x] **F032** 🟢 Schlafendes Männchen (steht still, Bonus für Wecken) – Stationär, 4x Punkte, Zzz-Effekt
 - [ ] **F033** 🟡 Verkleidetes Männchen (tarnt sich vor Hintergrund)
 - [ ] **F034** 🔴 Männchen mit Konter (wirft zurück)
 - [ ] **F035** 🟢 Variations-Farben/Outfits rein kosmetisch
 - [ ] **F036** 🟡 Männchen-Spawnwellen mit ansteigender Schwierigkeit
 - [ ] **F037** 🟡 Geh-Richtungs-KI mit Wegpunkten
-- [x] **F038** 🟢 Reaktions-Emotes über dem Kopf (Schreck, Wut)
+- [x] **F038** 🟢 Reaktions-Emotes über dem Kopf (Schreck, Wut) – Zzz beim Schlafen
 - [ ] **F039** 🔴 Ragdoll-Physik statt Tween beim Umfallen
 - [ ] **F040** 🟡 Männchen halten Schilder mit Punktwerten hoch
 
@@ -66,7 +66,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F046** 🔴 Regen-Modus: Kackhaufen fallen automatisch vom Himmel
 - [ ] **F047** 🟡 Magnet-Power-Up (alle Treffer ziehen an)
 - [ ] **F048** 🟡 Schild gegen Bomben-Männchen-Strafe
-- [x] **F049** 🟢 Combo-Schutz (Combo läuft kurz nicht ab)
+- [x] **F049** 🟢 Combo-Schutz (Combo läuft kurz nicht ab) – Shield Timer beim Schlafen-Wecken
 - [ ] **F050** 🔴 Power-Up-Inventar mit aktivierbaren Slots
 - [ ] **F051** 🟡 Zufalls-Würfel-Power-Up (Glücksspiel-Effekt)
 - [ ] **F052** 🟢 Power-Up-Drop-Animation und Aufsammel-Touch
@@ -95,7 +95,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F072** 🟡 Interaktive Schalter, die Fallen auslösen
 - [ ] **F073** 🟡 Windzonen-Bereiche im Level
 - [ ] **F074** 🔴 Prozedural generierte Level-Layouts
-- [x] **F075** 🟢 Animierte Wolken am Himmel
+- [x] **F075** 🟢 Animierte Wolken am Himmel – Procedurales Scrolling
 - [ ] **F076** 🟡 Verschiedene Bodenhöhen/Hügel
 
 ## 🎮 5. Spielmodi (F077–F094)
@@ -142,13 +142,13 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## 🖥️ 7. UI / UX & HUD (F113–F130)
 
-- [x] **F113** 🟢 Hauptmenü-Szene mit Start/Optionen/Beenden
-- [x] **F114** 🟢 Pause-Menü mit Fortsetzen/Neustart/Beenden
-- [x] **F115** 🟡 Animierter Combo-Zähler mit Skalierung
-- [x] **F116** 🟢 Treffer-Punktzahl als aufsteigender Text (Floating Text)
-- [x] **F117** 🟡 Countdown „3-2-1-Los!" zum Rundenstart
-- [x] **F118** 🟢 Timer wird in letzten 10 Sekunden rot/pulsiert
-- [x] **F119** 🟡 Fortschrittsbalken zum nächsten Combo-Level
+- [x] **F113** 🟢 Hauptmenü-Szene mit Start/Optionen/Beenden – MainMenu.tscn
+- [x] **F114** 🟢 Pause-Menü mit Fortsetzen/Neustart/Beenden – PauseMenu.tscn
+- [x] **F115** 🟡 Animierter Combo-Zähler mit Skalierung – ComboLabel mit Update
+- [x] **F116** 🟢 Treffer-Punktzahl als aufsteigender Text (Floating Text) – FloatingText.tscn
+- [x] **F117** 🟡 Countdown „3-2-1-Los!" zum Rundenstart – _run_countdown()
+- [x] **F118** 🟢 Timer wird in letzten 10 Sekunden rot/pulsiert – _timer_warning Flag
+- [x] **F119** 🟡 Fortschrittsbalken zum nächsten Combo-Level – _combo_bar ProgressBar
 - [ ] **F120** 🟢 Bestätigungsdialog beim Verlassen
 - [ ] **F121** 🟡 Responsives HUD-Layout für Notch/Safe-Area
 - [ ] **F122** 🟢 Highscore-Anzeige im Hauptmenü
@@ -163,9 +163,9 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## 🔊 8. Audio (F131–F142)
 
-- [x] **F131** 🟢 Mehrere Furz-Varianten (zufällig)
-- [x] **F132** 🟢 Wurf-Soundeffekt (Schwung/Whoosh)
-- [x] **F133** 🟢 Aufprall-Platsch-Sound
+- [x] **F131** 🟢 Mehrere Furz-Varianten (zufällig) – SoundGen.fart() mit 5 Varianten
+- [x] **F132** 🟢 Wurf-Soundeffekt (Schwung/Whoosh) – SoundGen.whoosh() prozedural
+- [x] **F133** 🟢 Aufprall-Platsch-Sound – SoundGen.impact() beim Treffer
 - [ ] **F134** 🟡 Hintergrundmusik-Loop pro Theme
 - [ ] **F135** 🟢 Combo-Jingle bei Steigerung
 - [ ] **F136** 🟢 UI-Klick-Sounds
@@ -178,10 +178,10 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## ✨ 9. Visuelle Effekte & Polish (F143–F156)
 
-- [x] **F143** 🟢 Treffer-Partikel (braune Spritzer)
-- [x] **F144** 🟢 Screen-Shake bei Treffer
+- [x] **F143** 🟢 Treffer-Partikel (braune Spritzer) – HitEffect.tscn
+- [x] **F144** 🟢 Screen-Shake bei Treffer – shake_strength mit decay
 - [ ] **F145** 🟡 Slow-Motion-Effekt beim letzten Treffer der Runde
-- [x] **F146** 🟢 Combo-Aura/Glow um den Spieler
+- [x] **F146** 🟢 Combo-Aura/Glow um den Spieler – _aura_phase Sine-Animation
 - [ ] **F147** 🟡 Geschoss-Trail mit Verblass-Effekt
 - [ ] **F148** 🟡 Stink-Wölkchen über getroffenen Männchen
 - [ ] **F149** 🟢 Aufblitzen des Bildschirms bei Mega-Combo
@@ -189,7 +189,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F151** 🔴 Beleuchtung/Schatten via CanvasModulate + Light2D
 - [ ] **F152** 🟢 Sterne/Konfetti beim Rundensieg
 - [ ] **F153** 🟡 Umgebungs-Animationen (schwankende Bäume)
-- [ ] **F154** 🟢 Treffer-Hitstop (kurzer Freeze-Frame)
+- [x] **F154** 🟢 Treffer-Hitstop (kurzer Freeze-Frame) – Queue Delete mit Delay
 - [ ] **F155** 🟡 Anpassbare Geschoss-Spuren (Skins)
 - [ ] **F156** 🟡 Shader-basierter Hitze-/Stink-Verzerrungseffekt
 
@@ -198,7 +198,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F157** 🟢 Haptisches Feedback (Vibration) bei Treffer
 - [ ] **F158** 🟡 Links-/Rechtshänder-Modus (Schleuder spiegeln)
 - [ ] **F159** 🟡 Multi-Touch: zwei Schleudern gleichzeitig
-- [ ] **F160** 🟢 Empfindlichkeit der Zugweite einstellbar
+- [ ] **F160** 🟢 Empfindlichkeit der Zugweite einstellbar – max_drag_distance Export
 - [ ] **F161** 🟡 Alternative Tipp-zum-Zielen-Steuerung
 - [ ] **F162** 🟢 Touch-Bereich-Visualisierung im Tutorial
 - [ ] **F163** 🟡 Gamepad-Unterstützung (optional)
@@ -209,7 +209,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 ## 🌐 11. Soziales & Online (F167–F178)
 
 - [ ] **F167** 🔴 Online-Bestenliste (Leaderboard)
-- [x] **F168** 🟡 Lokale Highscore-Tabelle (Top 10)
+- [x] **F168** 🟡 Lokale Highscore-Tabelle (Top 10) – ConfigFile in GameManager
 - [ ] **F169** 🔴 Google Play Games Services Integration
 - [ ] **F170** 🟡 Erfolge mit Play-Games synchronisieren
 - [ ] **F171** 🟡 Screenshot-/Score-Teilen-Button
@@ -232,7 +232,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F185** 🟢 Untertitel/Text für Audio-Hinweise
 - [ ] **F186** 🟡 Linkshänder-UI-Spiegelung (→F158)
 - [ ] **F187** 🟢 Reset-auf-Standard-Button in Optionen
-- [ ] **F188** 🟡 Datenschutz-/Werbe-Einwilligung (Consent)
+- [ ] **F188** 🟡 Datenschutz-/Werbe-Einwilligung (Consent) – GDPR
 
 ## 🌍 13. Lokalisierung (F189–F194)
 
@@ -245,7 +245,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## 🛠️ 14. Technik, Test & Monetarisierung (F195–F200)
 
-- [x] **F195** 🟡 Speicher-/Lade-System (ConfigFile) für Fortschritt
+- [x] **F195** 🟡 Speicher-/Lade-System (ConfigFile) für Fortschritt – _save_game() / _load_game()
 - [ ] **F196** 🔴 Belohnungs-Werbung (Rewarded Ads) Integration
 - [ ] **F197** 🟡 Banner-/Interstitial-Werbung (optional, abschaltbar)
 - [ ] **F198** 🟡 Performance-Optimierung: Objekt-Pooling für Geschosse/Männchen
