@@ -22,9 +22,9 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F008** 🔴 Zerlegbare Geschosse (Split-Shot in 3 kleinere Haufen)
 - [ ] **F009** 🟡 Klebrige Geschosse, die an Männchen haften bleiben
 - [ ] **F010** 🟡 Sprengradius/Flächenschaden bei Aufprall (AoE)
-- [ ] **F011** 🟢 Drehmoment/Spin durch Wischrichtung beim Loslassen
+- [x] **F011** 🟢 Drehmoment/Spin durch Wischrichtung beim Loslassen – Kreuzprodukt für Spin
 - [ ] **F012** 🟡 Zeitlupe (Bullet-Time) während des Zielens
-- [ ] **F013** 🟢 Doppeltipp zum schnellen Wiederholen des letzten Wurfs
+- [x] **F013** 🟢 Doppeltipp zum schnellen Wiederholen des letzten Wurfs – 0.4s Fenster
 - [ ] **F014** 🟡 Zwei-Finger-Zoom der Wurf-Vorschau
 - [ ] **F015** 🟡 Aufprall hinterlässt Schmierfleck-Decals am Boden
 - [ ] **F016** 🟢 Trefferzonen (Kopf = Bonus, Körper = normal)
@@ -149,13 +149,13 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F117** 🟡 Countdown „3-2-1-Los!" zum Rundenstart – _run_countdown()
 - [x] **F118** 🟢 Timer wird in letzten 10 Sekunden rot/pulsiert – _timer_warning Flag
 - [x] **F119** 🟡 Fortschrittsbalken zum nächsten Combo-Level – _combo_bar ProgressBar
-- [ ] **F120** 🟢 Bestätigungsdialog beim Verlassen
+- [x] **F120** 🟢 Bestätigungsdialog beim Verlassen – ConfirmationDialog
 - [ ] **F121** 🟡 Responsives HUD-Layout für Notch/Safe-Area
-- [ ] **F122** 🟢 Highscore-Anzeige im Hauptmenü
+- [x] **F122** 🟢 Highscore-Anzeige im Hauptmenü – Im MainMenu implementiert
 - [ ] **F123** 🟡 Toast-Benachrichtigungen (z. B. „Neuer Rekord!")
 - [ ] **F124** 🟢 Einstellungs-Button im HUD
 - [ ] **F125** 🟡 Anim. Szenenübergänge (Fade/Wipe)
-- [ ] **F126** 🟢 Treffer-Streak-Anzeige
+- [x] **F126** 🟢 Treffer-Streak-Anzeige – 🔥 Icon mit Zähler ab 3
 - [ ] **F127** 🟡 Mini-Map/Übersicht bei scrollenden Leveln (→F070)
 - [ ] **F128** 🟢 Theme-fähige UI (heller/dunkler Stil)
 - [ ] **F129** 🟡 On-Screen-Tooltips für Power-Ups
@@ -167,12 +167,12 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F132** 🟢 Wurf-Soundeffekt (Schwung/Whoosh) – SoundGen.whoosh() prozedural
 - [x] **F133** 🟢 Aufprall-Platsch-Sound – SoundGen.impact() beim Treffer
 - [ ] **F134** 🟡 Hintergrundmusik-Loop pro Theme
-- [ ] **F135** 🟢 Combo-Jingle bei Steigerung
-- [ ] **F136** 🟢 UI-Klick-Sounds
+- [x] **F135** 🟢 Combo-Jingle bei Steigerung – SoundGen.combo_jingle() Arpeggio
+- [x] **F136** 🟢 UI-Klick-Sounds – SoundGen.click() in Menüs
 - [ ] **F137** 🟡 Lautstärkeregler für Musik/SFX getrennt
-- [ ] **F138** 🟢 Countdown-Tick-Sound
+- [x] **F138** 🟢 Countdown-Tick-Sound – SoundGen.countdown_tick() bei "3-2-1"
 - [ ] **F139** 🟡 Dynamische Musik (intensiver bei hoher Combo)
-- [ ] **F140** 🟢 Stummschalt-Button
+- [x] **F140** 🟢 Stummschalt-Button – 🔊/🔇 Icon Toggle
 - [ ] **F141** 🟡 Sprach-Samples/Jubel bei Highscore
 - [ ] **F142** 🟡 Audio-Bus-Setup mit Effekten (Reverb)
 
@@ -198,7 +198,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F157** 🟢 Haptisches Feedback (Vibration) bei Treffer
 - [ ] **F158** 🟡 Links-/Rechtshänder-Modus (Schleuder spiegeln)
 - [ ] **F159** 🟡 Multi-Touch: zwei Schleudern gleichzeitig
-- [ ] **F160** 🟢 Empfindlichkeit der Zugweite einstellbar – max_drag_distance Export
+- [x] **F160** 🟢 Empfindlichkeit der Zugweite einstellbar – max_drag_distance Export (350 px default)
 - [ ] **F161** 🟡 Alternative Tipp-zum-Zielen-Steuerung
 - [ ] **F162** 🟢 Touch-Bereich-Visualisierung im Tutorial
 - [ ] **F163** 🟡 Gamepad-Unterstützung (optional)
