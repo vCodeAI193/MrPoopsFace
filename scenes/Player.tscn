@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://d0player0slingshot0"]
+
+[ext_resource type="Script" path="res://scripts/Player.gd" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://b0poop0projectile0" path="res://scenes/Projectile.tscn" id="2_proj"]
+
+[node name="Player" type="Node2D"]
+script = ExtResource("1_player")
+projectile_scene = ExtResource("2_proj")

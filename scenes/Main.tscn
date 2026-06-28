@@ -1,0 +1,71 @@
+[gd_scene load_steps=9 format=3 uid="uid://a0main0stinkytoss0"]
+
+[ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://d0player0slingshot0" path="res://scenes/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://c0maennchen0stick0" path="res://scenes/Maennchen.tscn" id="3_maen"]
+[ext_resource type="PackedScene" uid="uid://e0gameover0screen0" path="res://scenes/GameOver.tscn" id="4_over"]
+
+[sub_resource type="Gradient" id="Gradient_sky"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.4, 0.7, 0.95, 1, 0.82, 0.93, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_sky"]
+gradient = SubResource("Gradient_sky")
+width = 1920
+height = 1200
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(2400, 200)
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+maennchen_scene = ExtResource("3_maen")
+
+[node name="BackgroundLayer" type="CanvasLayer" parent="."]
+layer = -10
+
+[node name="Sky" type="TextureRect" parent="BackgroundLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = SubResource("GradientTexture2D_sky")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Floor" type="StaticBody2D" parent="."]
+position = Vector2(960, 1180)
+
+[node name="FloorShape" type="CollisionShape2D" parent="Floor"]
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(320, 920)
+
+[node name="SpawnTimer" type="Timer" parent="."]
+wait_time = 1.4
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="TopBar" type="HBoxContainer" parent="HUD"]
+anchor_right = 1.0
+offset_top = 24.0
+offset_bottom = 110.0
+theme_override_constants/separation = 80
+alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="HUD/TopBar"]
+text = "Punkte: 0"
+theme_override_font_sizes/font_size = 60
+
+[node name="TimeLabel" type="Label" parent="HUD/TopBar"]
+text = "Zeit: 60"
+theme_override_font_sizes/font_size = 60
+
+[node name="ComboLabel" type="Label" parent="HUD/TopBar"]
+visible = false
+text = "Combo x2!"
+theme_override_colors/font_color = Color(1, 0.55, 0.1, 1)
+theme_override_font_sizes/font_size = 60
+
+[node name="GameOver" parent="." instance=ExtResource("4_over")]
