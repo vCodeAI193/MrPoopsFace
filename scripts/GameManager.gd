@@ -80,8 +80,9 @@ func end_game() -> void:
 
 
 ## Registriert einen Treffer auf ein Strichmännchen und berechnet die Punkte
-## inklusive Combo-Multiplikator. Gibt die erzielten Punkte zurück.
-func register_hit() -> int:
+## inklusive Combo-Multiplikator und einem typabhängigen Multiplikator
+## (z. B. höher bei Gold-Männchen). Gibt die erzielten Punkte zurück.
+func register_hit(type_multiplier: int = 1) -> int:
 	if not game_active:
 		return 0
 
@@ -89,8 +90,8 @@ func register_hit() -> int:
 	combo += 1
 	_combo_timer = combo_time_window
 
-	# Punkte = Grundpunkte * Combo-Multiplikator
-	var points: int = base_hit_points * combo
+	# Punkte = Grundpunkte * Combo-Multiplikator * Typ-Multiplikator
+	var points: int = base_hit_points * combo * type_multiplier
 	score += points
 
 	score_changed.emit(score)

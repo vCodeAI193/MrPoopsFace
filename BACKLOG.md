@@ -35,14 +35,14 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## 🧍 2. Strichmännchen-Varianten (F021–F040)
 
-- [ ] **F021** 🟢 Schnelles Männchen (höheres Lauftempo, mehr Punkte)
+- [x] **F021** 🟢 Schnelles Männchen (höheres Lauftempo, mehr Punkte)
 - [ ] **F022** 🟡 Springendes Männchen (hüpft periodisch)
 - [ ] **F023** 🟡 Schild-Männchen (braucht 2 Treffer)
 - [ ] **F024** 🔴 Boss-Männchen mit Lebensbalken
-- [ ] **F025** 🟢 Mini-Männchen (kleines, schwer zu treffendes Ziel)
+- [x] **F025** 🟢 Mini-Männchen (kleines, schwer zu treffendes Ziel)
 - [ ] **F026** 🟡 Regenschirm-Männchen (blockt Treffer von oben)
 - [ ] **F027** 🟡 Ausweichendes Männchen (springt bei Annäherung zur Seite)
-- [ ] **F028** 🟡 Gold-Männchen (selten, hoher Punktewert)
+- [x] **F028** 🟡 Gold-Männchen (selten, hoher Punktewert)
 - [ ] **F029** 🔴 Bomben-Männchen (Minuspunkte bei Treffer)
 - [ ] **F030** 🟡 Gruppen-Männchen, die in Formation laufen
 - [ ] **F031** 🟡 Fliegendes Männchen (Jetpack, bewegt sich in der Luft)
@@ -144,10 +144,10 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 - [x] **F113** 🟢 Hauptmenü-Szene mit Start/Optionen/Beenden
 - [x] **F114** 🟢 Pause-Menü mit Fortsetzen/Neustart/Beenden
-- [ ] **F115** 🟡 Animierter Combo-Zähler mit Skalierung
+- [x] **F115** 🟡 Animierter Combo-Zähler mit Skalierung
 - [x] **F116** 🟢 Treffer-Punktzahl als aufsteigender Text (Floating Text)
-- [ ] **F117** 🟡 Countdown „3-2-1-Los!" zum Rundenstart
-- [ ] **F118** 🟢 Timer wird in letzten 10 Sekunden rot/pulsiert
+- [x] **F117** 🟡 Countdown „3-2-1-Los!" zum Rundenstart
+- [x] **F118** 🟢 Timer wird in letzten 10 Sekunden rot/pulsiert
 - [ ] **F119** 🟡 Fortschrittsbalken zum nächsten Combo-Level
 - [ ] **F120** 🟢 Bestätigungsdialog beim Verlassen
 - [ ] **F121** 🟡 Responsives HUD-Layout für Notch/Safe-Area
@@ -181,7 +181,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F143** 🟢 Treffer-Partikel (braune Spritzer)
 - [x] **F144** 🟢 Screen-Shake bei Treffer
 - [ ] **F145** 🟡 Slow-Motion-Effekt beim letzten Treffer der Runde
-- [ ] **F146** 🟢 Combo-Aura/Glow um den Spieler
+- [x] **F146** 🟢 Combo-Aura/Glow um den Spieler
 - [ ] **F147** 🟡 Geschoss-Trail mit Verblass-Effekt
 - [ ] **F148** 🟡 Stink-Wölkchen über getroffenen Männchen
 - [ ] **F149** 🟢 Aufblitzen des Bildschirms bei Mega-Combo

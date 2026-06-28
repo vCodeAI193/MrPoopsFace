@@ -1,3 +1,4 @@
+class_name Maennchen
 extends Area2D
 ## Maennchen – ein Strichmännchen, das getroffen werden kann.
 ## Reagiert auf einen Treffer mit einer lustigen Umfall-Animation und
@@ -8,6 +9,7 @@ signal hit                                     ## Wird gesendet, wenn getroffen
 @export var figure_color: Color = Color(0.1, 0.1, 0.1)   ## Farbe der Striche
 @export var figure_scale: float = 1.0                    ## Größenskalierung
 @export var walk_speed: float = 60.0                     ## Lauftempo in Pixel/Sek.
+@export var point_multiplier: int = 1                    ## Typabhängiger Punktebonus (F021/F025/F028)
 
 var _is_hit: bool = false
 var _direction: int = 1                          ## 1 = nach rechts, -1 = nach links
@@ -62,7 +64,7 @@ func _on_body_entered(body: Node) -> void:
 ## Löst die Treffer-Reaktion aus: Punkte, Sound, Effekte und Umfall-Animation.
 func _trigger_hit() -> void:
 	_is_hit = true
-	var points: int = GameManager.register_hit()
+	var points: int = GameManager.register_hit(point_multiplier)
 	hit.emit()
 
 	# Furz abspielen
@@ -86,9 +88,17 @@ func _trigger_hit() -> void:
 
 
 ## Erzeugt den aufsteigenden Punkte-Text über dem getroffenen Männchen (F116).
+## Die Farbe hängt vom Männchen-Typ ab (Gold sticht hervor).
 func _spawn_floating_text(points: int) -> void:
-	var ft: Node2D = FLOATING_TEXT_SCENE.instantiate()
-	ft.setup("+%d" % points)
+	var color: Color = Color(1, 0.85, 0.2)         # Standard: gelb
+	if point_multiplier >= 5:
+		color = Color(1.0, 0.84, 0.0)              # Gold
+	elif point_multiplier >= 3:
+		color = Color(0.4, 0.9, 1.0)               # Mini: cyan
+	elif point_multiplier >= 2:
+		color = Color(1.0, 0.55, 0.1)              # Schnell: orange
+	var ft: FloatingText = FLOATING_TEXT_SCENE.instantiate()
+	ft.setup("+%d" % points, color)
 	ft.global_position = global_position + Vector2(0, -120)
 	get_parent().add_child(ft)
 

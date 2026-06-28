@@ -1,3 +1,4 @@
+class_name PauseMenu
 extends CanvasLayer
 ## PauseMenu – Pause-Overlay mit Fortsetzen / Neustart / Hauptmenü (F114).
 ## Läuft im Modus ALWAYS weiter, damit die Knöpfe trotz Spielpause reagieren.

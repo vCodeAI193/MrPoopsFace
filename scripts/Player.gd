@@ -15,13 +15,35 @@ var _aiming: bool = false
 var _touch_index: int = -1                     ## Aktiv verfolgter Finger
 var _drag_current: Vector2 = Vector2.ZERO      ## Aktuelle Zugposition (lokal)
 
+# Combo-Aura (F146)
+var _combo: int = 0
+var _aura_phase: float = 0.0
+
 @onready var _whoosh_player: AudioStreamPlayer = $WhooshPlayer
 
 
 func _ready() -> void:
 	# Wurf-Whoosh prozedural erzeugen (F132)
 	_whoosh_player.stream = SoundGen.whoosh()
+	# Auf Combo-Änderungen reagieren, um die Aura zu steuern (F146)
+	GameManager.combo_changed.connect(_on_combo_changed)
 	queue_redraw()
+
+
+func _process(delta: float) -> void:
+	# Aura pulsieren lassen, solange eine Combo aktiv ist (F146)
+	if _combo >= 2:
+		_aura_phase += delta
+		queue_redraw()
+
+
+## Merkt sich den aktuellen Combo-Stand für die Aura-Darstellung.
+func _on_combo_changed(new_combo: int) -> void:
+	var had_aura: bool = _combo >= 2
+	_combo = new_combo
+	# Beim Verschwinden der Aura einmal neu zeichnen, um sie zu entfernen
+	if had_aura and _combo < 2:
+		queue_redraw()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -82,6 +104,16 @@ func _spawn_projectile(impulse: Vector2) -> void:
 
 
 func _draw() -> void:
+	# --- Combo-Aura hinter dem Anker (F146) ---
+	# Wächst mit der Combo und pulsiert sanft; Farbe wandert von Orange zu Rot.
+	if _combo >= 2:
+		var pulse: float = 0.5 + 0.5 * sin(_aura_phase * 6.0)
+		var radius: float = minf(45.0 + _combo * 7.0, 130.0) + pulse * 12.0
+		var heat: float = clampf(float(_combo) / 8.0, 0.0, 1.0)
+		var col: Color = Color(1.0, 0.6 - 0.4 * heat, 0.1, 0.18 + 0.16 * pulse)
+		draw_circle(Vector2.ZERO, radius, col)
+		draw_arc(Vector2.ZERO, radius, 0, TAU, 32, Color(1.0, 0.8, 0.2, 0.5), 4.0)
+
 	# Anker der Schleuder (immer sichtbar)
 	draw_circle(Vector2.ZERO, 18.0, Color(0.4, 0.26, 0.13))
 	draw_arc(Vector2.ZERO, 18.0, 0, TAU, 24, Color(0.25, 0.16, 0.08), 4.0)

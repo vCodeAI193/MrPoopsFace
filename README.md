@@ -17,20 +17,38 @@ project.godot            # Projektkonfiguration (Landscape, Touch, 1920x1200)
 export_presets.cfg       # Android-Export (com.yourname.stinkytoss, minSDK 21)
 icon.svg                 # App-Icon
 scenes/
-  Main.tscn              # Spielschleife, HUD (Punkte, Timer, Combo)
+  MainMenu.tscn          # Startbildschirm (Spielen/Beenden, Highscore)
+  Main.tscn              # Spielschleife, HUD, Countdown, Kamera-Shake
   Player.tscn            # Schleuder-/Wurfmechanik mit Touch-Eingabe
   Maennchen.tscn         # Strichmännchen mit Treffer-Animation + Furzsound
   Projectile.tscn        # Kackhaufen (RigidBody2D)
-  GameOver.tscn          # Endbildschirm mit Wiederholen-Knopf
+  PauseMenu.tscn         # Pause-Overlay (Fortsetzen/Neustart/Hauptmenü)
+  GameOver.tscn          # Endbildschirm (Score, Rekord, Wiederholen/Menü)
+  FloatingText.tscn      # Aufsteigender "+Punkte"-Text
+  HitEffect.tscn         # Partikel-Spritzer beim Treffer
 scripts/
-  GameManager.gd         # Autoload: Score-, Combo- und Timer-Status
-  Main.gd                # Spawner & HUD-Logik
-  Player.gd              # Touch-Steuerung & Wurfberechnung
-  Maennchen.gd           # Treffer-Erkennung, Animation, prozeduraler Furz
+  GameManager.gd         # Autoload: Score, Combo, Timer, Highscore, Speichern
+  SoundGen.gd            # Prozedurale Soundeffekte (Furz/Whoosh/Splat)
+  MainMenu.gd            # Startbildschirm-Logik
+  Main.gd                # Spawner, Varianten, HUD, Countdown, Screen-Shake
+  Player.gd              # Touch-Steuerung, Wurfberechnung, Combo-Aura
+  Maennchen.gd           # Treffer-Erkennung, Animation, Effekte, Varianten
   MaennchenBody.gd       # Zeichnet das Strichmännchen
-  Projectile.gd          # Zeichnet den Kackhaufen
+  Projectile.gd          # Zeichnet den Kackhaufen, Aufprall-Sound
+  PauseMenu.gd           # Pause-Logik
   GameOver.gd            # Endbildschirm-Logik
+  FloatingText.gd        # Animation des Punkte-Texts
+  HitEffect.gd           # Selbstaufräumende Partikel
 ```
+
+## 🎯 Männchen-Varianten
+
+| Variante | Größe | Tempo | Punktebonus | Häufigkeit |
+|----------|-------|-------|-------------|-----------|
+| Normal   | 100 % | mittel | x1 | häufig |
+| Schnell (blau) | 90 % | hoch | x2 | gelegentlich |
+| Mini     | 55 % | mittel | x3 | selten |
+| Gold     | 100 % | langsam | x5 | sehr selten |
 
 ## 🛠️ Anpassbare Werte (`@export`)
 

@@ -1,3 +1,4 @@
+class_name FloatingText
 extends Node2D
 ## FloatingText – aufsteigender Punkte-Text, der nach einem Treffer erscheint (F116).
 ## Schwebt nach oben und verblasst, dann entfernt er sich selbst.
