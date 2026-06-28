@@ -121,6 +121,29 @@ func _draw() -> void:
 	if not _aiming or _drag_current == Vector2.ZERO:
 		return
 
+	# --- Wurf-Kraftanzeige (F001) und Mindest-/Höchstkraft-Markierungen (F002) ---
+	var drag_len: float = _drag_current.length()
+	var ratio: float = clampf(drag_len / max_drag_distance, 0.0, 1.0)
+	var min_drag: float = 50.0 / throw_power
+	var min_ratio: float = clampf(min_drag / max_drag_distance, 0.0, 1.0)
+	const BAR_X: float = -70.0
+	const BAR_Y: float = -200.0
+	const BAR_W: float = 20.0
+	const BAR_H: float = 155.0
+	draw_rect(Rect2(BAR_X, BAR_Y, BAR_W, BAR_H), Color(0, 0, 0, 0.45))
+	if ratio > 0.0:
+		var fill_h: float = BAR_H * ratio
+		draw_rect(Rect2(BAR_X, BAR_Y + BAR_H - fill_h, BAR_W, fill_h),
+			Color(0.1 + 0.9 * ratio, 0.9 - 0.7 * ratio, 0.05, 0.92))
+	draw_rect(Rect2(BAR_X, BAR_Y, BAR_W, BAR_H), Color(1, 1, 1, 0.45), false, 2.0)
+	# Mindest-Markierung (F002): gelbe Linie
+	var min_y: float = BAR_Y + BAR_H * (1.0 - min_ratio)
+	draw_line(Vector2(BAR_X - 5, min_y), Vector2(BAR_X + BAR_W + 5, min_y),
+		Color(1.0, 0.95, 0.2, 0.9), 3.0)
+	# Höchst-Markierung (F002): rote Linie an der Oberkante
+	draw_line(Vector2(BAR_X - 5, BAR_Y), Vector2(BAR_X + BAR_W + 5, BAR_Y),
+		Color(1.0, 0.25, 0.1, 0.9), 3.0)
+
 	# Gummiband der Schleuder (vom Anker zur Zugposition)
 	draw_line(Vector2.ZERO, _drag_current, Color(0.3, 0.2, 0.1), 6.0)
 

@@ -15,18 +15,21 @@ extends Node2D
 @export var shake_decay: float = 45.0           ## Abklinggeschwindigkeit
 
 # --- Männchen-Varianten (F021/F025/F028) ---
-## Jede Variante: scale (Größe+Hitbox), speed, color, mult (Punktebonus), weight (Häufigkeit)
+## Jede Variante: scale, speed, color, mult, weight; optional jump_height, sleeping (F022/F032)
 const VARIANTS: Array = [
-	{"scale": 1.0, "speed": 60.0, "color": Color(0.1, 0.1, 0.1), "mult": 1, "weight": 70},
-	{"scale": 0.9, "speed": 150.0, "color": Color(0.15, 0.35, 0.8), "mult": 2, "weight": 22},   # schnell
-	{"scale": 0.55, "speed": 85.0, "color": Color(0.1, 0.1, 0.1), "mult": 3, "weight": 14},      # mini
-	{"scale": 1.0, "speed": 45.0, "color": Color(0.95, 0.75, 0.05), "mult": 5, "weight": 5},     # gold
+	{"scale": 1.0, "speed": 60.0, "color": Color(0.1, 0.1, 0.1), "mult": 1, "weight": 70, "jump_height": 0.0, "sleeping": false},
+	{"scale": 0.9, "speed": 150.0, "color": Color(0.15, 0.35, 0.8), "mult": 2, "weight": 22, "jump_height": 0.0, "sleeping": false},   # schnell
+	{"scale": 0.55, "speed": 85.0, "color": Color(0.1, 0.1, 0.1), "mult": 3, "weight": 14, "jump_height": 0.0, "sleeping": false},     # mini
+	{"scale": 1.0, "speed": 45.0, "color": Color(0.95, 0.75, 0.05), "mult": 5, "weight": 5, "jump_height": 0.0, "sleeping": false},    # gold
+	{"scale": 0.88, "speed": 75.0, "color": Color(0.1, 0.55, 0.15), "mult": 2, "weight": 18, "jump_height": 110.0, "sleeping": false}, # springend (F022)
+	{"scale": 1.05, "speed": 0.0, "color": Color(0.2, 0.22, 0.32), "mult": 4, "weight": 8, "jump_height": 0.0, "sleeping": true},     # schlafend (F032)
 ]
 
 @onready var _spawn_timer: Timer = $SpawnTimer
 @onready var _score_label: Label = $HUD/TopBar/ScoreLabel
 @onready var _time_label: Label = $HUD/TopBar/TimeLabel
 @onready var _combo_label: Label = $HUD/TopBar/ComboLabel
+@onready var _combo_bar: ProgressBar = $HUD/ComboBar
 @onready var _pause_button: Button = $HUD/PauseButton
 @onready var _countdown_label: Label = $HUD/CountdownLabel
 @onready var _pause_menu: PauseMenu = $PauseMenu
@@ -35,6 +38,9 @@ const VARIANTS: Array = [
 var _shake_strength: float = 0.0
 var _timer_warning: bool = false               ## Läuft der rote Timer-Warnmodus? (F118)
 var _last_shown_second: int = -1
+
+# F075 – Animierte Wolken
+var _clouds: Array = []
 
 
 func _ready() -> void:
@@ -58,6 +64,9 @@ func _ready() -> void:
 	_on_combo_changed(0)
 	_time_label.text = "Zeit: %d" % int(GameManager.round_duration)
 
+	# Wolken initialisieren (F075)
+	_init_clouds()
+
 	# Countdown abspielen, dann die Runde starten (F117)
 	_run_countdown()
 
@@ -70,6 +79,22 @@ func _process(delta: float) -> void:
 		_shake_strength = maxf(_shake_strength - shake_decay * delta, 0.0)
 		if _shake_strength <= 0.0:
 			_camera.offset = Vector2.ZERO
+
+	# Wolken animieren (F075)
+	for cloud in _clouds:
+		cloud["pos"].x += cloud["speed"] * delta
+		if cloud["pos"].x > 2200:
+			cloud["pos"].x = -280
+			cloud["pos"].y = randf_range(70, 330)
+	queue_redraw()
+
+	# Combo-Fortschrittsbalken aktualisieren (F119)
+	if GameManager.combo > 0:
+		_combo_bar.value = GameManager.combo_timer_pct * 100.0
+		_combo_bar.visible = true
+		_combo_bar.modulate = Color(1.0, 0.8, 0.0) if GameManager.combo_shield_active else Color.WHITE
+	else:
+		_combo_bar.visible = false
 
 
 ## Spielt den Start-Countdown "3 – 2 – 1 – Los!" und startet danach die Runde (F117).
@@ -126,6 +151,8 @@ func _apply_variant(maennchen: Maennchen) -> void:
 	maennchen.walk_speed = variant["speed"]
 	maennchen.figure_color = variant["color"]
 	maennchen.point_multiplier = variant["mult"]
+	maennchen.jump_height = variant.get("jump_height", 0.0)
+	maennchen.sleeping = variant.get("sleeping", false)
 
 
 ## Liefert eine zufällige Variante entsprechend ihrer Gewichtung.
@@ -181,3 +208,31 @@ func _pop_label(label: Control, from_scale: float, pivot: Vector2 = Vector2(-1, 
 	var tween: Tween = create_tween()
 	tween.tween_property(label, "scale", Vector2.ONE, 0.25) \
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+# --- Wolken (F075) ---
+
+## Füllt das _clouds-Array mit zufällig verteilten Wolken.
+func _init_clouds() -> void:
+	for i in 7:
+		_clouds.append({
+			"pos": Vector2(randf_range(-200, 2100), randf_range(70, 340)),
+			"speed": randf_range(14, 38),
+			"size": randf_range(75, 165),
+			"alpha": randf_range(0.45, 0.82)
+		})
+
+
+## Zeichnet alle Wolken hinter der Spielszene (F075).
+func _draw() -> void:
+	for c in _clouds:
+		_draw_cloud(c["pos"], c["size"], c["alpha"])
+
+
+## Zeichnet eine einzelne Wolke aus drei überlappenden Kreisen.
+func _draw_cloud(pos: Vector2, size: float, alpha: float) -> void:
+	var col: Color = Color(1, 1, 1, alpha)
+	draw_circle(pos, size * 0.6, col)
+	draw_circle(pos + Vector2(size * 0.56, size * 0.08), size * 0.48, col)
+	draw_circle(pos + Vector2(-size * 0.46, size * 0.1), size * 0.44, col)
+	draw_circle(pos + Vector2(size * 0.18, -size * 0.32), size * 0.42, col)

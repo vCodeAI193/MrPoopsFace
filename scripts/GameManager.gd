@@ -29,6 +29,9 @@ var highscores: Array = []                     ## Top-Punktestände (absteigend)
 var last_was_highscore: bool = false           ## Letzte Runde war neuer Rekord?
 
 var _combo_timer: float = 0.0                  ## Restzeit, in der die Combo gültig bleibt
+var combo_timer_pct: float = 0.0              ## Verhältnis 0..1 für den Fortschrittsbalken (F119)
+var combo_shield_active: bool = false         ## Läuft der Combo-Schutz gerade? (F049)
+var _combo_shield_timer: float = 0.0
 
 
 func _ready() -> void:
@@ -43,11 +46,18 @@ func _process(delta: float) -> void:
 	time_left -= delta
 	time_changed.emit(time_left)
 
-	# Combo-Fenster herunterzählen; läuft es ab, wird die Combo zurückgesetzt
-	if _combo_timer > 0.0:
+	# Combo-Schutz herunterzählen (F049)
+	if combo_shield_active:
+		_combo_shield_timer -= delta
+		if _combo_shield_timer <= 0.0:
+			combo_shield_active = false
+
+	# Combo-Fenster herunterzählen; während Combo-Schutz aktiv bleibt es eingefroren
+	if _combo_timer > 0.0 and not combo_shield_active:
 		_combo_timer -= delta
 		if _combo_timer <= 0.0:
 			_reset_combo()
+	combo_timer_pct = clampf(_combo_timer / combo_time_window, 0.0, 1.0) if combo > 0 else 0.0
 
 	# Runde beenden, wenn die Zeit abgelaufen ist
 	if time_left <= 0.0:
@@ -131,8 +141,16 @@ func _load_game() -> void:
 		highscores = cfg.get_value("scores", "highscores", [])
 
 
+## Aktiviert den Combo-Schutz für duration Sekunden (F049).
+## Das Combo-Zeitfenster läuft während dieser Zeit nicht ab.
+func activate_combo_shield(duration: float = 3.0) -> void:
+	combo_shield_active = true
+	_combo_shield_timer = maxf(_combo_shield_timer, duration)
+
+
 ## Setzt die Combo zurück (z. B. wenn das Zeitfenster abläuft).
 func _reset_combo() -> void:
 	combo = 0
 	_combo_timer = 0.0
+	combo_timer_pct = 0.0
 	combo_changed.emit(combo)

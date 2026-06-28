@@ -10,10 +10,19 @@ signal hit                                     ## Wird gesendet, wenn getroffen
 @export var figure_scale: float = 1.0                    ## Größenskalierung
 @export var walk_speed: float = 60.0                     ## Lauftempo in Pixel/Sek.
 @export var point_multiplier: int = 1                    ## Typabhängiger Punktebonus (F021/F025/F028)
+@export var jump_height: float = 0.0                     ## Sprunghöhe in Pixeln; 0 = kein Sprung (F022)
+@export var sleeping: bool = false                       ## Steht still und schläft (F032)
 
 var _is_hit: bool = false
 var _direction: int = 1                          ## 1 = nach rechts, -1 = nach links
 var _walk_phase: float = 0.0                     ## Phase für die Beinanimation
+
+# F022 – Springendes Männchen
+var _base_y: float = 0.0
+var _jump_phase: float = 0.0
+
+# F032 – Schlafendes Männchen
+var _zzz_timer: float = 1.5
 
 # Vorgeladene Effekt-Szenen
 const FLOATING_TEXT_SCENE: PackedScene = preload("res://scenes/FloatingText.tscn")
@@ -26,6 +35,7 @@ const HIT_EFFECT_SCENE: PackedScene = preload("res://scenes/HitEffect.tscn")
 func _ready() -> void:
 	randomize()
 	_direction = 1 if randf() < 0.5 else -1
+	_base_y = position.y
 	# Treffer-Erkennung: der Kackhaufen (RigidBody2D) löst body_entered aus
 	body_entered.connect(_on_body_entered)
 	# Zufällige Furz-Variante zuweisen (F131)
@@ -37,9 +47,10 @@ func _process(delta: float) -> void:
 	if _is_hit or not GameManager.game_active:
 		return
 
-	# Gemächlich hin und her laufen
-	position.x += _direction * walk_speed * delta
-	_walk_phase += delta * 8.0
+	# Gemächlich hin und her laufen (schlafende Männchen stehen still, F032)
+	if not sleeping:
+		position.x += _direction * walk_speed * delta
+		_walk_phase += delta * 8.0
 
 	# Am Bildschirmrand umdrehen, damit das Männchen sichtbar bleibt
 	var view_width: float = get_viewport_rect().size.x
@@ -47,6 +58,18 @@ func _process(delta: float) -> void:
 		_direction = 1
 	elif position.x > view_width - 80.0 and _direction > 0:
 		_direction = -1
+
+	# Sprungbewegung (F022)
+	if jump_height > 0.0:
+		_jump_phase += delta * 2.8
+		position.y = _base_y - abs(sin(_jump_phase)) * jump_height
+
+	# Zzz-Effekt beim Schlafen (F032)
+	if sleeping:
+		_zzz_timer -= delta
+		if _zzz_timer <= 0.0:
+			_zzz_timer = 2.0
+			_spawn_zzz()
 
 	_body.queue_redraw()
 
@@ -67,9 +90,16 @@ func _trigger_hit() -> void:
 	var points: int = GameManager.register_hit(point_multiplier)
 	hit.emit()
 
+	# Schlafendes Männchen geweckt → Combo-Schutz schalten (F032/F049)
+	if sleeping:
+		GameManager.activate_combo_shield(3.0)
+
 	# Furz abspielen
 	if _fart_player.stream != null:
 		_fart_player.play()
+
+	# Reaktions-Emote über dem Kopf (F038)
+	_spawn_reaction_emote()
 
 	# Schwebenden Punkte-Text und Partikel-Spritzer erzeugen (F116, F143)
 	_spawn_floating_text(points)
@@ -100,6 +130,23 @@ func _spawn_floating_text(points: int) -> void:
 	var ft: FloatingText = FLOATING_TEXT_SCENE.instantiate()
 	ft.setup("+%d" % points, color)
 	ft.global_position = global_position + Vector2(0, -120)
+	get_parent().add_child(ft)
+
+
+## Zeigt ein zufälliges Reaktions-Emote über dem Männchen (F038).
+func _spawn_reaction_emote() -> void:
+	const EMOTES: Array = ["NEIN!", "AUA!", "WAS?!", "HILFE!", "OUGH!"]
+	var ft: FloatingText = FLOATING_TEXT_SCENE.instantiate()
+	ft.setup(EMOTES[randi() % EMOTES.size()], Color(1.0, 0.88, 0.88))
+	ft.global_position = global_position + Vector2(randf_range(-40, 40), -190)
+	get_parent().add_child(ft)
+
+
+## Spawnt einen aufsteigenden Zzz-Text über dem schlafenden Männchen (F032).
+func _spawn_zzz() -> void:
+	var ft: FloatingText = FLOATING_TEXT_SCENE.instantiate()
+	ft.setup("Zzz...", Color(0.72, 0.72, 1.0, 0.9))
+	ft.global_position = global_position + Vector2(randf_range(-25, 35), -150)
 	get_parent().add_child(ft)
 
 

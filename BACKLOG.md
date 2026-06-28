@@ -12,8 +12,8 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## 🎯 1. Wurf- & Kernmechanik (F001–F020)
 
-- [ ] **F001** 🟢 Wurf-Kraftanzeige (Ladebalken) während des Ziehens
-- [ ] **F002** 🟢 Mindest-/Höchstkraft visuell am Gummiband markieren
+- [x] **F001** 🟢 Wurf-Kraftanzeige (Ladebalken) während des Ziehens
+- [x] **F002** 🟢 Mindest-/Höchstkraft visuell am Gummiband markieren
 - [ ] **F003** 🟡 Mehrere Geschosse gleichzeitig in der Luft erlauben (Limit konfigurierbar)
 - [ ] **F004** 🟡 Geschoss-Vorrat/Munition pro Runde (begrenzte Würfe)
 - [ ] **F005** 🟢 Nachlade-Animation des Kackhaufens am Anker
@@ -31,12 +31,12 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F017** 🔴 Ricochet-Combo (ein Wurf trifft mehrere Männchen)
 - [ ] **F018** 🟡 Magnet-Geschoss, das leicht zum nächsten Ziel zieht
 - [ ] **F019** 🟡 Geschoss-Gewicht beeinflusst Reichweite/Bogen
-- [ ] **F020** 🟢 Konfetti-/Partikel-Schweif hinter dem fliegenden Haufen
+- [x] **F020** 🟢 Konfetti-/Partikel-Schweif hinter dem fliegenden Haufen
 
 ## 🧍 2. Strichmännchen-Varianten (F021–F040)
 
 - [x] **F021** 🟢 Schnelles Männchen (höheres Lauftempo, mehr Punkte)
-- [ ] **F022** 🟡 Springendes Männchen (hüpft periodisch)
+- [x] **F022** 🟡 Springendes Männchen (hüpft periodisch)
 - [ ] **F023** 🟡 Schild-Männchen (braucht 2 Treffer)
 - [ ] **F024** 🔴 Boss-Männchen mit Lebensbalken
 - [x] **F025** 🟢 Mini-Männchen (kleines, schwer zu treffendes Ziel)
@@ -46,13 +46,13 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F029** 🔴 Bomben-Männchen (Minuspunkte bei Treffer)
 - [ ] **F030** 🟡 Gruppen-Männchen, die in Formation laufen
 - [ ] **F031** 🟡 Fliegendes Männchen (Jetpack, bewegt sich in der Luft)
-- [ ] **F032** 🟢 Schlafendes Männchen (steht still, Bonus für Wecken)
+- [x] **F032** 🟢 Schlafendes Männchen (steht still, Bonus für Wecken)
 - [ ] **F033** 🟡 Verkleidetes Männchen (tarnt sich vor Hintergrund)
 - [ ] **F034** 🔴 Männchen mit Konter (wirft zurück)
 - [ ] **F035** 🟢 Variations-Farben/Outfits rein kosmetisch
 - [ ] **F036** 🟡 Männchen-Spawnwellen mit ansteigender Schwierigkeit
 - [ ] **F037** 🟡 Geh-Richtungs-KI mit Wegpunkten
-- [ ] **F038** 🟢 Reaktions-Emotes über dem Kopf (Schreck, Wut)
+- [x] **F038** 🟢 Reaktions-Emotes über dem Kopf (Schreck, Wut)
 - [ ] **F039** 🔴 Ragdoll-Physik statt Tween beim Umfallen
 - [ ] **F040** 🟡 Männchen halten Schilder mit Punktwerten hoch
 
@@ -66,7 +66,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F046** 🔴 Regen-Modus: Kackhaufen fallen automatisch vom Himmel
 - [ ] **F047** 🟡 Magnet-Power-Up (alle Treffer ziehen an)
 - [ ] **F048** 🟡 Schild gegen Bomben-Männchen-Strafe
-- [ ] **F049** 🟢 Combo-Schutz (Combo läuft kurz nicht ab)
+- [x] **F049** 🟢 Combo-Schutz (Combo läuft kurz nicht ab)
 - [ ] **F050** 🔴 Power-Up-Inventar mit aktivierbaren Slots
 - [ ] **F051** 🟡 Zufalls-Würfel-Power-Up (Glücksspiel-Effekt)
 - [ ] **F052** 🟢 Power-Up-Drop-Animation und Aufsammel-Touch
@@ -95,7 +95,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F072** 🟡 Interaktive Schalter, die Fallen auslösen
 - [ ] **F073** 🟡 Windzonen-Bereiche im Level
 - [ ] **F074** 🔴 Prozedural generierte Level-Layouts
-- [ ] **F075** 🟢 Animierte Wolken am Himmel
+- [x] **F075** 🟢 Animierte Wolken am Himmel
 - [ ] **F076** 🟡 Verschiedene Bodenhöhen/Hügel
 
 ## 🎮 5. Spielmodi (F077–F094)
@@ -148,7 +148,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F116** 🟢 Treffer-Punktzahl als aufsteigender Text (Floating Text)
 - [x] **F117** 🟡 Countdown „3-2-1-Los!" zum Rundenstart
 - [x] **F118** 🟢 Timer wird in letzten 10 Sekunden rot/pulsiert
-- [ ] **F119** 🟡 Fortschrittsbalken zum nächsten Combo-Level
+- [x] **F119** 🟡 Fortschrittsbalken zum nächsten Combo-Level
 - [ ] **F120** 🟢 Bestätigungsdialog beim Verlassen
 - [ ] **F121** 🟡 Responsives HUD-Layout für Notch/Safe-Area
 - [ ] **F122** 🟢 Highscore-Anzeige im Hauptmenü

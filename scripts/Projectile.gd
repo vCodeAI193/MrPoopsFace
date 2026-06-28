@@ -22,6 +22,23 @@ func _ready() -> void:
 	# Sicherstellen, dass der Haufen gezeichnet wird
 	queue_redraw()
 
+	# Partikel-Schweif hinter dem fliegenden Haufen (F020)
+	var trail: CPUParticles2D = CPUParticles2D.new()
+	trail.emitting = true
+	trail.amount = 14
+	trail.lifetime = 0.38
+	trail.one_shot = false
+	trail.explosiveness = 0.0
+	trail.randomness = 0.75
+	trail.gravity = Vector2(0, -80)
+	trail.initial_velocity_min = 12.0
+	trail.initial_velocity_max = 42.0
+	trail.spread = 55.0
+	trail.scale_amount_min = 0.2
+	trail.scale_amount_max = 0.5
+	trail.color = Color(0.52, 0.32, 0.13, 0.6)
+	add_child(trail)
+
 
 ## Spielt beim ersten Aufprall (Boden oder Männchen) den Platsch-Sound.
 func _on_body_entered(_body: Node) -> void:
