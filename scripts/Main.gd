@@ -31,9 +31,16 @@ const VARIANTS: Array = [
 @onready var _combo_label: Label = $HUD/TopBar/ComboLabel
 @onready var _combo_bar: ProgressBar = $HUD/ComboBar
 @onready var _pause_button: Button = $HUD/PauseButton
+@onready var _mute_button: Button = $HUD/MuteButton
 @onready var _countdown_label: Label = $HUD/CountdownLabel
 @onready var _pause_menu: PauseMenu = $PauseMenu
 @onready var _camera: Camera2D = $Camera2D
+
+# Audio Players (F135, F136, F138, F140)
+var _combo_jingle_player: AudioStreamPlayer
+var _ui_click_player: AudioStreamPlayer
+var _countdown_tick_player: AudioStreamPlayer
+var _muted: bool = false
 
 var _shake_strength: float = 0.0
 var _timer_warning: bool = false               ## Läuft der rote Timer-Warnmodus? (F118)
@@ -54,6 +61,16 @@ func _ready() -> void:
 
 	# Pause-Knopf verbinden (F114)
 	_pause_button.pressed.connect(_on_pause_pressed)
+	# Stummschalt-Knopf verbinden (F140)
+	_mute_button.pressed.connect(_on_mute_pressed)
+
+	# Audio-Player erstellen (F135, F136, F138)
+	_combo_jingle_player = AudioStreamPlayer.new()
+	_ui_click_player = AudioStreamPlayer.new()
+	_countdown_tick_player = AudioStreamPlayer.new()
+	add_child(_combo_jingle_player)
+	add_child(_ui_click_player)
+	add_child(_countdown_tick_player)
 
 	# Spawn-Timer einrichten (wird erst nach dem Countdown gestartet)
 	_spawn_timer.wait_time = spawn_rate
@@ -98,6 +115,7 @@ func _process(delta: float) -> void:
 
 
 ## Spielt den Start-Countdown "3 – 2 – 1 – Los!" und startet danach die Runde (F117).
+## Countdown-Tick-Sounds bei jedem Tick (F138).
 func _run_countdown() -> void:
 	# Drehpunkt = Bildschirmmitte (Label füllt die Basis-Auflösung 1920x1200)
 	_countdown_label.pivot_offset = Vector2(960, 600)
@@ -105,6 +123,7 @@ func _run_countdown() -> void:
 	for n in ["3", "2", "1"]:
 		_countdown_label.text = n
 		_pop_label(_countdown_label, 1.8, Vector2(960, 600))
+		_play_countdown_tick()  # F138
 		await get_tree().create_timer(0.8).timeout
 	_countdown_label.text = "Los!"
 	_pop_label(_countdown_label, 1.8, Vector2(960, 600))
@@ -125,6 +144,12 @@ func _on_hit_registered(_points: int) -> void:
 ## Öffnet das Pause-Overlay (F114).
 func _on_pause_pressed() -> void:
 	_pause_menu.show_pause()
+
+
+## Schaltet Stummschaltung um (F140).
+func _on_mute_pressed() -> void:
+	toggle_mute()
+	_mute_button.text = "🔇" if _muted else "🔊"
 
 
 ## Spawnt ein neues Strichmännchen, solange das Limit nicht erreicht ist.
@@ -196,6 +221,8 @@ func _on_combo_changed(new_combo: int) -> void:
 		_combo_label.text = "Combo x%d!" % new_combo
 		_combo_label.visible = true
 		_pop_label(_combo_label, 1.5)          # animierter Combo-Zähler (F115)
+		if new_combo == 2 or new_combo % 5 == 0:  # Jingle bei 2+ und alle 5er (F135)
+			play_combo_jingle()
 	else:
 		_combo_label.visible = false
 
@@ -236,3 +263,34 @@ func _draw_cloud(pos: Vector2, size: float, alpha: float) -> void:
 	draw_circle(pos + Vector2(size * 0.56, size * 0.08), size * 0.48, col)
 	draw_circle(pos + Vector2(-size * 0.46, size * 0.1), size * 0.44, col)
 	draw_circle(pos + Vector2(size * 0.18, -size * 0.32), size * 0.42, col)
+
+
+# --- Audio (F135, F136, F138, F140) ---
+
+## Gibt den Countdown-Tick-Sound aus (F138)
+func _play_countdown_tick() -> void:
+	if _muted:
+		return
+	_countdown_tick_player.stream = SoundGen.countdown_tick()
+	_countdown_tick_player.play()
+
+
+## Gibt das Combo-Jingle aus, wenn Combo >= 2 (F135)
+func play_combo_jingle() -> void:
+	if _muted:
+		return
+	_combo_jingle_player.stream = SoundGen.combo_jingle()
+	_combo_jingle_player.play()
+
+
+## Gibt den UI-Klick-Sound aus (F136)
+func play_ui_click() -> void:
+	if _muted:
+		return
+	_ui_click_player.stream = SoundGen.click()
+	_ui_click_player.play()
+
+
+## Schaltet den Ton an/aus (F140)
+func toggle_mute() -> void:
+	_muted = not _muted

@@ -68,3 +68,43 @@ static func splat() -> AudioStreamWAV:
 		var noise: float = randf_range(-1.0, 1.0)
 		samples[i] = clampf((tone * 0.4 + noise * 0.6) * env, -1.0, 1.0)
 	return _make_stream(samples)
+
+
+## Combo-Jingle – aufsteigender Ton-Arpeggio bei Combo-Steigerung (F135)
+static func combo_jingle() -> AudioStreamWAV:
+	var notes: PackedFloat32Array = [262.0, 330.0, 392.0, 523.0]  # C-E-G-C (Dur-Dreiklang)
+	var samples: PackedFloat32Array = PackedFloat32Array()
+	var note_duration: float = 0.08
+	for note_freq in notes:
+		var n: int = int(MIX_RATE * note_duration)
+		for i in n:
+			var t: float = float(i) / MIX_RATE
+			var env: float = 1.0 - (t / note_duration)
+			samples.append(sin(TAU * note_freq * t) * env * 0.3)
+	return _make_stream(samples)
+
+
+## UI-Klick-Sound – kurzer, heller Ton (F136)
+static func click() -> AudioStreamWAV:
+	var duration: float = 0.1
+	var n: int = int(MIX_RATE * duration)
+	var samples: PackedFloat32Array = PackedFloat32Array()
+	samples.resize(n)
+	for i in n:
+		var t: float = float(i) / MIX_RATE
+		var env: float = 1.0 - (t / duration)
+		samples[i] = sin(TAU * 800.0 * t) * env * 0.2
+	return _make_stream(samples)
+
+
+## Countdown-Tick – kurzer, prägnanter Ton (F138)
+static func countdown_tick() -> AudioStreamWAV:
+	var duration: float = 0.12
+	var n: int = int(MIX_RATE * duration)
+	var samples: PackedFloat32Array = PackedFloat32Array()
+	samples.resize(n)
+	for i in n:
+		var t: float = float(i) / MIX_RATE
+		var env: float = (1.0 - t / duration) * (1.0 - t / duration)
+		samples[i] = sin(TAU * 600.0 * t) * env * 0.25
+	return _make_stream(samples)
