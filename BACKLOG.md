@@ -49,7 +49,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F032** 🟢 Schlafendes Männchen (steht still, Bonus für Wecken) – Stationär, 4x Punkte, Zzz-Effekt
 - [ ] **F033** 🟡 Verkleidetes Männchen (tarnt sich vor Hintergrund)
 - [ ] **F034** 🔴 Männchen mit Konter (wirft zurück)
-- [ ] **F035** 🟢 Variations-Farben/Outfits rein kosmetisch
+- [x] **F035** 🟢 Variations-Farben/Outfits rein kosmetisch – Farben per Variante (blau, gold, grün)
 - [ ] **F036** 🟡 Männchen-Spawnwellen mit ansteigender Schwierigkeit
 - [ ] **F037** 🟡 Geh-Richtungs-KI mit Wegpunkten
 - [x] **F038** 🟢 Reaktions-Emotes über dem Kopf (Schreck, Wut) – Zzz beim Schlafen
@@ -108,11 +108,11 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F082** 🔴 Lokaler 2-Spieler-Wettkampf (geteilter Bildschirm)
 - [ ] **F083** 🟡 Überlebens-Modus mit Männchen-Wellen
 - [ ] **F084** 🟡 Bonus-Runde (Goldregen)
-- [ ] **F085** 🟢 Übungsmodus ohne Zeitdruck
+- [x] **F085** 🟢 Übungsmodus ohne Zeitdruck – practice mode mit 999s Timer
 - [ ] **F086** 🔴 Boss-Rush-Modus
 - [ ] **F087** 🟡 Modifikator-Modus (Mutatoren wählbar)
 - [ ] **F088** 🟡 Hardcore-Modus (ein Fehlwurf = Ende)
-- [ ] **F089** 🟢 Schwierigkeitsgrade (leicht/mittel/schwer)
+- [x] **F089** 🟢 Schwierigkeitsgrade (leicht/mittel/schwer) – easy/normal/hard mit unterschiedlichen Einstellungen
 - [ ] **F090** 🔴 Wöchentliche Sonder-Events
 - [ ] **F091** 🟡 Ziel-Quoten-Modus (genau X treffen, nicht mehr)
 - [ ] **F092** 🟡 Combo-Jagd-Modus (höchste Combo zählt)
@@ -202,7 +202,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F161** 🟡 Alternative Tipp-zum-Zielen-Steuerung
 - [ ] **F162** 🟢 Touch-Bereich-Visualisierung im Tutorial
 - [ ] **F163** 🟡 Gamepad-Unterstützung (optional)
-- [ ] **F164** 🟢 Abbruch des Wurfs durch Zurückziehen in den Anker
+- [x] **F164** 🟢 Abbruch des Wurfs durch Zurückziehen in den Anker – 30px proximity check
 - [ ] **F165** 🟡 Geste zum schnellen Power-Up-Einsatz
 - [ ] **F166** 🟢 Konfigurierbare Vibrationsstärke
 
