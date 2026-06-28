@@ -108,6 +108,7 @@ func _release_throw() -> void:
 
 
 ## Instanziiert den Kackhaufen am Anker und gibt ihm den Wurfimpuls.
+## Berechnet auch das Drehmoment basierend auf der Wischrichtung (F011)
 func _spawn_projectile(impulse: Vector2) -> void:
 	if projectile_scene == null:
 		push_warning("Keine projectile_scene zugewiesen!")
@@ -115,9 +116,16 @@ func _spawn_projectile(impulse: Vector2) -> void:
 	var poop: RigidBody2D = projectile_scene.instantiate()
 	poop.global_position = global_position
 	poop.add_to_group("projectile")
+
+	# Drehmoment durch Wischrichtung berechnen (F011)
+	# Kreuzprodukt der Wurfrichtung mit "oben" ergibt die Spin-Richtung
+	var spin: float = (impulse.x * 0.0 - impulse.y * -1.0) / (max(impulse.length(), 1.0))
 	# Als Geschwister in die Spielszene einfügen
 	get_parent().add_child(poop)
-	poop.call("launch", impulse)
+	if poop.has_method("launch"):
+		poop.launch(impulse, spin)
+	else:
+		poop.call("launch", impulse)
 
 
 func _draw() -> void:

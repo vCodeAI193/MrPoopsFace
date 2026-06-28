@@ -42,11 +42,20 @@ func _on_restart_pressed() -> void:
 	get_tree().reload_current_scene()
 
 
-## Kehrt zum Hauptmenü zurück.
+## Kehrt zum Hauptmenü zurück (mit Bestätigung, F120).
 func _on_menu_pressed() -> void:
 	_play_click_sound()
-	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
+	# Bestätigungsdialog (F120)
+	var dialog: ConfirmationDialog = ConfirmationDialog.new()
+	dialog.title = "Zum Menü?"
+	dialog.dialog_text = "Aktuelle Runde beenden?"
+	dialog.confirmed.connect(func():
+		get_tree().paused = false
+		get_tree().change_scene_to_file("res://scenes/MainMenu.tscn")
+	)
+	dialog.canceled.connect(func(): dialog.queue_free())
+	add_child(dialog)
+	dialog.popup_centered_ratio(0.35)
 
 
 ## Gibt den UI-Klick-Sound aus (F136)

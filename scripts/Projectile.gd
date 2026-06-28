@@ -57,10 +57,14 @@ func _process(delta: float) -> void:
 
 
 ## Gibt dem Haufen einen Anfangsimpuls (wird vom Player beim Loslassen aufgerufen).
-func launch(impulse: Vector2) -> void:
+## spin: Drehmoment basierend auf Wischrichtung (F011)
+func launch(impulse: Vector2, spin: float = 0.0) -> void:
 	apply_central_impulse(impulse)
-	# Etwas Drehung für mehr Komik
-	angular_velocity = randf_range(-8.0, 8.0)
+	# Drehung durch Wischrichtung (F011) oder zufällige Drehung
+	if spin != 0.0:
+		angular_velocity = spin * 12.0
+	else:
+		angular_velocity = randf_range(-8.0, 8.0)
 
 
 func _draw() -> void:
