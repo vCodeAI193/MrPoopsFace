@@ -80,6 +80,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	# --- Finger bewegt sich (Zielen) ---
 	elif event is InputEventScreenDrag and _aiming and event.index == _touch_index:
 		_drag_current = to_local(event.position)
+		# Abbruch des Wurfs durch Zurückziehen in den Anker (F164)
+		if _drag_current.length() < 30.0:
+			_aiming = false
+			_touch_index = -1
+			_drag_current = Vector2.ZERO
+			queue_redraw()
+			return
 		# Zugweite begrenzen
 		if _drag_current.length() > max_drag_distance:
 			_drag_current = _drag_current.normalized() * max_drag_distance

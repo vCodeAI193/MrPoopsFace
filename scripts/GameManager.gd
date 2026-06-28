@@ -17,6 +17,11 @@ signal hit_registered(points: int)             ## Wird bei jedem Treffer gesende
 @export var combo_time_window: float = 1.5     ## Zeitfenster für aufeinanderfolgende Treffer
 @export var base_hit_points: int = 10          ## Grundpunkte pro Treffer
 
+# --- Spielmodi & Schwierigkeit (F085, F089) ---
+var game_mode: String = "normal"               ## "normal", "practice", "easy", "hard" (F085, F089)
+enum Difficulty {EASY, NORMAL, HARD}
+var difficulty: int = Difficulty.NORMAL
+
 # --- Laufzeit-Status ---
 var score: int = 0
 var combo: int = 0
@@ -155,6 +160,24 @@ func _load_game() -> void:
 func activate_combo_shield(duration: float = 3.0) -> void:
 	combo_shield_active = true
 	_combo_shield_timer = maxf(_combo_shield_timer, duration)
+
+
+## Setzt den Spielmodus und passt die Einstellungen an (F085, F089)
+func set_game_mode(mode: String) -> void:
+	game_mode = mode
+	match mode:
+		"practice":  # Übungsmodus ohne Timer (F085)
+			round_duration = 999.0
+			base_hit_points = 10
+		"easy":  # Einfach (F089)
+			round_duration = 90.0
+			base_hit_points = 15
+		"hard":  # Schwer (F089)
+			round_duration = 45.0
+			base_hit_points = 5
+		_:  # Normal
+			round_duration = 60.0
+			base_hit_points = 10
 
 
 ## Setzt die Combo zurück (z. B. wenn das Zeitfenster abläuft).
