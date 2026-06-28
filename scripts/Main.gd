@@ -33,6 +33,7 @@ const VARIANTS: Array = [
 @onready var _pause_button: Button = $HUD/PauseButton
 @onready var _mute_button: Button = $HUD/MuteButton
 @onready var _countdown_label: Label = $HUD/CountdownLabel
+@onready var _streak_label: Label = $HUD/TopBar/StreakLabel
 @onready var _pause_menu: PauseMenu = $PauseMenu
 @onready var _camera: Camera2D = $Camera2D
 
@@ -57,6 +58,7 @@ func _ready() -> void:
 	GameManager.score_changed.connect(_on_score_changed)
 	GameManager.time_changed.connect(_on_time_changed)
 	GameManager.combo_changed.connect(_on_combo_changed)
+	GameManager.streak_changed.connect(_on_streak_changed)
 	GameManager.hit_registered.connect(_on_hit_registered)
 
 	# Pause-Knopf verbinden (F114)
@@ -225,6 +227,15 @@ func _on_combo_changed(new_combo: int) -> void:
 			play_combo_jingle()
 	else:
 		_combo_label.visible = false
+
+
+## Zeigt die Treffer-Streak an (F126)
+func _on_streak_changed(new_streak: int) -> void:
+	if new_streak >= 3:
+		_streak_label.text = "🔥 Streak: %d" % new_streak
+		_streak_label.visible = true
+	else:
+		_streak_label.visible = false
 
 
 ## Kleiner "Pop"-Effekt: Element kurz vergrößern und auf Normalgröße zurückfedern.

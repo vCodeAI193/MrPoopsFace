@@ -19,6 +19,11 @@ var _drag_current: Vector2 = Vector2.ZERO      ## Aktuelle Zugposition (lokal)
 var _combo: int = 0
 var _aura_phase: float = 0.0
 
+# Doppeltipp zum Wiederholen (F013)
+var _last_tap_time: float = 0.0
+var _last_drag: Vector2 = Vector2.ZERO
+const DOUBLE_TAP_WINDOW: float = 0.4
+
 @onready var _whoosh_player: AudioStreamPlayer = $WhooshPlayer
 
 
@@ -53,6 +58,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	# --- Finger aufgesetzt ---
 	if event is InputEventScreenTouch:
 		if event.pressed and not _aiming:
+			# Doppeltipp-Erkennung (F013)
+			var current_time: float = Time.get_ticks_msec() / 1000.0
+			if current_time - _last_tap_time < DOUBLE_TAP_WINDOW and _last_drag.length() > 50.0:
+				# Doppeltipp erkannt: Letzten Wurf wiederholen
+				_spawn_projectile(-_last_drag * throw_power)
+				if _whoosh_player.stream != null:
+					_whoosh_player.play()
+				_last_tap_time = 0.0  # Fenster zurücksetzen
+				return
+			_last_tap_time = current_time
+
 			_aiming = true
 			_touch_index = event.index
 			_drag_current = to_local(event.position)
@@ -83,6 +99,7 @@ func _release_throw() -> void:
 	# Zu kurze Züge ignorieren (versehentliche Tipper)
 	if launch_impulse.length() > 50.0:
 		_spawn_projectile(launch_impulse)
+		_last_drag = _drag_current  # Für Doppeltipp-Wiederholen speichern (F013)
 		if _whoosh_player.stream != null:
 			_whoosh_player.play()
 
