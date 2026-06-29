@@ -35,15 +35,21 @@ const MAX_HIGHSCORES: int = 10
 var highscores: Array = []                     ## Top-Punktestände (absteigend)
 var last_was_highscore: bool = false           ## Letzte Runde war neuer Rekord?
 
+# --- Spielstatistiken (F130) ---
+var best_combo: int = 0               ## Beste Combo in dieser Runde
+var hits_total: int = 0               ## Gesamtzahl Treffer
+var avg_points_per_hit: float = 0.0   ## Durchschnitt Punkte/Treffer
+
 var _combo_timer: float = 0.0                  ## Restzeit, in der die Combo gültig bleibt
 var combo_timer_pct: float = 0.0              ## Verhältnis 0..1 für den Fortschrittsbalken (F119)
 var combo_shield_active: bool = false         ## Läuft der Combo-Schutz gerade? (F049)
 var _combo_shield_timer: float = 0.0
 
-# --- Power-Up System (F041/F044/F052) ---
+# --- Power-Up System (F041/F042/F043/F044/F052) ---
 var active_powerups: Dictionary = {}          ## Aktive Power-Ups: {"type": {duration: float, data: {...}}}
 var projectile_scale_bonus: float = 1.0       ## Geschoss-Größen-Multiplikator (F044)
 var points_multiplier: float = 1.0             ## Punkte-Multiplikator (F042)
+var multi_shot_count: int = 1                 ## Anzahl Geschosse pro Wurf (F043)
 
 # --- Game Modes & Einstellungen ---
 var game_mode: String = "normal"               ## "normal", "practice" (F085), "hard" (F089)
@@ -100,6 +106,10 @@ func start_game() -> void:
 	# Übungsmodus (F085): extrem lange Zeit (praktisch unbegrenzt)
 	time_left = round_duration if game_mode != "practice" else 3600.0
 	game_active = true
+	# Statistiken zurücksetzen (F130)
+	best_combo = 0
+	hits_total = 0
+	avg_points_per_hit = 0.0
 	score_changed.emit(score)
 	combo_changed.emit(combo)
 	streak_changed.emit(streak)
@@ -136,6 +146,11 @@ func register_hit(type_multiplier: int = 1) -> int:
 	# Punkte = Grundpunkte * Combo-Multiplikator * Typ-Multiplikator * Power-Up-Multiplikator (F042)
 	var points: int = int(base_hit_points * combo * type_multiplier * points_multiplier)
 	score += points
+
+	# Statistiken aktualisieren (F130)
+	best_combo = maxi(best_combo, combo)
+	hits_total += 1
+	avg_points_per_hit = float(score) / float(hits_total)
 
 	score_changed.emit(score)
 	combo_changed.emit(combo)
@@ -218,6 +233,8 @@ func activate_powerup(type: String, duration: float, data: Dictionary = {}) -> v
 		projectile_scale_bonus = 1.5  # Geschoss 1.5x größer (F044)
 	elif type == "points_double":
 		points_multiplier = 2.0  # Punkte verdoppelt (F042)
+	elif type == "multi_shot":
+		multi_shot_count = 3  # 3 Geschosse auf einmal (F043)
 	active_powerups[type] = {"duration": duration, "data": data}
 
 
@@ -227,6 +244,8 @@ func _deactivate_powerup(type: String) -> void:
 		projectile_scale_bonus = 1.0
 	elif type == "points_double":
 		points_multiplier = 1.0
+	elif type == "multi_shot":
+		multi_shot_count = 1
 	active_powerups.erase(type)
 
 

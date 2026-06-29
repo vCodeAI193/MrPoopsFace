@@ -7,6 +7,8 @@ extends RigidBody2D
 @export var lifetime: float = 6.0              ## Sekunden bis zur automatischen Entfernung
 @export var is_sticky: bool = false            ## Klebrig? Bleibt an Männchen haften (F009)
 @export var weight: float = 1.0                ## Gewicht (1.0 = normal, beeinflusst Reichweite, F019)
+@export var has_explosion: bool = false        ## Explosion beim Aufprall? (F010)
+@export var explosion_radius: float = 150.0    ## Radius der Explosion (F010)
 
 var _alive_time: float = 0.0
 var _has_splatted: bool = false
@@ -20,6 +22,10 @@ func _ready() -> void:
 	# Kontaktüberwachung erlauben, damit der Aufprall erkannt wird
 	contact_monitor = true
 	max_contacts_reported = 4
+	# Abprall-Physik (F006): Restitution für Bouncing
+	physics_material_override = PhysicsMaterial.new()
+	physics_material_override.bounce = 0.45
+	physics_material_override.friction = 0.3
 	# Platsch-Sound prozedural erzeugen (F133)
 	_splat_player.stream = SoundGen.splat()
 	body_entered.connect(_on_body_entered)
@@ -51,6 +57,14 @@ func _on_body_entered(body: Node) -> void:
 	_has_splatted = true
 	if _splat_player.stream != null:
 		_splat_player.play()
+
+	# Explosion-AoE (F010): Alle Männchen im Radius treffen
+	if has_explosion:
+		var all_maennchen: Array = get_tree().get_nodes_in_group("maennchen")
+		for maennchen in all_maennchen:
+			if maennchen.global_position.distance_to(global_position) < explosion_radius:
+				if not maennchen._is_hit:
+					maennchen._trigger_hit()
 
 	# Klebrig: an Männchen bleiben haften (F009)
 	if is_sticky and body.is_in_group("maennchen"):

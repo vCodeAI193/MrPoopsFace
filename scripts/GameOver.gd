@@ -3,6 +3,7 @@ extends CanvasLayer
 
 @onready var _score_label: Label = $Center/Panel/VBox/ScoreLabel
 @onready var _best_label: Label = $Center/Panel/VBox/BestLabel
+@onready var _stats_label: Label = $Center/Panel/VBox/StatsLabel
 @onready var _replay_button: Button = $Center/Panel/VBox/ReplayButton
 @onready var _menu_button: Button = $Center/Panel/VBox/MenuButton
 
@@ -23,6 +24,14 @@ func _on_game_over(final_score: int) -> void:
 		_best_label.text = "🏆 Neuer Rekord!"
 	else:
 		_best_label.text = "Bester: %d" % GameManager.get_high_score()
+
+	# Spielstatistiken anzeigen (F130)
+	var stats_text: String = "Beste Combo: %d | Treffer: %d\nØ Pro Hit: %.0f" % [
+		GameManager.best_combo,
+		GameManager.hits_total,
+		GameManager.avg_points_per_hit
+	]
+	_stats_label.text = stats_text
 	visible = true
 
 

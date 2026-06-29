@@ -132,7 +132,12 @@ func _release_throw() -> void:
 		# Limite für gleichzeitige Geschosse prüfen (F003)
 		var active_projectiles: int = get_tree().get_nodes_in_group("projectile").size()
 		if active_projectiles < max_projectiles:
-			_spawn_projectile(launch_impulse)
+			# Mehrfach-Wurf Power-Up (F043)
+			for i in GameManager.multi_shot_count:
+				var spread: float = float(i) - (GameManager.multi_shot_count - 1) * 0.5
+				var spread_angle: float = spread * 0.15  # 0.15 Radiant pro Geschoss
+				var rotated_impulse: Vector2 = launch_impulse.rotated(spread_angle)
+				_spawn_projectile(rotated_impulse)
 			_last_drag = _drag_current  # Für Doppeltipp-Wiederholen speichern (F013)
 			if _whoosh_player.stream != null:
 				_whoosh_player.play()

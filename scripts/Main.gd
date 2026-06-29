@@ -15,14 +15,15 @@ extends Node2D
 @export var shake_decay: float = 45.0           ## Abklinggeschwindigkeit
 
 # --- Männchen-Varianten (F021/F025/F028) ---
-## Jede Variante: scale, speed, color, mult, weight; optional jump_height, sleeping (F022/F032)
+## Jede Variante: scale, speed, color, mult, weight; optional jump_height, sleeping, has_shield (F022/F032/F023)
 const VARIANTS: Array = [
-	{"scale": 1.0, "speed": 60.0, "color": Color(0.1, 0.1, 0.1), "mult": 1, "weight": 70, "jump_height": 0.0, "sleeping": false},
-	{"scale": 0.9, "speed": 150.0, "color": Color(0.15, 0.35, 0.8), "mult": 2, "weight": 22, "jump_height": 0.0, "sleeping": false},   # schnell
-	{"scale": 0.55, "speed": 85.0, "color": Color(0.1, 0.1, 0.1), "mult": 3, "weight": 14, "jump_height": 0.0, "sleeping": false},     # mini
-	{"scale": 1.0, "speed": 45.0, "color": Color(0.95, 0.75, 0.05), "mult": 5, "weight": 5, "jump_height": 0.0, "sleeping": false},    # gold
-	{"scale": 0.88, "speed": 75.0, "color": Color(0.1, 0.55, 0.15), "mult": 2, "weight": 18, "jump_height": 110.0, "sleeping": false}, # springend (F022)
-	{"scale": 1.05, "speed": 0.0, "color": Color(0.2, 0.22, 0.32), "mult": 4, "weight": 8, "jump_height": 0.0, "sleeping": true},     # schlafend (F032)
+	{"scale": 1.0, "speed": 60.0, "color": Color(0.1, 0.1, 0.1), "mult": 1, "weight": 70, "jump_height": 0.0, "sleeping": false, "has_shield": false},
+	{"scale": 0.9, "speed": 150.0, "color": Color(0.15, 0.35, 0.8), "mult": 2, "weight": 22, "jump_height": 0.0, "sleeping": false, "has_shield": false},   # schnell
+	{"scale": 0.55, "speed": 85.0, "color": Color(0.1, 0.1, 0.1), "mult": 3, "weight": 14, "jump_height": 0.0, "sleeping": false, "has_shield": false},     # mini
+	{"scale": 1.0, "speed": 45.0, "color": Color(0.95, 0.75, 0.05), "mult": 5, "weight": 5, "jump_height": 0.0, "sleeping": false, "has_shield": false},    # gold
+	{"scale": 0.88, "speed": 75.0, "color": Color(0.1, 0.55, 0.15), "mult": 2, "weight": 18, "jump_height": 110.0, "sleeping": false, "has_shield": false}, # springend (F022)
+	{"scale": 1.05, "speed": 0.0, "color": Color(0.2, 0.22, 0.32), "mult": 4, "weight": 8, "jump_height": 0.0, "sleeping": true, "has_shield": false},     # schlafend (F032)
+	{"scale": 1.15, "speed": 50.0, "color": Color(0.35, 0.35, 0.35), "mult": 2, "weight": 8, "jump_height": 0.0, "sleeping": false, "has_shield": true},   # Schild (F023)
 ]
 
 @onready var _spawn_timer: Timer = $SpawnTimer
@@ -202,6 +203,7 @@ func _apply_variant(maennchen: Maennchen) -> void:
 	maennchen.point_multiplier = variant["mult"]
 	maennchen.jump_height = variant.get("jump_height", 0.0)
 	maennchen.sleeping = variant.get("sleeping", false)
+	maennchen.has_shield = variant.get("has_shield", false)
 
 
 ## Liefert eine zufällige Variante entsprechend ihrer Gewichtung.

@@ -76,6 +76,12 @@ func _draw() -> void:
 			var col: Color = Color(1.0, 0.84, 0.0)
 			draw_circle(Vector2(0, 0), r * 0.9, col)
 			draw_circle(Vector2(0, 0), r * 0.7, Color(1.0, 0.92, 0.1))
+		"multi_shot":
+			# Drei kleine Kreise
+			var col: Color = Color(0.75, 0.4, 0.8)
+			draw_circle(Vector2(-r * 0.6, 0), r * 0.5, col)
+			draw_circle(Vector2(0, 0), r * 0.6, col)
+			draw_circle(Vector2(r * 0.6, 0), r * 0.5, col)
 
 	# Countdown-Ring um den Pickup (F055)
 	var start_angle: float = -PI / 2.0

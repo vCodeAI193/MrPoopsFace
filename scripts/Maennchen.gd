@@ -12,8 +12,10 @@ signal hit                                     ## Wird gesendet, wenn getroffen
 @export var point_multiplier: int = 1                    ## Typabhängiger Punktebonus (F021/F025/F028)
 @export var jump_height: float = 0.0                     ## Sprunghöhe in Pixeln; 0 = kein Sprung (F022)
 @export var sleeping: bool = false                       ## Steht still und schläft (F032)
+@export var has_shield: bool = false                     ## Schild-Männchen braucht 2 Treffer (F023)
 
 var _is_hit: bool = false
+var _shield_hits: int = 0                                ## Verbleibende Schildtreffer (F023)
 var _direction: int = 1                          ## 1 = nach rechts, -1 = nach links
 var _walk_phase: float = 0.0                     ## Phase für die Beinanimation
 
@@ -77,11 +79,21 @@ func _process(delta: float) -> void:
 
 ## Wird aufgerufen, wenn ein Körper (der Kackhaufen) das Männchen berührt.
 func _on_body_entered(body: Node) -> void:
-	if _is_hit:
-		return
 	# Nur auf Projektile reagieren
 	if not body.is_in_group("projectile"):
 		return
+
+	# Schild-Männchen (F023): 2 Treffer nötig
+	if has_shield:
+		_shield_hits += 1
+		if _shield_hits < 2:
+			# Erstes Treffer: Schild aktivieren/visuell aktualisieren
+			queue_redraw()
+			return
+
+	if _is_hit:
+		return
+
 	# Trefferzonen (F016): Kopf oben = 1.3x, Körper/Beine = 1.0x
 	var hit_multiplier: float = 1.0
 	if body.global_position.y < global_position.y - 40.0:
@@ -167,9 +179,9 @@ func _spawn_hit_particles() -> void:
 	get_parent().add_child(fx)
 
 
-## Spawnt ein zufälliges Power-Up (F041/F042/F044/F052).
+## Spawnt ein zufälliges Power-Up (F041/F042/F043/F044/F052).
 func _spawn_powerup() -> void:
-	var types: Array = ["time_bonus", "big_projectile", "points_double"]
+	var types: Array = ["time_bonus", "big_projectile", "points_double", "multi_shot"]
 	var pu: Area2D = POWERUP_SCENE.instantiate()
 	pu.powerup_type = types[randi() % types.size()]
 	pu.global_position = global_position + Vector2(randf_range(-30, 30), -80)

@@ -39,6 +39,14 @@ func _draw() -> void:
 	draw_line(hip, Vector2(-18 * s + swing, 55 * s), col, w)
 	draw_line(hip, Vector2(18 * s - swing, 55 * s), col, w)
 
+	# --- Schild-Anzeige (F023) ---
+	if _maennchen.has_shield:
+		# Schild-Balkens unter dem Kopf
+		var shield_health: float = float(_maennchen._shield_hits) / 2.0
+		draw_rect(Rect2(-25 * s, -45 * s, 50 * s, 6 * s), Color(0.2, 0.2, 0.2, 0.6))
+		draw_rect(Rect2(-25 * s, -45 * s, 50 * s * shield_health, 6 * s),
+			Color(0.8, 0.6, 0.1, 1.0))
+
 	# --- Gesicht (offen oder schlafend/geschlossen) ---
 	if is_sleeping:
 		# Geschlossene Augen als horizontale Striche

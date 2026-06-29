@@ -17,11 +17,11 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F003** 🟡 Mehrere Geschosse gleichzeitig in der Luft erlauben (Limit konfigurierbar)
 - [ ] **F004** 🟡 Geschoss-Vorrat/Munition pro Runde (begrenzte Würfe)
 - [x] **F005** 🟢 Nachlade-Animation des Kackhaufens am Anker
-- [ ] **F006** 🟡 Abprall-Physik an Wänden mit Restitution
+- [x] **F006** 🟡 Abprall-Physik an Wänden mit Restitution
 - [ ] **F007** 🟡 Wind-Einfluss auf die Flugbahn (seitliche Kraft)
 - [ ] **F008** 🔴 Zerlegbare Geschosse (Split-Shot in 3 kleinere Haufen)
 - [x] **F009** 🟡 Klebrige Geschosse, die an Männchen haften bleiben
-- [ ] **F010** 🟡 Sprengradius/Flächenschaden bei Aufprall (AoE)
+- [x] **F010** 🟡 Sprengradius/Flächenschaden bei Aufprall (AoE)
 - [x] **F011** 🟢 Drehmoment/Spin durch Wischrichtung beim Loslassen – Kreuzprodukt für Spin
 - [ ] **F012** 🟡 Zeitlupe (Bullet-Time) während des Zielens
 - [x] **F013** 🟢 Doppeltipp zum schnellen Wiederholen des letzten Wurfs – 0.4s Fenster
@@ -37,7 +37,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 - [x] **F021** 🟢 Schnelles Männchen (höheres Lauftempo, mehr Punkte) – 150 px/s, 2x Punkte
 - [x] **F022** 🟡 Springendes Männchen (hüpft periodisch) – Jump-Phase Sinus-Animation
-- [ ] **F023** 🟡 Schild-Männchen (braucht 2 Treffer)
+- [x] **F023** 🟡 Schild-Männchen (braucht 2 Treffer)
 - [ ] **F024** 🔴 Boss-Männchen mit Lebensbalken
 - [x] **F025** 🟢 Mini-Männchen (kleines, schwer zu treffendes Ziel) – 0.55x Größe, 3x Punkte
 - [ ] **F026** 🟡 Regenschirm-Männchen (blockt Treffer von oben)
@@ -60,7 +60,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 - [x] **F041** 🟡 Zeit-Bonus-Pickup (+5 Sekunden)
 - [x] **F042** 🟡 Punkte-Verdopplung für 10 Sekunden
-- [ ] **F043** 🟡 Mehrfach-Wurf (3 Geschosse auf einmal)
+- [x] **F043** 🟡 Mehrfach-Wurf (3 Geschosse auf einmal)
 - [x] **F044** 🟢 Größeres Geschoss temporär
 - [ ] **F045** 🟡 Einfrieren – alle Männchen stehen still
 - [ ] **F046** 🔴 Regen-Modus: Kackhaufen fallen automatisch vom Himmel
@@ -150,7 +150,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F118** 🟢 Timer wird in letzten 10 Sekunden rot/pulsiert – _timer_warning Flag
 - [x] **F119** 🟡 Fortschrittsbalken zum nächsten Combo-Level – _combo_bar ProgressBar
 - [x] **F120** 🟢 Bestätigungsdialog beim Verlassen – ConfirmationDialog
-- [ ] **F121** 🟡 Responsives HUD-Layout für Notch/Safe-Area
+- [x] **F121** 🟡 Responsives HUD-Layout für Notch/Safe-Area
 - [x] **F122** 🟢 Highscore-Anzeige im Hauptmenü – Im MainMenu implementiert
 - [ ] **F123** 🟡 Toast-Benachrichtigungen (z. B. „Neuer Rekord!")
 - [ ] **F124** 🟢 Einstellungs-Button im HUD
@@ -159,7 +159,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F127** 🟡 Mini-Map/Übersicht bei scrollenden Leveln (→F070)
 - [ ] **F128** 🟢 Theme-fähige UI (heller/dunkler Stil)
 - [ ] **F129** 🟡 On-Screen-Tooltips für Power-Ups
-- [ ] **F130** 🟢 GameOver-Screen zeigt Statistiken (Treffer, beste Combo)
+- [x] **F130** 🟢 GameOver-Screen zeigt Statistiken (Treffer, beste Combo)
 
 ## 🔊 8. Audio (F131–F142)
 
