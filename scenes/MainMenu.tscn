@@ -1,0 +1,62 @@
+[gd_scene load_steps=4 format=3 uid="uid://m0mainmenu0start0"]
+
+[ext_resource type="Script" path="res://scripts/MainMenu.gd" id="1_menu"]
+
+[sub_resource type="Gradient" id="Gradient_menu"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.4, 0.7, 0.95, 1, 0.82, 0.93, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_menu"]
+gradient = SubResource("Gradient_menu")
+width = 1920
+height = 1200
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_menu")
+
+[node name="Background" type="TextureRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = SubResource("GradientTexture2D_menu")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="Center" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="Center"]
+custom_minimum_size = Vector2(700, 0)
+theme_override_constants/separation = 36
+alignment = 1
+
+[node name="Title" type="Label" parent="Center/VBox"]
+text = "💩 Stinky Toss"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 120
+
+[node name="Subtitle" type="Label" parent="Center/VBox"]
+text = "Wirf Kackhaufen auf Strichmännchen!"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 40
+
+[node name="HighscoreLabel" type="Label" parent="Center/VBox"]
+text = "Bester: 0"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 48
+
+[node name="StartButton" type="Button" parent="Center/VBox"]
+custom_minimum_size = Vector2(0, 130)
+text = "Spielen"
+theme_override_font_sizes/font_size = 60
+
+[node name="QuitButton" type="Button" parent="Center/VBox"]
+custom_minimum_size = Vector2(0, 110)
+text = "Beenden"
+theme_override_font_sizes/font_size = 48

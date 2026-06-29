@@ -1,0 +1,10 @@
+# Godot 4 spezifische Ignore-Regeln
+.godot/
+.import/
+export.cfg
+build/
+*.tmp
+
+# Android Build-Artefakte
+*.apk
+*.aab

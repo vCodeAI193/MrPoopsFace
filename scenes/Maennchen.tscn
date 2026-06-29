@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://c0maennchen0stick0"]
+
+[ext_resource type="Script" path="res://scripts/Maennchen.gd" id="1_maen"]
+[ext_resource type="Script" path="res://scripts/MaennchenBody.gd" id="2_body"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_maen"]
+radius = 30.0
+height = 150.0
+
+[node name="Maennchen" type="Area2D" groups=["maennchen"]]
+script = ExtResource("1_maen")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -10)
+shape = SubResource("CapsuleShape2D_maen")
+
+[node name="Body" type="Node2D" parent="."]
+script = ExtResource("2_body")
+
+[node name="FartPlayer" type="AudioStreamPlayer" parent="."]

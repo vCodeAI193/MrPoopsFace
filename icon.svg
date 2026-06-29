@@ -1,0 +1,12 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="20" fill="#87cee9"/>
+  <!-- Kackhaufen -->
+  <ellipse cx="64" cy="92" rx="44" ry="26" fill="#5c3a1e"/>
+  <ellipse cx="58" cy="66" rx="32" ry="22" fill="#6f4524"/>
+  <ellipse cx="66" cy="44" rx="20" ry="15" fill="#5c3a1e"/>
+  <!-- Augen -->
+  <circle cx="52" cy="62" r="8" fill="#ffffff"/>
+  <circle cx="76" cy="62" r="8" fill="#ffffff"/>
+  <circle cx="53" cy="64" r="4" fill="#000000"/>
+  <circle cx="77" cy="64" r="4" fill="#000000"/>
+</svg>
