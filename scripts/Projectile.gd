@@ -5,9 +5,13 @@ extends RigidBody2D
 
 @export var poop_radius: float = 40.0          ## Radius des Haufens in Pixeln
 @export var lifetime: float = 6.0              ## Sekunden bis zur automatischen Entfernung
+@export var is_sticky: bool = false            ## Klebrig? Bleibt an Männchen haften (F009)
+@export var weight: float = 1.0                ## Gewicht (1.0 = normal, beeinflusst Reichweite, F019)
 
 var _alive_time: float = 0.0
 var _has_splatted: bool = false
+var _stuck_to: Node2D = null
+var _stuck_timer: float = 0.0
 
 @onready var _splat_player: AudioStreamPlayer = $SplatPlayer
 
@@ -41,15 +45,35 @@ func _ready() -> void:
 
 
 ## Spielt beim ersten Aufprall (Boden oder Männchen) den Platsch-Sound.
-func _on_body_entered(_body: Node) -> void:
+func _on_body_entered(body: Node) -> void:
 	if _has_splatted:
 		return
 	_has_splatted = true
 	if _splat_player.stream != null:
 		_splat_player.play()
 
+	# Klebrig: an Männchen bleiben haften (F009)
+	if is_sticky and body.is_in_group("maennchen"):
+		_stuck_to = body
+		_stuck_timer = 0.8
+		set_physics_process(false)
+		freeze = true
+
 
 func _process(delta: float) -> void:
+	# Klebrig: an Männchen folgen und regelmäßig Schaden verursachen (F009)
+	if _stuck_to and is_instance_valid(_stuck_to):
+		global_position = _stuck_to.global_position + Vector2(randf_range(-10, 10), -40)
+		_stuck_timer -= delta
+		if _stuck_timer <= 0.0:
+			_stuck_timer = 0.8
+			if _stuck_to.has_method("_trigger_hit"):
+				_stuck_to._trigger_hit()
+	elif _stuck_to:
+		# Männchen wurde getötet, Geschoss kann weg
+		queue_free()
+		return
+
 	# Den Haufen nach einer Weile aufräumen, damit die Szene nicht vollläuft
 	_alive_time += delta
 	if _alive_time >= lifetime:

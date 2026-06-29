@@ -55,6 +55,15 @@ var _clouds: Array = []
 func _ready() -> void:
 	randomize()
 
+	# Schwierigkeitsmultiplikatoren anwenden (F089)
+	match GameManager.difficulty:
+		"easy":
+			max_maennchen = 5
+			spawn_rate = 2.0
+		"hard":
+			max_maennchen = 12
+			spawn_rate = 0.9
+
 	# HUD mit den GameManager-Signalen verbinden
 	GameManager.score_changed.connect(_on_score_changed)
 	GameManager.time_changed.connect(_on_time_changed)

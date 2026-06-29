@@ -14,13 +14,13 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 - [x] **F001** 🟢 Wurf-Kraftanzeige (Ladebalken) während des Ziehens – Drag-Distanz limitiert
 - [x] **F002** 🟢 Mindest-/Höchstkraft visuell am Gummiband markieren – Trajectory-Vorschau
-- [ ] **F003** 🟡 Mehrere Geschosse gleichzeitig in der Luft erlauben (Limit konfigurierbar)
+- [x] **F003** 🟡 Mehrere Geschosse gleichzeitig in der Luft erlauben (Limit konfigurierbar)
 - [ ] **F004** 🟡 Geschoss-Vorrat/Munition pro Runde (begrenzte Würfe)
 - [x] **F005** 🟢 Nachlade-Animation des Kackhaufens am Anker
 - [ ] **F006** 🟡 Abprall-Physik an Wänden mit Restitution
 - [ ] **F007** 🟡 Wind-Einfluss auf die Flugbahn (seitliche Kraft)
 - [ ] **F008** 🔴 Zerlegbare Geschosse (Split-Shot in 3 kleinere Haufen)
-- [ ] **F009** 🟡 Klebrige Geschosse, die an Männchen haften bleiben
+- [x] **F009** 🟡 Klebrige Geschosse, die an Männchen haften bleiben
 - [ ] **F010** 🟡 Sprengradius/Flächenschaden bei Aufprall (AoE)
 - [x] **F011** 🟢 Drehmoment/Spin durch Wischrichtung beim Loslassen – Kreuzprodukt für Spin
 - [ ] **F012** 🟡 Zeitlupe (Bullet-Time) während des Zielens
@@ -30,7 +30,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F016** 🟢 Trefferzonen (Kopf = Bonus, Körper = normal)
 - [ ] **F017** 🔴 Ricochet-Combo (ein Wurf trifft mehrere Männchen)
 - [ ] **F018** 🟡 Magnet-Geschoss, das leicht zum nächsten Ziel zieht
-- [ ] **F019** 🟡 Geschoss-Gewicht beeinflusst Reichweite/Bogen
+- [x] **F019** 🟡 Geschoss-Gewicht beeinflusst Reichweite/Bogen
 - [x] **F020** 🟢 Konfetti-/Partikel-Schweif hinter dem fliegenden Haufen – Particle Trail
 
 ## 🧍 2. Strichmännchen-Varianten (F021–F040)
@@ -59,7 +59,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 ## 🎁 3. Power-Ups & Items (F041–F058)
 
 - [x] **F041** 🟡 Zeit-Bonus-Pickup (+5 Sekunden)
-- [ ] **F042** 🟡 Punkte-Verdopplung für 10 Sekunden
+- [x] **F042** 🟡 Punkte-Verdopplung für 10 Sekunden
 - [ ] **F043** 🟡 Mehrfach-Wurf (3 Geschosse auf einmal)
 - [x] **F044** 🟢 Größeres Geschoss temporär
 - [ ] **F045** 🟡 Einfrieren – alle Männchen stehen still

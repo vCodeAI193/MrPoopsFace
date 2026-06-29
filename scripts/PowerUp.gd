@@ -71,6 +71,11 @@ func _draw() -> void:
 			var col: Color = Color(0.45, 0.27, 0.12)
 			draw_circle(Vector2(0, 0), r * 1.1, col)
 			draw_circle(Vector2(0, 0), r * 0.75, Color(0.55, 0.35, 0.15))
+		"points_double":
+			# Münz-Form mit "2x"
+			var col: Color = Color(1.0, 0.84, 0.0)
+			draw_circle(Vector2(0, 0), r * 0.9, col)
+			draw_circle(Vector2(0, 0), r * 0.7, Color(1.0, 0.92, 0.1))
 
 	# Countdown-Ring um den Pickup (F055)
 	var start_angle: float = -PI / 2.0

@@ -167,9 +167,9 @@ func _spawn_hit_particles() -> void:
 	get_parent().add_child(fx)
 
 
-## Spawnt ein zufälliges Power-Up (F041/F044/F052).
+## Spawnt ein zufälliges Power-Up (F041/F042/F044/F052).
 func _spawn_powerup() -> void:
-	var types: Array = ["time_bonus", "big_projectile"]
+	var types: Array = ["time_bonus", "big_projectile", "points_double"]
 	var pu: Area2D = POWERUP_SCENE.instantiate()
 	pu.powerup_type = types[randi() % types.size()]
 	pu.global_position = global_position + Vector2(randf_range(-30, 30), -80)

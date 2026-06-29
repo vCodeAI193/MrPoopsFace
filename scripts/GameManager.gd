@@ -43,6 +43,11 @@ var _combo_shield_timer: float = 0.0
 # --- Power-Up System (F041/F044/F052) ---
 var active_powerups: Dictionary = {}          ## Aktive Power-Ups: {"type": {duration: float, data: {...}}}
 var projectile_scale_bonus: float = 1.0       ## Geschoss-Größen-Multiplikator (F044)
+var points_multiplier: float = 1.0             ## Punkte-Multiplikator (F042)
+
+# --- Game Modes & Einstellungen ---
+var game_mode: String = "normal"               ## "normal", "practice" (F085), "hard" (F089)
+var difficulty: String = "medium"              ## "easy", "medium", "hard" (F089)
 
 
 func _ready() -> void:
@@ -92,7 +97,8 @@ func start_game() -> void:
 	combo = 0
 	streak = 0
 	_combo_timer = 0.0
-	time_left = round_duration
+	# Übungsmodus (F085): extrem lange Zeit (praktisch unbegrenzt)
+	time_left = round_duration if game_mode != "practice" else 3600.0
 	game_active = true
 	score_changed.emit(score)
 	combo_changed.emit(combo)
@@ -127,8 +133,8 @@ func register_hit(type_multiplier: int = 1) -> int:
 	# Streak erhöhen für aufeinanderfolgende Treffer (F126)
 	streak += 1
 
-	# Punkte = Grundpunkte * Combo-Multiplikator * Typ-Multiplikator
-	var points: int = base_hit_points * combo * type_multiplier
+	# Punkte = Grundpunkte * Combo-Multiplikator * Typ-Multiplikator * Power-Up-Multiplikator (F042)
+	var points: int = int(base_hit_points * combo * type_multiplier * points_multiplier)
 	score += points
 
 	score_changed.emit(score)
@@ -210,6 +216,8 @@ func activate_powerup(type: String, duration: float, data: Dictionary = {}) -> v
 		time_left += duration * 5.0  # +5 Sekunden pro Pickup (F041)
 	elif type == "big_projectile":
 		projectile_scale_bonus = 1.5  # Geschoss 1.5x größer (F044)
+	elif type == "points_double":
+		points_multiplier = 2.0  # Punkte verdoppelt (F042)
 	active_powerups[type] = {"duration": duration, "data": data}
 
 
@@ -217,6 +225,8 @@ func activate_powerup(type: String, duration: float, data: Dictionary = {}) -> v
 func _deactivate_powerup(type: String) -> void:
 	if type == "big_projectile":
 		projectile_scale_bonus = 1.0
+	elif type == "points_double":
+		points_multiplier = 1.0
 	active_powerups.erase(type)
 
 

@@ -6,6 +6,8 @@ extends Node2D
 @export var throw_power: float = 9.0           ## Multiplikator für die Wurfstärke
 @export var max_drag_distance: float = 350.0   ## Maximale Ziehweite in Pixeln
 @export var projectile_scene: PackedScene      ## Szene des Kackhaufens
+@export var max_projectiles: int = 3           ## Max. Geschosse gleichzeitig (F003)
+@export var projectile_weight: float = 1.0     ## Geschoss-Gewicht (1.0 = normal, 0.7 = leicht, 1.3 = schwer, F019)
 
 # Vorschau-Trajektorie
 @export var trajectory_points: int = 24        ## Anzahl der Vorschaupunkte
@@ -122,14 +124,18 @@ func _release_throw() -> void:
 	_touch_index = -1
 
 	# Wurfrichtung = entgegengesetzt zur Zugrichtung (Schleuder-Prinzip)
-	var launch_impulse: Vector2 = -_drag_current * throw_power
+	# Gewicht beeinflusst Reichweite: leichter (0.7) = weiter, schwerer (1.3) = näher (F019)
+	var launch_impulse: Vector2 = -_drag_current * throw_power / projectile_weight
 
 	# Zu kurze Züge ignorieren (versehentliche Tipper)
 	if launch_impulse.length() > 50.0:
-		_spawn_projectile(launch_impulse)
-		_last_drag = _drag_current  # Für Doppeltipp-Wiederholen speichern (F013)
-		if _whoosh_player.stream != null:
-			_whoosh_player.play()
+		# Limite für gleichzeitige Geschosse prüfen (F003)
+		var active_projectiles: int = get_tree().get_nodes_in_group("projectile").size()
+		if active_projectiles < max_projectiles:
+			_spawn_projectile(launch_impulse)
+			_last_drag = _drag_current  # Für Doppeltipp-Wiederholen speichern (F013)
+			if _whoosh_player.stream != null:
+				_whoosh_player.play()
 
 	_drag_current = Vector2.ZERO
 	queue_redraw()
