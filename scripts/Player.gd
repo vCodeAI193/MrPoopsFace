@@ -15,19 +15,25 @@ var _aiming: bool = false
 var _touch_index: int = -1                     ## Aktiv verfolgter Finger
 var _drag_current: Vector2 = Vector2.ZERO      ## Aktuelle Zugposition (lokal)
 
+# F005 – Nachlade-Animation
+var _last_projectile: Node2D = null
+var _projectile_returning: bool = false
+var _projectile_return_progress: float = 0.0
+
+# F013 – Doppeltipp zum Wiederholen
+var _last_tap_time: float = 0.0
+var _last_drag: Vector2 = Vector2.ZERO
+const DOUBLE_TAP_WINDOW: float = 0.35
+
 # Combo-Aura (F146)
 var _combo: int = 0
 var _aura_phase: float = 0.0
-
-# Doppeltipp zum Wiederholen (F013)
-var _last_tap_time: float = 0.0
-var _last_drag: Vector2 = Vector2.ZERO
-const DOUBLE_TAP_WINDOW: float = 0.4
 
 @onready var _whoosh_player: AudioStreamPlayer = $WhooshPlayer
 
 
 func _ready() -> void:
+	add_to_group("player")
 	# Wurf-Whoosh prozedural erzeugen (F132)
 	_whoosh_player.stream = SoundGen.whoosh()
 	# Auf Combo-Änderungen reagieren, um die Aura zu steuern (F146)
@@ -36,6 +42,21 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	# Nachlade-Animation verwalten (F005)
+	if _projectile_returning and _last_projectile:
+		_projectile_return_progress += delta * 3.0
+		if _projectile_return_progress >= 1.0:
+			_projectile_returning = false
+			_last_projectile = null
+		else:
+			var start_pos: Vector2 = _last_projectile.global_position
+			var end_pos: Vector2 = global_position
+			_last_projectile.global_position = start_pos.lerp(end_pos, _projectile_return_progress)
+			_last_projectile.rotation_degrees += 360.0 * delta * 5.0
+
+	# Doppeltipp-Fenster abklingen lassen (F013)
+	_last_tap_time += delta
+
 	# Aura pulsieren lassen, solange eine Combo aktiv ist (F146)
 	if _combo >= 2:
 		_aura_phase += delta
@@ -133,6 +154,32 @@ func _spawn_projectile(impulse: Vector2) -> void:
 		poop.launch(impulse, spin)
 	else:
 		poop.call("launch", impulse)
+
+	# Für Nachlade-Animation speichern (F005)
+	_last_projectile = poop
+	_projectile_returning = false
+	poop.body_entered.connect(_on_projectile_hit.bindv([poop]))
+
+
+## Startet die Nachlade-Animation nach Treffer (F005).
+func _on_projectile_hit(poop: Node2D) -> void:
+	if not is_instance_valid(poop) or poop != _last_projectile:
+		return
+	# Physik deaktivieren, um die Rückkehr-Tween-Animation zu ermöglichen
+	if poop is RigidBody2D:
+		poop.set_physics_process(false)
+		poop.freeze = true
+	_projectile_returning = true
+	_projectile_return_progress = 0.0
+
+
+## Schneller Wurf-Wiederholung durch Doppeltipp (F013).
+func _quick_repeat_throw() -> void:
+	if _last_drag.length() > 50.0:
+		var launch_impulse: Vector2 = -_last_drag * throw_power
+		_spawn_projectile(launch_impulse)
+		if _whoosh_player.stream != null:
+			_whoosh_player.play()
 
 
 func _draw() -> void:

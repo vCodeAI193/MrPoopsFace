@@ -30,6 +30,7 @@ const VARIANTS: Array = [
 @onready var _time_label: Label = $HUD/TopBar/TimeLabel
 @onready var _combo_label: Label = $HUD/TopBar/ComboLabel
 @onready var _combo_bar: ProgressBar = $HUD/ComboBar
+@onready var _powerup_label: Label = $HUD/PowerUpLabel
 @onready var _pause_button: Button = $HUD/PauseButton
 @onready var _mute_button: Button = $HUD/MuteButton
 @onready var _countdown_label: Label = $HUD/CountdownLabel
@@ -114,6 +115,18 @@ func _process(delta: float) -> void:
 		_combo_bar.modulate = Color(1.0, 0.8, 0.0) if GameManager.combo_shield_active else Color.WHITE
 	else:
 		_combo_bar.visible = false
+
+	# Power-Up-Timer-Anzeige (F055)
+	var pu_text: String = ""
+	if "time_bonus" in GameManager.active_powerups:
+		pu_text += "⏱ +5s (%.1fs)\n" % GameManager.get_powerup_remaining("time_bonus")
+	if "big_projectile" in GameManager.active_powerups:
+		pu_text += "●+1.5x (%.1fs)" % GameManager.get_powerup_remaining("big_projectile")
+	if pu_text.is_empty():
+		_powerup_label.visible = false
+	else:
+		_powerup_label.text = pu_text.trim_suffix("\n")
+		_powerup_label.visible = true
 
 
 ## Spielt den Start-Countdown "3 – 2 – 1 – Los!" und startet danach die Runde (F117).

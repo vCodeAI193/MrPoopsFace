@@ -65,6 +65,8 @@ func launch(impulse: Vector2, spin: float = 0.0) -> void:
 		angular_velocity = spin * 12.0
 	else:
 		angular_velocity = randf_range(-8.0, 8.0)
+	# Größen-Bonus durch Power-Up (F044)
+	scale *= GameManager.projectile_scale_bonus
 
 
 func _draw() -> void:

@@ -16,7 +16,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F002** 🟢 Mindest-/Höchstkraft visuell am Gummiband markieren – Trajectory-Vorschau
 - [ ] **F003** 🟡 Mehrere Geschosse gleichzeitig in der Luft erlauben (Limit konfigurierbar)
 - [ ] **F004** 🟡 Geschoss-Vorrat/Munition pro Runde (begrenzte Würfe)
-- [ ] **F005** 🟢 Nachlade-Animation des Kackhaufens am Anker
+- [x] **F005** 🟢 Nachlade-Animation des Kackhaufens am Anker
 - [ ] **F006** 🟡 Abprall-Physik an Wänden mit Restitution
 - [ ] **F007** 🟡 Wind-Einfluss auf die Flugbahn (seitliche Kraft)
 - [ ] **F008** 🔴 Zerlegbare Geschosse (Split-Shot in 3 kleinere Haufen)
@@ -27,7 +27,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F013** 🟢 Doppeltipp zum schnellen Wiederholen des letzten Wurfs – 0.4s Fenster
 - [ ] **F014** 🟡 Zwei-Finger-Zoom der Wurf-Vorschau
 - [ ] **F015** 🟡 Aufprall hinterlässt Schmierfleck-Decals am Boden
-- [ ] **F016** 🟢 Trefferzonen (Kopf = Bonus, Körper = normal)
+- [x] **F016** 🟢 Trefferzonen (Kopf = Bonus, Körper = normal)
 - [ ] **F017** 🔴 Ricochet-Combo (ein Wurf trifft mehrere Männchen)
 - [ ] **F018** 🟡 Magnet-Geschoss, das leicht zum nächsten Ziel zieht
 - [ ] **F019** 🟡 Geschoss-Gewicht beeinflusst Reichweite/Bogen
@@ -58,10 +58,10 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## 🎁 3. Power-Ups & Items (F041–F058)
 
-- [ ] **F041** 🟡 Zeit-Bonus-Pickup (+5 Sekunden)
+- [x] **F041** 🟡 Zeit-Bonus-Pickup (+5 Sekunden)
 - [ ] **F042** 🟡 Punkte-Verdopplung für 10 Sekunden
 - [ ] **F043** 🟡 Mehrfach-Wurf (3 Geschosse auf einmal)
-- [ ] **F044** 🟢 Größeres Geschoss temporär
+- [x] **F044** 🟢 Größeres Geschoss temporär
 - [ ] **F045** 🟡 Einfrieren – alle Männchen stehen still
 - [ ] **F046** 🔴 Regen-Modus: Kackhaufen fallen automatisch vom Himmel
 - [ ] **F047** 🟡 Magnet-Power-Up (alle Treffer ziehen an)
@@ -69,10 +69,10 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F049** 🟢 Combo-Schutz (Combo läuft kurz nicht ab) – Shield Timer beim Schlafen-Wecken
 - [ ] **F050** 🔴 Power-Up-Inventar mit aktivierbaren Slots
 - [ ] **F051** 🟡 Zufalls-Würfel-Power-Up (Glücksspiel-Effekt)
-- [ ] **F052** 🟢 Power-Up-Drop-Animation und Aufsammel-Touch
+- [x] **F052** 🟢 Power-Up-Drop-Animation und Aufsammel-Touch
 - [ ] **F053** 🟡 Negativ-Item meiden (Stinkbombe = Punktabzug)
 - [ ] **F054** 🟡 Kettenblitz-Geschoss (springt zwischen Zielen)
-- [ ] **F055** 🟢 Power-Up-Timer-Anzeige im HUD
+- [x] **F055** 🟢 Power-Up-Timer-Anzeige im HUD
 - [ ] **F056** 🟡 Seltenheitsstufen für Power-Ups (Common→Legendary)
 - [ ] **F057** 🔴 Power-Up-Kombinationen (Synergie-Effekte)
 - [ ] **F058** 🟡 Boden-Power-Up-Spawner mit Cooldown

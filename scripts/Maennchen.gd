@@ -27,6 +27,7 @@ var _zzz_timer: float = 1.5
 # Vorgeladene Effekt-Szenen
 const FLOATING_TEXT_SCENE: PackedScene = preload("res://scenes/FloatingText.tscn")
 const HIT_EFFECT_SCENE: PackedScene = preload("res://scenes/HitEffect.tscn")
+const POWERUP_SCENE: PackedScene = preload("res://scenes/PowerUp.tscn")
 
 @onready var _fart_player: AudioStreamPlayer = $FartPlayer
 @onready var _body: Node2D = $Body                ## Wird gedreht/animiert beim Treffer
@@ -81,13 +82,18 @@ func _on_body_entered(body: Node) -> void:
 	# Nur auf Projektile reagieren
 	if not body.is_in_group("projectile"):
 		return
-	_trigger_hit()
+	# Trefferzonen (F016): Kopf oben = 1.3x, Körper/Beine = 1.0x
+	var hit_multiplier: float = 1.0
+	if body.global_position.y < global_position.y - 40.0:
+		hit_multiplier = 1.3
+	_trigger_hit(hit_multiplier)
 
 
 ## Löst die Treffer-Reaktion aus: Punkte, Sound, Effekte und Umfall-Animation.
-func _trigger_hit() -> void:
+func _trigger_hit(zone_multiplier: float = 1.0) -> void:
 	_is_hit = true
-	var points: int = GameManager.register_hit(point_multiplier)
+	var effective_mult: int = int(point_multiplier * zone_multiplier)
+	var points: int = GameManager.register_hit(effective_mult)
 	hit.emit()
 
 	# Schlafendes Männchen geweckt → Combo-Schutz schalten (F032/F049)
@@ -104,6 +110,10 @@ func _trigger_hit() -> void:
 	# Schwebenden Punkte-Text und Partikel-Spritzer erzeugen (F116, F143)
 	_spawn_floating_text(points)
 	_spawn_hit_particles()
+
+	# Zufälliger Power-Up-Drop (F041/F044/F052 – 15% Chance)
+	if randf() < 0.15:
+		_spawn_powerup()
 
 	# Lustige Umfall-Animation: kippt um und verblasst, dann entfernen
 	var tween: Tween = create_tween()
@@ -155,3 +165,12 @@ func _spawn_hit_particles() -> void:
 	var fx: CPUParticles2D = HIT_EFFECT_SCENE.instantiate()
 	fx.global_position = global_position + Vector2(0, -60)
 	get_parent().add_child(fx)
+
+
+## Spawnt ein zufälliges Power-Up (F041/F044/F052).
+func _spawn_powerup() -> void:
+	var types: Array = ["time_bonus", "big_projectile"]
+	var pu: Area2D = POWERUP_SCENE.instantiate()
+	pu.powerup_type = types[randi() % types.size()]
+	pu.global_position = global_position + Vector2(randf_range(-30, 30), -80)
+	get_parent().add_child(pu)

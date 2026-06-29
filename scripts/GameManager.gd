@@ -40,6 +40,10 @@ var combo_timer_pct: float = 0.0              ## Verhältnis 0..1 für den Forts
 var combo_shield_active: bool = false         ## Läuft der Combo-Schutz gerade? (F049)
 var _combo_shield_timer: float = 0.0
 
+# --- Power-Up System (F041/F044/F052) ---
+var active_powerups: Dictionary = {}          ## Aktive Power-Ups: {"type": {duration: float, data: {...}}}
+var projectile_scale_bonus: float = 1.0       ## Geschoss-Größen-Multiplikator (F044)
+
 
 func _ready() -> void:
 	_load_game()
@@ -65,6 +69,16 @@ func _process(delta: float) -> void:
 		if _combo_timer <= 0.0:
 			_reset_combo()
 	combo_timer_pct = clampf(_combo_timer / combo_time_window, 0.0, 1.0) if combo > 0 else 0.0
+
+	# Power-Ups aktualisieren (F041/F044/F052)
+	var expired_powerups: Array = []
+	for key in active_powerups:
+		var pu = active_powerups[key]
+		pu["duration"] -= delta
+		if pu["duration"] <= 0.0:
+			expired_powerups.append(key)
+	for key in expired_powerups:
+		_deactivate_powerup(key)
 
 	# Runde beenden, wenn die Zeit abgelaufen ist
 	if time_left <= 0.0:
@@ -186,3 +200,28 @@ func _reset_combo() -> void:
 	_combo_timer = 0.0
 	combo_timer_pct = 0.0
 	combo_changed.emit(combo)
+
+
+# --- Power-Up System (F041/F044/F052) ---
+
+## Aktiviert ein Power-Up mit einer Dauer.
+func activate_powerup(type: String, duration: float, data: Dictionary = {}) -> void:
+	if type == "time_bonus":
+		time_left += duration * 5.0  # +5 Sekunden pro Pickup (F041)
+	elif type == "big_projectile":
+		projectile_scale_bonus = 1.5  # Geschoss 1.5x größer (F044)
+	active_powerups[type] = {"duration": duration, "data": data}
+
+
+## Deaktiviert ein Power-Up.
+func _deactivate_powerup(type: String) -> void:
+	if type == "big_projectile":
+		projectile_scale_bonus = 1.0
+	active_powerups.erase(type)
+
+
+## Gibt Dauer/Status eines aktiven Power-Ups zurück (für HUD, F055).
+func get_powerup_remaining(type: String) -> float:
+	if type in active_powerups:
+		return active_powerups[type]["duration"]
+	return 0.0
