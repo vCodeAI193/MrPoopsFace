@@ -82,6 +82,19 @@ func _draw() -> void:
 			draw_circle(Vector2(-r * 0.6, 0), r * 0.5, col)
 			draw_circle(Vector2(0, 0), r * 0.6, col)
 			draw_circle(Vector2(r * 0.6, 0), r * 0.5, col)
+		"freeze":
+			# Eiskristall (F045)
+			var col: Color = Color(0.5, 0.85, 1.0)
+			draw_circle(Vector2.ZERO, r * 0.9, col)
+			draw_circle(Vector2.ZERO, r * 0.6, Color(0.85, 0.97, 1.0))
+			draw_line(Vector2(0, -r * 0.85), Vector2(0, r * 0.85), Color(0.15, 0.45, 0.85), 3.5)
+			draw_line(Vector2(-r * 0.85, 0), Vector2(r * 0.85, 0), Color(0.15, 0.45, 0.85), 3.5)
+		"magnet":
+			# Magnet-U-Form (F047)
+			var col: Color = Color(1.0, 0.28, 0.28)
+			draw_arc(Vector2.ZERO, r * 0.75, PI, TAU, 16, col, 5.5)
+			draw_line(Vector2(-r * 0.75, 0), Vector2(-r * 0.75, r * 0.65), col, 5.5)
+			draw_line(Vector2(r * 0.75, 0), Vector2(r * 0.75, r * 0.65), col, 5.5)
 
 	# Countdown-Ring um den Pickup (F055)
 	var start_angle: float = -PI / 2.0

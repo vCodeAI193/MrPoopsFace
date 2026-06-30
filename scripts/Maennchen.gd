@@ -13,6 +13,7 @@ signal hit                                     ## Wird gesendet, wenn getroffen
 @export var jump_height: float = 0.0                     ## Sprunghöhe in Pixeln; 0 = kein Sprung (F022)
 @export var sleeping: bool = false                       ## Steht still und schläft (F032)
 @export var has_shield: bool = false                     ## Schild-Männchen braucht 2 Treffer (F023)
+@export var is_bomb: bool = false                        ## Bomben-Männchen gibt Minuspunkte (F029)
 
 var _is_hit: bool = false
 var _shield_hits: int = 0                                ## Verbleibende Schildtreffer (F023)
@@ -48,6 +49,10 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if _is_hit or not GameManager.game_active:
+		return
+
+	# Eingefroren durch Power-Up (F045)
+	if GameManager.freeze_active:
 		return
 
 	# Gemächlich hin und her laufen (schlafende Männchen stehen still, F032)
@@ -104,8 +109,14 @@ func _on_body_entered(body: Node) -> void:
 ## Löst die Treffer-Reaktion aus: Punkte, Sound, Effekte und Umfall-Animation.
 func _trigger_hit(zone_multiplier: float = 1.0) -> void:
 	_is_hit = true
-	var effective_mult: int = int(point_multiplier * zone_multiplier)
-	var points: int = GameManager.register_hit(effective_mult)
+	var points: int = 0
+	if is_bomb:
+		# Bomben-Männchen: Punkteabzug statt Gewinn (F029)
+		GameManager.register_bomb_hit(50)
+		points = -50
+	else:
+		var effective_mult: int = int(point_multiplier * zone_multiplier)
+		points = GameManager.register_hit(effective_mult)
 	hit.emit()
 
 	# Schlafendes Männchen geweckt → Combo-Schutz schalten (F032/F049)
@@ -142,15 +153,25 @@ func _trigger_hit(zone_multiplier: float = 1.0) -> void:
 ## Erzeugt den aufsteigenden Punkte-Text über dem getroffenen Männchen (F116).
 ## Die Farbe hängt vom Männchen-Typ ab (Gold sticht hervor).
 func _spawn_floating_text(points: int) -> void:
-	var color: Color = Color(1, 0.85, 0.2)         # Standard: gelb
-	if point_multiplier >= 5:
+	var color: Color
+	var text: String
+	if is_bomb:
+		color = Color(1.0, 0.2, 0.2)              # Bombe: rot
+		text = "%d" % points
+	elif point_multiplier >= 5:
 		color = Color(1.0, 0.84, 0.0)              # Gold
+		text = "+%d" % points
 	elif point_multiplier >= 3:
 		color = Color(0.4, 0.9, 1.0)               # Mini: cyan
+		text = "+%d" % points
 	elif point_multiplier >= 2:
 		color = Color(1.0, 0.55, 0.1)              # Schnell: orange
+		text = "+%d" % points
+	else:
+		color = Color(1, 0.85, 0.2)
+		text = "+%d" % points
 	var ft: FloatingText = FLOATING_TEXT_SCENE.instantiate()
-	ft.setup("+%d" % points, color)
+	ft.setup(text, color)
 	ft.global_position = global_position + Vector2(0, -120)
 	get_parent().add_child(ft)
 
@@ -158,8 +179,10 @@ func _spawn_floating_text(points: int) -> void:
 ## Zeigt ein zufälliges Reaktions-Emote über dem Männchen (F038).
 func _spawn_reaction_emote() -> void:
 	const EMOTES: Array = ["NEIN!", "AUA!", "WAS?!", "HILFE!", "OUGH!"]
+	const BOMB_EMOTES: Array = ["BOOM!", "VERLOREN!", "OH NEIN!"]
+	var list: Array = BOMB_EMOTES if is_bomb else EMOTES
 	var ft: FloatingText = FLOATING_TEXT_SCENE.instantiate()
-	ft.setup(EMOTES[randi() % EMOTES.size()], Color(1.0, 0.88, 0.88))
+	ft.setup(list[randi() % list.size()], Color(1.0, 0.88, 0.88))
 	ft.global_position = global_position + Vector2(randf_range(-40, 40), -190)
 	get_parent().add_child(ft)
 
@@ -179,9 +202,9 @@ func _spawn_hit_particles() -> void:
 	get_parent().add_child(fx)
 
 
-## Spawnt ein zufälliges Power-Up (F041/F042/F043/F044/F052).
+## Spawnt ein zufälliges Power-Up (F041/F042/F043/F044/F045/F047/F052).
 func _spawn_powerup() -> void:
-	var types: Array = ["time_bonus", "big_projectile", "points_double", "multi_shot"]
+	var types: Array = ["time_bonus", "big_projectile", "points_double", "multi_shot", "freeze", "magnet"]
 	var pu: Area2D = POWERUP_SCENE.instantiate()
 	pu.powerup_type = types[randi() % types.size()]
 	pu.global_position = global_position + Vector2(randf_range(-30, 30), -80)

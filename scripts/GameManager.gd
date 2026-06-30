@@ -17,11 +17,6 @@ signal hit_registered(points: int)             ## Wird bei jedem Treffer gesende
 @export var combo_time_window: float = 1.5     ## Zeitfenster für aufeinanderfolgende Treffer
 @export var base_hit_points: int = 10          ## Grundpunkte pro Treffer
 
-# --- Spielmodi & Schwierigkeit (F085, F089) ---
-var game_mode: String = "normal"               ## "normal", "practice", "easy", "hard" (F085, F089)
-enum Difficulty {EASY, NORMAL, HARD}
-var difficulty: int = Difficulty.NORMAL
-
 # --- Laufzeit-Status ---
 var score: int = 0
 var combo: int = 0
@@ -50,6 +45,11 @@ var active_powerups: Dictionary = {}          ## Aktive Power-Ups: {"type": {dur
 var projectile_scale_bonus: float = 1.0       ## Geschoss-Größen-Multiplikator (F044)
 var points_multiplier: float = 1.0             ## Punkte-Multiplikator (F042)
 var multi_shot_count: int = 1                 ## Anzahl Geschosse pro Wurf (F043)
+
+# --- Umgebung & erweiterte Power-Ups ---
+var wind_force: Vector2 = Vector2.ZERO        ## Seitliche Windkraft (F007)
+var freeze_active: bool = false               ## Alle Männchen eingefroren (F045)
+var magnet_active: bool = false               ## Magnet-Power-Up aktiv (F047)
 
 # --- Game Modes & Einstellungen ---
 var game_mode: String = "normal"               ## "normal", "practice" (F085), "hard" (F089)
@@ -110,6 +110,9 @@ func start_game() -> void:
 	best_combo = 0
 	hits_total = 0
 	avg_points_per_hit = 0.0
+	wind_force = Vector2(randf_range(-120.0, 120.0), 0.0)  # Wind randomisieren (F007)
+	freeze_active = false
+	magnet_active = false
 	score_changed.emit(score)
 	combo_changed.emit(combo)
 	streak_changed.emit(streak)
@@ -162,6 +165,14 @@ func register_hit(type_multiplier: int = 1) -> int:
 ## Gibt den höchsten gespeicherten Punktestand zurück (0, falls keiner).
 func get_high_score() -> int:
 	return int(highscores[0]) if highscores.size() > 0 else 0
+
+
+## Zieht Punkte für ein Bomben-Männchen ab (F029).
+func register_bomb_hit(penalty: int = 50) -> void:
+	if not game_active:
+		return
+	score = maxi(0, score - penalty)
+	score_changed.emit(score)
 
 
 ## Trägt einen Punktestand in die Bestenliste ein und speichert.
@@ -235,6 +246,10 @@ func activate_powerup(type: String, duration: float, data: Dictionary = {}) -> v
 		points_multiplier = 2.0  # Punkte verdoppelt (F042)
 	elif type == "multi_shot":
 		multi_shot_count = 3  # 3 Geschosse auf einmal (F043)
+	elif type == "freeze":
+		freeze_active = true  # Alle Männchen einfrieren (F045)
+	elif type == "magnet":
+		magnet_active = true  # Geschosse ziehen zu Männchen (F047)
 	active_powerups[type] = {"duration": duration, "data": data}
 
 
@@ -246,6 +261,10 @@ func _deactivate_powerup(type: String) -> void:
 		points_multiplier = 1.0
 	elif type == "multi_shot":
 		multi_shot_count = 1
+	elif type == "freeze":
+		freeze_active = false
+	elif type == "magnet":
+		magnet_active = false
 	active_powerups.erase(type)
 
 

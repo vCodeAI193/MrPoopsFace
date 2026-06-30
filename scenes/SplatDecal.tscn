@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://d0splat0decal0floor0"]
+
+[ext_resource type="Script" path="res://scripts/SplatDecal.gd" id="1_splat"]
+
+[node name="SplatDecal" type="Node2D"]
+script = ExtResource("1_splat")

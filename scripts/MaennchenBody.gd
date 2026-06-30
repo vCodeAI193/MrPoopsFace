@@ -12,6 +12,7 @@ func _draw() -> void:
 	var s: float = _maennchen.figure_scale
 	var w: float = 6.0 * s                       # Strichstärke
 	var is_sleeping: bool = _maennchen.sleeping
+	var is_bomb: bool = _maennchen.is_bomb
 
 	# Beinwinkel: beim Schlafen still, sonst animiert
 	var swing: float = 0.0
@@ -47,8 +48,13 @@ func _draw() -> void:
 		draw_rect(Rect2(-25 * s, -45 * s, 50 * s * shield_health, 6 * s),
 			Color(0.8, 0.6, 0.1, 1.0))
 
-	# --- Gesicht (offen oder schlafend/geschlossen) ---
-	if is_sleeping:
+	# --- Gesicht (offen oder schlafend/geschlossen/Bombe) ---
+	if is_bomb:
+		# Bomben-Männchen: rotes Ausrufezeichen statt normaler Augen (F029)
+		var red: Color = Color(1.0, 0.1, 0.1, 0.9)
+		draw_line(head_center + Vector2(0, -10 * s), head_center + Vector2(0, 5 * s), red, w * 0.85)
+		draw_circle(head_center + Vector2(0, 11 * s), 3.5 * s, red)
+	elif is_sleeping:
 		# Geschlossene Augen als horizontale Striche
 		draw_line(head_center + Vector2(-11 * s, -2 * s), head_center + Vector2(-3 * s, -2 * s), col, w * 0.65)
 		draw_line(head_center + Vector2(3 * s, -2 * s), head_center + Vector2(11 * s, -2 * s), col, w * 0.65)

@@ -24,6 +24,7 @@ const VARIANTS: Array = [
 	{"scale": 0.88, "speed": 75.0, "color": Color(0.1, 0.55, 0.15), "mult": 2, "weight": 18, "jump_height": 110.0, "sleeping": false, "has_shield": false}, # springend (F022)
 	{"scale": 1.05, "speed": 0.0, "color": Color(0.2, 0.22, 0.32), "mult": 4, "weight": 8, "jump_height": 0.0, "sleeping": true, "has_shield": false},     # schlafend (F032)
 	{"scale": 1.15, "speed": 50.0, "color": Color(0.35, 0.35, 0.35), "mult": 2, "weight": 8, "jump_height": 0.0, "sleeping": false, "has_shield": true},   # Schild (F023)
+	{"scale": 1.0, "speed": 80.0, "color": Color(0.65, 0.08, 0.08), "mult": 0, "weight": 10, "jump_height": 0.0, "sleeping": false, "has_shield": false, "is_bomb": true},  # Bombe (F029)
 ]
 
 @onready var _spawn_timer: Timer = $SpawnTimer
@@ -97,6 +98,13 @@ func _ready() -> void:
 	# Wolken initialisieren (F075)
 	_init_clouds()
 
+	# Wellen-Schwierigkeit alle 15 Sekunden erhöhen (F036)
+	var wave_timer: Timer = Timer.new()
+	wave_timer.wait_time = 15.0
+	wave_timer.timeout.connect(_on_wave_tick)
+	add_child(wave_timer)
+	wave_timer.start()
+
 	# Countdown abspielen, dann die Runde starten (F117)
 	_run_countdown()
 
@@ -131,7 +139,18 @@ func _process(delta: float) -> void:
 	if "time_bonus" in GameManager.active_powerups:
 		pu_text += "⏱ +5s (%.1fs)\n" % GameManager.get_powerup_remaining("time_bonus")
 	if "big_projectile" in GameManager.active_powerups:
-		pu_text += "●+1.5x (%.1fs)" % GameManager.get_powerup_remaining("big_projectile")
+		pu_text += "●+1.5x (%.1fs)\n" % GameManager.get_powerup_remaining("big_projectile")
+	if "points_double" in GameManager.active_powerups:
+		pu_text += "2x Punkte (%.1fs)\n" % GameManager.get_powerup_remaining("points_double")
+	if "freeze" in GameManager.active_powerups:
+		pu_text += "❄ Eingefroren (%.1fs)\n" % GameManager.get_powerup_remaining("freeze")
+	if "magnet" in GameManager.active_powerups:
+		pu_text += "Magnet (%.1fs)\n" % GameManager.get_powerup_remaining("magnet")
+	# Wind-Anzeige (F007)
+	if GameManager.game_active and abs(GameManager.wind_force.x) > 10.0:
+		var wind_dir: String = ">" if GameManager.wind_force.x > 0 else "<"
+		var wind_str: int = clampi(int(abs(GameManager.wind_force.x) / 40.0), 1, 3)
+		pu_text += "Wind " + wind_dir.repeat(wind_str) + "\n"
 	if pu_text.is_empty():
 		_powerup_label.visible = false
 	else:
@@ -204,6 +223,7 @@ func _apply_variant(maennchen: Maennchen) -> void:
 	maennchen.jump_height = variant.get("jump_height", 0.0)
 	maennchen.sleeping = variant.get("sleeping", false)
 	maennchen.has_shield = variant.get("has_shield", false)
+	maennchen.is_bomb = variant.get("is_bomb", false)
 
 
 ## Liefert eine zufällige Variante entsprechend ihrer Gewichtung.
@@ -270,6 +290,15 @@ func _pop_label(label: Control, from_scale: float, pivot: Vector2 = Vector2(-1, 
 	var tween: Tween = create_tween()
 	tween.tween_property(label, "scale", Vector2.ONE, 0.25) \
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+## Erhöht alle 15 Sekunden Schwierigkeit: mehr Männchen und schnellerer Spawn (F036).
+func _on_wave_tick() -> void:
+	if not GameManager.game_active:
+		return
+	max_maennchen = mini(max_maennchen + 1, 20)
+	spawn_rate = maxf(spawn_rate * 0.9, 0.5)
+	_spawn_timer.wait_time = spawn_rate
 
 
 # --- Wolken (F075) ---

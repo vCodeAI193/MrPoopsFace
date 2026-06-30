@@ -1,5 +1,7 @@
 extends RigidBody2D
 ## Projectile – der Kackhaufen, den der Spieler wirft.
+
+const SPLAT_DECAL_SCENE: PackedScene = preload("res://scenes/SplatDecal.tscn")
 ## Ein RigidBody2D mit Schwerkraft, der per _draw() als brauner Haufen
 ## mit Emoji-Augen gezeichnet wird (keine externen Grafiken nötig).
 
@@ -58,6 +60,13 @@ func _on_body_entered(body: Node) -> void:
 	if _splat_player.stream != null:
 		_splat_player.play()
 
+	# Schmierfleck-Decal am Boden (F015)
+	if body is StaticBody2D and SPLAT_DECAL_SCENE != null:
+		var decal: Node2D = SPLAT_DECAL_SCENE.instantiate()
+		if get_parent():
+			get_parent().add_child(decal)
+			decal.setup(global_position, poop_radius)
+
 	# Explosion-AoE (F010): Alle Männchen im Radius treffen
 	if has_explosion:
 		var all_maennchen: Array = get_tree().get_nodes_in_group("maennchen")
@@ -75,6 +84,19 @@ func _on_body_entered(body: Node) -> void:
 
 
 func _process(delta: float) -> void:
+	# Magnet: Geschoss wird zu nächstem Männchen gezogen (F047)
+	if GameManager.magnet_active and not freeze and _stuck_to == null:
+		var nearest: Node2D = null
+		var best_dist: float = INF
+		for m in get_tree().get_nodes_in_group("maennchen"):
+			var d: float = global_position.distance_to(m.global_position)
+			if d < best_dist:
+				best_dist = d
+				nearest = m
+		if nearest and best_dist < 600.0:
+			var pull: Vector2 = (nearest.global_position - global_position).normalized() * 260.0
+			apply_central_force(pull)
+
 	# Klebrig: an Männchen folgen und regelmäßig Schaden verursachen (F009)
 	if _stuck_to and is_instance_valid(_stuck_to):
 		global_position = _stuck_to.global_position + Vector2(randf_range(-10, 10), -40)
@@ -105,6 +127,8 @@ func launch(impulse: Vector2, spin: float = 0.0) -> void:
 		angular_velocity = randf_range(-8.0, 8.0)
 	# Größen-Bonus durch Power-Up (F044)
 	scale *= GameManager.projectile_scale_bonus
+	# Windkraft als konstante Kraft anwenden (F007)
+	constant_force = GameManager.wind_force
 
 
 func _draw() -> void:

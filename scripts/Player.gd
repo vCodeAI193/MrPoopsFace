@@ -40,6 +40,8 @@ func _ready() -> void:
 	_whoosh_player.stream = SoundGen.whoosh()
 	# Auf Combo-Änderungen reagieren, um die Aura zu steuern (F146)
 	GameManager.combo_changed.connect(_on_combo_changed)
+	# Zeitlupe bei Rundenende aufheben (F012)
+	GameManager.game_over.connect(func(_s: int) -> void: Engine.time_scale = 1.0)
 	queue_redraw()
 
 
@@ -95,9 +97,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			_aiming = true
 			_touch_index = event.index
 			_drag_current = to_local(event.position)
+			Engine.time_scale = 0.35  # Zeitlupe beim Zielen (F012)
 			queue_redraw()
 		elif not event.pressed and event.index == _touch_index:
 			# --- Finger losgelassen: werfen ---
+			Engine.time_scale = 1.0  # Zeitlupe aufheben (F012)
 			_release_throw()
 
 	# --- Finger bewegt sich (Zielen) ---
@@ -108,6 +112,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_aiming = false
 			_touch_index = -1
 			_drag_current = Vector2.ZERO
+			Engine.time_scale = 1.0  # Zeitlupe aufheben (F012)
 			queue_redraw()
 			return
 		# Zugweite begrenzen
@@ -247,5 +252,6 @@ func _draw() -> void:
 	for i in trajectory_points:
 		pos += vel * trajectory_step
 		vel.y += gravity * trajectory_step
+		vel += GameManager.wind_force * trajectory_step  # Wind-Abweichung (F007)
 		var alpha: float = 1.0 - float(i) / trajectory_points
 		draw_circle(pos, 6.0, Color(1, 1, 1, alpha * 0.7))

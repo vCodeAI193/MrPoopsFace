@@ -18,15 +18,15 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F004** 🟡 Geschoss-Vorrat/Munition pro Runde (begrenzte Würfe)
 - [x] **F005** 🟢 Nachlade-Animation des Kackhaufens am Anker
 - [x] **F006** 🟡 Abprall-Physik an Wänden mit Restitution
-- [ ] **F007** 🟡 Wind-Einfluss auf die Flugbahn (seitliche Kraft)
+- [x] **F007** 🟡 Wind-Einfluss auf die Flugbahn (seitliche Kraft)
 - [ ] **F008** 🔴 Zerlegbare Geschosse (Split-Shot in 3 kleinere Haufen)
 - [x] **F009** 🟡 Klebrige Geschosse, die an Männchen haften bleiben
 - [x] **F010** 🟡 Sprengradius/Flächenschaden bei Aufprall (AoE)
 - [x] **F011** 🟢 Drehmoment/Spin durch Wischrichtung beim Loslassen – Kreuzprodukt für Spin
-- [ ] **F012** 🟡 Zeitlupe (Bullet-Time) während des Zielens
+- [x] **F012** 🟡 Zeitlupe (Bullet-Time) während des Zielens
 - [x] **F013** 🟢 Doppeltipp zum schnellen Wiederholen des letzten Wurfs – 0.4s Fenster
 - [ ] **F014** 🟡 Zwei-Finger-Zoom der Wurf-Vorschau
-- [ ] **F015** 🟡 Aufprall hinterlässt Schmierfleck-Decals am Boden
+- [x] **F015** 🟡 Aufprall hinterlässt Schmierfleck-Decals am Boden
 - [x] **F016** 🟢 Trefferzonen (Kopf = Bonus, Körper = normal)
 - [ ] **F017** 🔴 Ricochet-Combo (ein Wurf trifft mehrere Männchen)
 - [ ] **F018** 🟡 Magnet-Geschoss, das leicht zum nächsten Ziel zieht
@@ -43,14 +43,14 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F026** 🟡 Regenschirm-Männchen (blockt Treffer von oben)
 - [ ] **F027** 🟡 Ausweichendes Männchen (springt bei Annäherung zur Seite)
 - [x] **F028** 🟡 Gold-Männchen (selten, hoher Punktewert) – Gelb, 5x Punkte
-- [ ] **F029** 🔴 Bomben-Männchen (Minuspunkte bei Treffer)
+- [x] **F029** 🔴 Bomben-Männchen (Minuspunkte bei Treffer)
 - [ ] **F030** 🟡 Gruppen-Männchen, die in Formation laufen
 - [ ] **F031** 🟡 Fliegendes Männchen (Jetpack, bewegt sich in der Luft)
 - [x] **F032** 🟢 Schlafendes Männchen (steht still, Bonus für Wecken) – Stationär, 4x Punkte, Zzz-Effekt
 - [ ] **F033** 🟡 Verkleidetes Männchen (tarnt sich vor Hintergrund)
 - [ ] **F034** 🔴 Männchen mit Konter (wirft zurück)
 - [x] **F035** 🟢 Variations-Farben/Outfits rein kosmetisch – Farben per Variante (blau, gold, grün)
-- [ ] **F036** 🟡 Männchen-Spawnwellen mit ansteigender Schwierigkeit
+- [x] **F036** 🟡 Männchen-Spawnwellen mit ansteigender Schwierigkeit
 - [ ] **F037** 🟡 Geh-Richtungs-KI mit Wegpunkten
 - [x] **F038** 🟢 Reaktions-Emotes über dem Kopf (Schreck, Wut) – Zzz beim Schlafen
 - [ ] **F039** 🔴 Ragdoll-Physik statt Tween beim Umfallen
@@ -62,9 +62,9 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F042** 🟡 Punkte-Verdopplung für 10 Sekunden
 - [x] **F043** 🟡 Mehrfach-Wurf (3 Geschosse auf einmal)
 - [x] **F044** 🟢 Größeres Geschoss temporär
-- [ ] **F045** 🟡 Einfrieren – alle Männchen stehen still
+- [x] **F045** 🟡 Einfrieren – alle Männchen stehen still
 - [ ] **F046** 🔴 Regen-Modus: Kackhaufen fallen automatisch vom Himmel
-- [ ] **F047** 🟡 Magnet-Power-Up (alle Treffer ziehen an)
+- [x] **F047** 🟡 Magnet-Power-Up (alle Treffer ziehen an)
 - [ ] **F048** 🟡 Schild gegen Bomben-Männchen-Strafe
 - [x] **F049** 🟢 Combo-Schutz (Combo läuft kurz nicht ab) – Shield Timer beim Schlafen-Wecken
 - [ ] **F050** 🔴 Power-Up-Inventar mit aktivierbaren Slots
