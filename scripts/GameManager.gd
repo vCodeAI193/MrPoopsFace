@@ -62,9 +62,21 @@ var ammo_left: int = -1                       ## Verbleibende Würfe in dieser R
 var game_mode: String = "normal"               ## "normal", "practice" (F085), "hard" (F089)
 var difficulty: String = "medium"              ## "easy", "medium", "hard" (F089)
 
+# --- Optionen (F179, F137, F181, F183, F166) ---
+var music_volume: float = 0.7                  ## Musiklautstärke 0..1 (F137)
+var sfx_volume: float = 1.0                    ## Effektlautstärke 0..1 (F137)
+var screen_shake_enabled: bool = true          ## Bildschirm-Erschütterung an/aus (F181)
+var reduced_motion: bool = false               ## Reduzierte Bewegung (F183)
+var vibration_strength: float = 1.0            ## Vibrationsstärke 0..1 (F166)
+
+var _music_player: AudioStreamPlayer           ## Spielt den Hintergrund-Loop (F134)
+
 
 func _ready() -> void:
+	_setup_audio_buses()
 	_load_game()
+	apply_audio_settings()
+	_start_music()
 
 
 func _process(delta: float) -> void:
@@ -222,18 +234,84 @@ func _record_highscore(value: int) -> void:
 	_save_game()
 
 
-## Speichert den Spielstand persistent (F195).
+## Speichert den Spielstand persistent (F195), inkl. Optionen (F179).
 func _save_game() -> void:
 	var cfg: ConfigFile = ConfigFile.new()
 	cfg.set_value("scores", "highscores", highscores)
+	cfg.set_value("settings", "music_volume", music_volume)
+	cfg.set_value("settings", "sfx_volume", sfx_volume)
+	cfg.set_value("settings", "screen_shake_enabled", screen_shake_enabled)
+	cfg.set_value("settings", "reduced_motion", reduced_motion)
+	cfg.set_value("settings", "vibration_strength", vibration_strength)
 	cfg.save(SAVE_PATH)
 
 
-## Lädt den Spielstand, falls vorhanden (F195).
+## Lädt den Spielstand, falls vorhanden (F195), inkl. Optionen (F179).
 func _load_game() -> void:
 	var cfg: ConfigFile = ConfigFile.new()
 	if cfg.load(SAVE_PATH) == OK:
 		highscores = cfg.get_value("scores", "highscores", [])
+		music_volume = cfg.get_value("settings", "music_volume", 0.7)
+		sfx_volume = cfg.get_value("settings", "sfx_volume", 1.0)
+		screen_shake_enabled = cfg.get_value("settings", "screen_shake_enabled", true)
+		reduced_motion = cfg.get_value("settings", "reduced_motion", false)
+		vibration_strength = cfg.get_value("settings", "vibration_strength", 1.0)
+
+
+# --- Audio-Setup & Optionen (F134, F137, F142, F179, F187) ---
+
+## Legt die Audio-Busse "Music" und "SFX" an, mit leichtem Hall auf SFX (F142).
+func _setup_audio_buses() -> void:
+	for bus_name in ["Music", "SFX"]:
+		if AudioServer.get_bus_index(bus_name) == -1:
+			var idx: int = AudioServer.bus_count
+			AudioServer.add_bus(idx)
+			AudioServer.set_bus_name(idx, bus_name)
+			AudioServer.set_bus_send(idx, "Master")
+	# Leichter Raumhall auf den Effekten (F142)
+	var sfx_idx: int = AudioServer.get_bus_index("SFX")
+	if AudioServer.get_bus_effect_count(sfx_idx) == 0:
+		var reverb: AudioEffectReverb = AudioEffectReverb.new()
+		reverb.wet = 0.12
+		reverb.room_size = 0.4
+		AudioServer.add_bus_effect(sfx_idx, reverb)
+
+
+## Überträgt die Lautstärke-Einstellungen auf die Audio-Busse (F137).
+func apply_audio_settings() -> void:
+	var music_idx: int = AudioServer.get_bus_index("Music")
+	var sfx_idx: int = AudioServer.get_bus_index("SFX")
+	AudioServer.set_bus_volume_db(music_idx, linear_to_db(maxf(music_volume, 0.001)))
+	AudioServer.set_bus_mute(music_idx, music_volume <= 0.0)
+	AudioServer.set_bus_volume_db(sfx_idx, linear_to_db(maxf(sfx_volume, 0.001)))
+	AudioServer.set_bus_mute(sfx_idx, sfx_volume <= 0.0)
+
+
+## Startet den prozeduralen Hintergrundmusik-Loop (F134).
+## Läuft auch während der Pause weiter.
+func _start_music() -> void:
+	_music_player = AudioStreamPlayer.new()
+	_music_player.bus = "Music"
+	_music_player.process_mode = Node.PROCESS_MODE_ALWAYS
+	_music_player.stream = SoundGen.music_loop()
+	add_child(_music_player)
+	_music_player.play()
+
+
+## Speichert die aktuellen Optionen (F179).
+func save_settings() -> void:
+	_save_game()
+
+
+## Setzt alle Optionen auf die Standardwerte zurück (F187).
+func reset_settings() -> void:
+	music_volume = 0.7
+	sfx_volume = 1.0
+	screen_shake_enabled = true
+	reduced_motion = false
+	vibration_strength = 1.0
+	apply_audio_settings()
+	_save_game()
 
 
 ## Aktiviert den Combo-Schutz für duration Sekunden (F049).

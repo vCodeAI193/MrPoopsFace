@@ -3,19 +3,23 @@ extends Control
 ## Zeigt zusätzlich den aktuellen Highscore an. UI-Klick-Sounds (F136).
 
 @onready var _start_button: Button = $Center/VBox/StartButton
+@onready var _options_button: Button = $Center/VBox/OptionsButton
 @onready var _quit_button: Button = $Center/VBox/QuitButton
 @onready var _highscore_label: Label = $Center/VBox/HighscoreLabel
+@onready var _settings: SettingsOverlay = $Settings
 
 var _ui_click_player: AudioStreamPlayer
 
 
 func _ready() -> void:
 	_start_button.pressed.connect(_on_start_pressed)
+	_options_button.pressed.connect(_on_options_pressed)
 	_quit_button.pressed.connect(_on_quit_pressed)
 	_highscore_label.text = "Bester: %d" % GameManager.get_high_score()
 
 	# Audio-Player für UI-Klicks (F136)
 	_ui_click_player = AudioStreamPlayer.new()
+	_ui_click_player.bus = "SFX"
 	add_child(_ui_click_player)
 
 
@@ -23,6 +27,12 @@ func _ready() -> void:
 func _on_start_pressed() -> void:
 	_play_click_sound()
 	get_tree().change_scene_to_file("res://scenes/Main.tscn")
+
+
+## Öffnet die Optionen (F179).
+func _on_options_pressed() -> void:
+	_play_click_sound()
+	_settings.show_settings()
 
 
 ## Beendet das Spiel.

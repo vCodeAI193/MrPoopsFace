@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://m0mainmenu0start0"]
+[gd_scene load_steps=5 format=3 uid="uid://m0mainmenu0start0"]
 
 [ext_resource type="Script" path="res://scripts/MainMenu.gd" id="1_menu"]
+[ext_resource type="PackedScene" uid="uid://s0settings0overlay00" path="res://scenes/Settings.tscn" id="2_settings"]
 
 [sub_resource type="Gradient" id="Gradient_menu"]
 offsets = PackedFloat32Array(0, 1)
@@ -56,7 +57,14 @@ custom_minimum_size = Vector2(0, 130)
 text = "Spielen"
 theme_override_font_sizes/font_size = 60
 
+[node name="OptionsButton" type="Button" parent="Center/VBox"]
+custom_minimum_size = Vector2(0, 110)
+text = "Optionen"
+theme_override_font_sizes/font_size = 48
+
 [node name="QuitButton" type="Button" parent="Center/VBox"]
 custom_minimum_size = Vector2(0, 110)
 text = "Beenden"
 theme_override_font_sizes/font_size = 48
+
+[node name="Settings" parent="." instance=ExtResource("2_settings")]

@@ -16,6 +16,7 @@ var _collected: bool = false
 
 
 func _ready() -> void:
+	_collect_player.bus = "SFX"  # F137/F142
 	_collect_player.stream = SoundGen.whoosh()
 	add_to_group("powerup")
 	queue_redraw()

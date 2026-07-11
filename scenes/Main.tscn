@@ -1,10 +1,11 @@
-[gd_scene load_steps=12 format=3 uid="uid://a0main0stinkytoss0"]
+[gd_scene load_steps=13 format=3 uid="uid://a0main0stinkytoss0"]
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://d0player0slingshot0" path="res://scenes/Player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://c0maennchen0stick0" path="res://scenes/Maennchen.tscn" id="3_maen"]
 [ext_resource type="PackedScene" uid="uid://e0gameover0screen0" path="res://scenes/GameOver.tscn" id="4_over"]
 [ext_resource type="PackedScene" uid="uid://p0pausemenu0overlay0" path="res://scenes/PauseMenu.tscn" id="5_pause"]
+[ext_resource type="PackedScene" uid="uid://s0settings0overlay00" path="res://scenes/Settings.tscn" id="6_settings"]
 
 [sub_resource type="Gradient" id="Gradient_sky"]
 offsets = PackedFloat32Array(0, 1)
@@ -143,6 +144,16 @@ offset_bottom = 116.0
 text = "🔊"
 theme_override_font_sizes/font_size = 48
 
+[node name="SettingsButton" type="Button" parent="HUD"]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_top = 24.0
+offset_right = -250.0
+offset_bottom = 116.0
+text = "⚙"
+theme_override_font_sizes/font_size = 48
+
 [node name="CountdownLabel" type="Label" parent="HUD"]
 visible = false
 anchor_right = 1.0
@@ -156,5 +167,7 @@ theme_override_constants/outline_size = 16
 theme_override_font_sizes/font_size = 280
 
 [node name="PauseMenu" parent="." instance=ExtResource("5_pause")]
+
+[node name="Settings" parent="." instance=ExtResource("6_settings")]
 
 [node name="GameOver" parent="." instance=ExtResource("4_over")]

@@ -28,7 +28,8 @@ func _ready() -> void:
 	physics_material_override = PhysicsMaterial.new()
 	physics_material_override.bounce = 0.45
 	physics_material_override.friction = 0.3
-	# Platsch-Sound prozedural erzeugen (F133)
+	# Platsch-Sound prozedural erzeugen (F133), über den SFX-Bus (F137/F142)
+	_splat_player.bus = "SFX"
 	_splat_player.stream = SoundGen.splat()
 	body_entered.connect(_on_body_entered)
 	# Sicherstellen, dass der Haufen gezeichnet wird

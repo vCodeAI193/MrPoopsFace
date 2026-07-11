@@ -153,7 +153,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F121** 🟡 Responsives HUD-Layout für Notch/Safe-Area
 - [x] **F122** 🟢 Highscore-Anzeige im Hauptmenü – Im MainMenu implementiert
 - [x] **F123** 🟡 Toast-Benachrichtigungen (z. B. „Neuer Rekord!")
-- [ ] **F124** 🟢 Einstellungs-Button im HUD
+- [x] **F124** 🟢 Einstellungs-Button im HUD
 - [ ] **F125** 🟡 Anim. Szenenübergänge (Fade/Wipe)
 - [x] **F126** 🟢 Treffer-Streak-Anzeige – 🔥 Icon mit Zähler ab 3
 - [ ] **F127** 🟡 Mini-Map/Übersicht bei scrollenden Leveln (→F070)
@@ -166,15 +166,15 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F131** 🟢 Mehrere Furz-Varianten (zufällig) – SoundGen.fart() mit 5 Varianten
 - [x] **F132** 🟢 Wurf-Soundeffekt (Schwung/Whoosh) – SoundGen.whoosh() prozedural
 - [x] **F133** 🟢 Aufprall-Platsch-Sound – SoundGen.impact() beim Treffer
-- [ ] **F134** 🟡 Hintergrundmusik-Loop pro Theme
+- [x] **F134** 🟡 Hintergrundmusik-Loop pro Theme
 - [x] **F135** 🟢 Combo-Jingle bei Steigerung – SoundGen.combo_jingle() Arpeggio
 - [x] **F136** 🟢 UI-Klick-Sounds – SoundGen.click() in Menüs
-- [ ] **F137** 🟡 Lautstärkeregler für Musik/SFX getrennt
+- [x] **F137** 🟡 Lautstärkeregler für Musik/SFX getrennt
 - [x] **F138** 🟢 Countdown-Tick-Sound – SoundGen.countdown_tick() bei "3-2-1"
 - [ ] **F139** 🟡 Dynamische Musik (intensiver bei hoher Combo)
 - [x] **F140** 🟢 Stummschalt-Button – 🔊/🔇 Icon Toggle
 - [ ] **F141** 🟡 Sprach-Samples/Jubel bei Highscore
-- [ ] **F142** 🟡 Audio-Bus-Setup mit Effekten (Reverb)
+- [x] **F142** 🟡 Audio-Bus-Setup mit Effekten (Reverb)
 
 ## ✨ 9. Visuelle Effekte & Polish (F143–F156)
 
@@ -204,7 +204,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F163** 🟡 Gamepad-Unterstützung (optional)
 - [x] **F164** 🟢 Abbruch des Wurfs durch Zurückziehen in den Anker – 30px proximity check
 - [ ] **F165** 🟡 Geste zum schnellen Power-Up-Einsatz
-- [ ] **F166** 🟢 Konfigurierbare Vibrationsstärke
+- [x] **F166** 🟢 Konfigurierbare Vibrationsstärke
 
 ## 🌐 11. Soziales & Online (F167–F178)
 
@@ -223,15 +223,15 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## ⚙️ 12. Einstellungen & Barrierefreiheit (F179–F188)
 
-- [ ] **F179** 🟢 Einstellungs-Szene mit persistenten Optionen
+- [x] **F179** 🟢 Einstellungs-Szene mit persistenten Optionen
 - [ ] **F180** 🟡 Farbenblind-Modus / hoher Kontrast
-- [ ] **F181** 🟢 Bildschirm-Erschütterung abschaltbar
+- [x] **F181** 🟢 Bildschirm-Erschütterung abschaltbar
 - [ ] **F182** 🟡 Schriftgröße skalierbar
-- [ ] **F183** 🟢 Reduzierte-Bewegung-Option
+- [x] **F183** 🟢 Reduzierte-Bewegung-Option
 - [ ] **F184** 🟡 Eingabe-Hilfe (größere Trefferzonen)
 - [ ] **F185** 🟢 Untertitel/Text für Audio-Hinweise
 - [ ] **F186** 🟡 Linkshänder-UI-Spiegelung (→F158)
-- [ ] **F187** 🟢 Reset-auf-Standard-Button in Optionen
+- [x] **F187** 🟢 Reset-auf-Standard-Button in Optionen
 - [ ] **F188** 🟡 Datenschutz-/Werbe-Einwilligung (Consent) – GDPR
 
 ## 🌍 13. Lokalisierung (F189–F194)

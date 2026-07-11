@@ -47,7 +47,8 @@ func _ready() -> void:
 	_base_y = position.y
 	# Treffer-Erkennung: der Kackhaufen (RigidBody2D) löst body_entered aus
 	body_entered.connect(_on_body_entered)
-	# Zufällige Furz-Variante zuweisen (F131)
+	# Zufällige Furz-Variante zuweisen (F131), über den SFX-Bus (F137/F142)
+	_fart_player.bus = "SFX"
 	_fart_player.stream = SoundGen.fart(randi() % 5)
 	queue_redraw()
 
@@ -164,8 +165,9 @@ func _trigger_hit(zone_multiplier: float = 1.0) -> void:
 	# Stink-Wölkchen aufsteigen lassen (F148)
 	_spawn_stink_cloud()
 
-	# Haptisches Feedback auf Android (F157); am Desktop wirkungslos
-	Input.vibrate_handheld(60)
+	# Haptisches Feedback auf Android (F157), Stärke einstellbar (F166)
+	if GameManager.vibration_strength > 0.0:
+		Input.vibrate_handheld(int(60 * GameManager.vibration_strength))
 
 	# Zufälliger Power-Up-Drop (F041/F044/F052 – 15% Chance)
 	if randf() < 0.15:

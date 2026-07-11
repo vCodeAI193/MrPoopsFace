@@ -97,6 +97,39 @@ static func click() -> AudioStreamWAV:
 	return _make_stream(samples)
 
 
+## Hintergrundmusik – fröhlicher, nahtlos loopender 4-Sekunden-Groove (F134).
+## Achtelnoten-Melodie in C-Dur-Pentatonik über einem einfachen Bass.
+static func music_loop() -> AudioStreamWAV:
+	const STEP: float = 0.25                       # Achtelnote bei 120 BPM
+	# 16 Achtel Melodie (C-Dur-Pentatonik, endet zum Loop passend)
+	var melody: Array = [
+		523.0, 659.0, 784.0, 659.0, 880.0, 784.0, 659.0, 523.0,
+		587.0, 659.0, 784.0, 880.0, 784.0, 659.0, 587.0, 523.0,
+	]
+	# 8 Viertel Bass (C – G – A – F Kadenz)
+	var bass: Array = [131.0, 131.0, 98.0, 98.0, 110.0, 110.0, 87.0, 98.0]
+	var n: int = int(MIX_RATE * STEP * melody.size())
+	var samples: PackedFloat32Array = PackedFloat32Array()
+	samples.resize(n)
+	for i in n:
+		var t: float = float(i) / MIX_RATE
+		var step_idx: int = int(t / STEP) % melody.size()
+		var t_in_step: float = fmod(t, STEP)
+		# Melodie: Sinuston mit weichem Anschlag und Ausklang pro Note
+		var env: float = clampf(t_in_step / 0.015, 0.0, 1.0) * (1.0 - t_in_step / STEP * 0.55)
+		var mel: float = sin(TAU * melody[step_idx] * t) * 0.16 * env
+		# Bass: leiser Rechteckton pro Viertelnote
+		var bass_idx: int = int(t / (STEP * 2.0)) % bass.size()
+		var square: float = 1.0 if fmod(bass[bass_idx] * t, 1.0) < 0.5 else -1.0
+		var bs: float = square * 0.07
+		samples[i] = clampf(mel + bs, -1.0, 1.0)
+	var stream: AudioStreamWAV = _make_stream(samples)
+	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	stream.loop_begin = 0
+	stream.loop_end = n
+	return stream
+
+
 ## Countdown-Tick – kurzer, prägnanter Ton (F138)
 static func countdown_tick() -> AudioStreamWAV:
 	var duration: float = 0.12

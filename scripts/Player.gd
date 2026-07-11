@@ -36,7 +36,8 @@ var _aura_phase: float = 0.0
 
 func _ready() -> void:
 	add_to_group("player")
-	# Wurf-Whoosh prozedural erzeugen (F132)
+	# Wurf-Whoosh prozedural erzeugen (F132), über den SFX-Bus (F137/F142)
+	_whoosh_player.bus = "SFX"
 	_whoosh_player.stream = SoundGen.whoosh()
 	# Auf Combo-Änderungen reagieren, um die Aura zu steuern (F146)
 	GameManager.combo_changed.connect(_on_combo_changed)

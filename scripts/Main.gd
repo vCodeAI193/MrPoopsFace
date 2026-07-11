@@ -41,6 +41,8 @@ const VARIANTS: Array = [
 @onready var _streak_label: Label = $HUD/TopBar/StreakLabel
 @onready var _ammo_label: Label = $HUD/TopBar/AmmoLabel
 @onready var _pause_menu: PauseMenu = $PauseMenu
+@onready var _settings: SettingsOverlay = $Settings
+@onready var _settings_button: Button = $HUD/SettingsButton
 @onready var _camera: Camera2D = $Camera2D
 
 # Audio Players (F135, F136, F138, F140)
@@ -88,14 +90,16 @@ func _ready() -> void:
 	_pause_button.pressed.connect(_on_pause_pressed)
 	# Stummschalt-Knopf verbinden (F140)
 	_mute_button.pressed.connect(_on_mute_pressed)
+	# Optionen-Knopf verbinden (F124): öffnet die Einstellungen und pausiert
+	_settings_button.pressed.connect(func() -> void: _settings.show_settings(true))
 
-	# Audio-Player erstellen (F135, F136, F138)
+	# Audio-Player erstellen (F135, F136, F138); alle auf den SFX-Bus (F137/F142)
 	_combo_jingle_player = AudioStreamPlayer.new()
 	_ui_click_player = AudioStreamPlayer.new()
 	_countdown_tick_player = AudioStreamPlayer.new()
-	add_child(_combo_jingle_player)
-	add_child(_ui_click_player)
-	add_child(_countdown_tick_player)
+	for p in [_combo_jingle_player, _ui_click_player, _countdown_tick_player]:
+		p.bus = "SFX"
+		add_child(p)
 
 	# Spawn-Timer einrichten (wird erst nach dem Countdown gestartet)
 	_spawn_timer.wait_time = spawn_rate
@@ -214,7 +218,10 @@ func _run_countdown() -> void:
 
 
 ## Reagiert auf einen Treffer mit einer Kamera-Erschütterung (F144).
+## Abschaltbar in den Optionen (F181); bei reduzierter Bewegung aus (F183).
 func _on_hit_registered(_points: int) -> void:
+	if not GameManager.screen_shake_enabled or GameManager.reduced_motion:
+		return
 	_shake_strength = minf(_shake_strength + shake_per_hit, shake_max)
 
 
@@ -312,7 +319,10 @@ func _on_combo_changed(new_combo: int) -> void:
 
 
 ## Kurzes weißes Aufblitzen des Bildschirms (F149).
+## Bei reduzierter Bewegung deaktiviert (F183).
 func _flash_screen() -> void:
+	if GameManager.reduced_motion:
+		return
 	_flash_rect.color = Color(1, 1, 1, 0.3)
 	var tween: Tween = create_tween()
 	tween.tween_property(_flash_rect, "color:a", 0.0, 0.35)
@@ -369,7 +379,11 @@ func _on_streak_changed(new_streak: int) -> void:
 
 ## Kleiner "Pop"-Effekt: Element kurz vergrößern und auf Normalgröße zurückfedern.
 ## Mit pivot < 0 wird der Drehpunkt automatisch in die Elementmitte gelegt.
+## Bei reduzierter Bewegung entfällt die Skalier-Animation (F183).
 func _pop_label(label: Control, from_scale: float, pivot: Vector2 = Vector2(-1, -1)) -> void:
+	if GameManager.reduced_motion:
+		label.scale = Vector2.ONE
+		return
 	label.pivot_offset = label.size * 0.5 if pivot.x < 0.0 else pivot
 	label.scale = Vector2(from_scale, from_scale)
 	var tween: Tween = create_tween()

@@ -17,8 +17,9 @@ func _ready() -> void:
 	_restart_button.pressed.connect(_on_restart_pressed)
 	_menu_button.pressed.connect(_on_menu_pressed)
 
-	# Audio-Player für UI-Klicks (F136)
+	# Audio-Player für UI-Klicks (F136), über den SFX-Bus (F137/F142)
 	_ui_click_player = AudioStreamPlayer.new()
+	_ui_click_player.bus = "SFX"
 	add_child(_ui_click_player)
 
 
