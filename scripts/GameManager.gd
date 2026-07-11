@@ -11,6 +11,8 @@ signal time_changed(seconds_left: float)       ## Wird jede Sekunde aktualisiert
 signal game_over(final_score: int)             ## Wird beim Rundenende gesendet
 signal game_started()                          ## Wird beim Rundenstart gesendet
 signal hit_registered(points: int)             ## Wird bei jedem Treffer gesendet (für Effekte)
+signal powerup_activated(type: String)         ## Wird beim Einsammeln eines Power-Ups gesendet (F123)
+signal ammo_changed(ammo_left: int)            ## Wird bei Munitionsänderung gesendet (F004)
 
 # --- Einstellbare Werte (im Inspector / per Code anpassbar) ---
 @export var round_duration: float = 60.0       ## Rundenlänge in Sekunden
@@ -50,6 +52,11 @@ var multi_shot_count: int = 1                 ## Anzahl Geschosse pro Wurf (F043
 var wind_force: Vector2 = Vector2.ZERO        ## Seitliche Windkraft (F007)
 var freeze_active: bool = false               ## Alle Männchen eingefroren (F045)
 var magnet_active: bool = false               ## Magnet-Power-Up aktiv (F047)
+var bomb_shield_active: bool = false          ## Schutz vor Bomben-Strafe aktiv (F048)
+
+# --- Munition (F004) ---
+var ammo_per_round: int = -1                  ## Würfe pro Runde; -1 = unbegrenzt
+var ammo_left: int = -1                       ## Verbleibende Würfe in dieser Runde
 
 # --- Game Modes & Einstellungen ---
 var game_mode: String = "normal"               ## "normal", "practice" (F085), "hard" (F089)
@@ -113,6 +120,14 @@ func start_game() -> void:
 	wind_force = Vector2(randf_range(-120.0, 120.0), 0.0)  # Wind randomisieren (F007)
 	freeze_active = false
 	magnet_active = false
+	bomb_shield_active = false
+	projectile_scale_bonus = 1.0
+	points_multiplier = 1.0
+	multi_shot_count = 1
+	active_powerups.clear()
+	# Munition auffüllen (F004)
+	ammo_left = ammo_per_round
+	ammo_changed.emit(ammo_left)
 	score_changed.emit(score)
 	combo_changed.emit(combo)
 	streak_changed.emit(streak)
@@ -168,11 +183,31 @@ func get_high_score() -> int:
 
 
 ## Zieht Punkte für ein Bomben-Männchen ab (F029).
+## Mit aktivem Bomben-Schutz (F048) entfällt die Strafe.
 func register_bomb_hit(penalty: int = 50) -> void:
-	if not game_active:
+	if not game_active or bomb_shield_active:
 		return
 	score = maxi(0, score - penalty)
 	score_changed.emit(score)
+
+
+## Verbraucht einen Wurf Munition; gibt false zurück, wenn keine mehr da ist (F004).
+func consume_ammo() -> bool:
+	if ammo_left < 0:
+		return true                              # -1 = unbegrenzt
+	if ammo_left == 0:
+		return false
+	ammo_left -= 1
+	ammo_changed.emit(ammo_left)
+	return true
+
+
+## Füllt Munition nach (z. B. als Belohnung für Treffer, F004).
+func add_ammo(amount: int) -> void:
+	if ammo_left < 0:
+		return
+	ammo_left += amount
+	ammo_changed.emit(ammo_left)
 
 
 ## Trägt einen Punktestand in die Bestenliste ein und speichert.
@@ -215,15 +250,19 @@ func set_game_mode(mode: String) -> void:
 		"practice":  # Übungsmodus ohne Timer (F085)
 			round_duration = 999.0
 			base_hit_points = 10
+			ammo_per_round = -1
 		"easy":  # Einfach (F089)
 			round_duration = 90.0
 			base_hit_points = 15
-		"hard":  # Schwer (F089)
+			ammo_per_round = -1
+		"hard":  # Schwer (F089): begrenzte Munition (F004)
 			round_duration = 45.0
 			base_hit_points = 5
+			ammo_per_round = 30
 		_:  # Normal
 			round_duration = 60.0
 			base_hit_points = 10
+			ammo_per_round = -1
 
 
 ## Setzt die Combo zurück (z. B. wenn das Zeitfenster abläuft).
@@ -250,7 +289,10 @@ func activate_powerup(type: String, duration: float, data: Dictionary = {}) -> v
 		freeze_active = true  # Alle Männchen einfrieren (F045)
 	elif type == "magnet":
 		magnet_active = true  # Geschosse ziehen zu Männchen (F047)
+	elif type == "bomb_shield":
+		bomb_shield_active = true  # Schutz vor Bomben-Strafe (F048)
 	active_powerups[type] = {"duration": duration, "data": data}
+	powerup_activated.emit(type)
 
 
 ## Deaktiviert ein Power-Up.
@@ -265,6 +307,8 @@ func _deactivate_powerup(type: String) -> void:
 		freeze_active = false
 	elif type == "magnet":
 		magnet_active = false
+	elif type == "bomb_shield":
+		bomb_shield_active = false
 	active_powerups.erase(type)
 
 

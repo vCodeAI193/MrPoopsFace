@@ -22,6 +22,7 @@ func _on_game_over(final_score: int) -> void:
 	# Neuen Rekord hervorheben bzw. den besten Wert anzeigen (F168)
 	if GameManager.last_was_highscore:
 		_best_label.text = "🏆 Neuer Rekord!"
+		_spawn_confetti()  # Konfetti-Regen bei neuem Rekord (F152)
 	else:
 		_best_label.text = "Bester: %d" % GameManager.get_high_score()
 
@@ -33,6 +34,31 @@ func _on_game_over(final_score: int) -> void:
 	]
 	_stats_label.text = stats_text
 	visible = true
+
+
+## Lässt bunten Konfetti-Regen von oben über den Bildschirm fallen (F152).
+func _spawn_confetti() -> void:
+	for x in [480, 960, 1440]:
+		var confetti: CPUParticles2D = CPUParticles2D.new()
+		confetti.one_shot = true
+		confetti.emitting = true
+		confetti.amount = 45
+		confetti.lifetime = 2.5
+		confetti.explosiveness = 0.9
+		confetti.direction = Vector2(0, 1)
+		confetti.spread = 70.0
+		confetti.gravity = Vector2(0, 320)
+		confetti.initial_velocity_min = 180.0
+		confetti.initial_velocity_max = 480.0
+		confetti.scale_amount_min = 3.0
+		confetti.scale_amount_max = 6.0
+		confetti.color = Color(1.0, 0.35, 0.35)
+		confetti.hue_variation_min = -0.5
+		confetti.hue_variation_max = 0.5
+		confetti.position = Vector2(x, -30)
+		add_child(confetti)
+		# Nach dem Ausklingen aufräumen
+		get_tree().create_timer(3.5).timeout.connect(confetti.queue_free)
 
 
 ## Startet die Runde neu, indem die Hauptszene neu geladen wird.

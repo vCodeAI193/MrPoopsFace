@@ -15,7 +15,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F001** 🟢 Wurf-Kraftanzeige (Ladebalken) während des Ziehens – Drag-Distanz limitiert
 - [x] **F002** 🟢 Mindest-/Höchstkraft visuell am Gummiband markieren – Trajectory-Vorschau
 - [x] **F003** 🟡 Mehrere Geschosse gleichzeitig in der Luft erlauben (Limit konfigurierbar)
-- [ ] **F004** 🟡 Geschoss-Vorrat/Munition pro Runde (begrenzte Würfe)
+- [x] **F004** 🟡 Geschoss-Vorrat/Munition pro Runde (begrenzte Würfe)
 - [x] **F005** 🟢 Nachlade-Animation des Kackhaufens am Anker
 - [x] **F006** 🟡 Abprall-Physik an Wänden mit Restitution
 - [x] **F007** 🟡 Wind-Einfluss auf die Flugbahn (seitliche Kraft)
@@ -40,8 +40,8 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F023** 🟡 Schild-Männchen (braucht 2 Treffer)
 - [ ] **F024** 🔴 Boss-Männchen mit Lebensbalken
 - [x] **F025** 🟢 Mini-Männchen (kleines, schwer zu treffendes Ziel) – 0.55x Größe, 3x Punkte
-- [ ] **F026** 🟡 Regenschirm-Männchen (blockt Treffer von oben)
-- [ ] **F027** 🟡 Ausweichendes Männchen (springt bei Annäherung zur Seite)
+- [x] **F026** 🟡 Regenschirm-Männchen (blockt Treffer von oben)
+- [x] **F027** 🟡 Ausweichendes Männchen (springt bei Annäherung zur Seite)
 - [x] **F028** 🟡 Gold-Männchen (selten, hoher Punktewert) – Gelb, 5x Punkte
 - [x] **F029** 🔴 Bomben-Männchen (Minuspunkte bei Treffer)
 - [ ] **F030** 🟡 Gruppen-Männchen, die in Formation laufen
@@ -65,7 +65,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F045** 🟡 Einfrieren – alle Männchen stehen still
 - [ ] **F046** 🔴 Regen-Modus: Kackhaufen fallen automatisch vom Himmel
 - [x] **F047** 🟡 Magnet-Power-Up (alle Treffer ziehen an)
-- [ ] **F048** 🟡 Schild gegen Bomben-Männchen-Strafe
+- [x] **F048** 🟡 Schild gegen Bomben-Männchen-Strafe
 - [x] **F049** 🟢 Combo-Schutz (Combo läuft kurz nicht ab) – Shield Timer beim Schlafen-Wecken
 - [ ] **F050** 🔴 Power-Up-Inventar mit aktivierbaren Slots
 - [ ] **F051** 🟡 Zufalls-Würfel-Power-Up (Glücksspiel-Effekt)
@@ -152,7 +152,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F120** 🟢 Bestätigungsdialog beim Verlassen – ConfirmationDialog
 - [x] **F121** 🟡 Responsives HUD-Layout für Notch/Safe-Area
 - [x] **F122** 🟢 Highscore-Anzeige im Hauptmenü – Im MainMenu implementiert
-- [ ] **F123** 🟡 Toast-Benachrichtigungen (z. B. „Neuer Rekord!")
+- [x] **F123** 🟡 Toast-Benachrichtigungen (z. B. „Neuer Rekord!")
 - [ ] **F124** 🟢 Einstellungs-Button im HUD
 - [ ] **F125** 🟡 Anim. Szenenübergänge (Fade/Wipe)
 - [x] **F126** 🟢 Treffer-Streak-Anzeige – 🔥 Icon mit Zähler ab 3
@@ -183,11 +183,11 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F145** 🟡 Slow-Motion-Effekt beim letzten Treffer der Runde
 - [x] **F146** 🟢 Combo-Aura/Glow um den Spieler – _aura_phase Sine-Animation
 - [ ] **F147** 🟡 Geschoss-Trail mit Verblass-Effekt
-- [ ] **F148** 🟡 Stink-Wölkchen über getroffenen Männchen
-- [ ] **F149** 🟢 Aufblitzen des Bildschirms bei Mega-Combo
+- [x] **F148** 🟡 Stink-Wölkchen über getroffenen Männchen
+- [x] **F149** 🟢 Aufblitzen des Bildschirms bei Mega-Combo
 - [ ] **F150** 🟡 Animierter Wackel-Effekt der Schleuder beim Spannen
 - [ ] **F151** 🔴 Beleuchtung/Schatten via CanvasModulate + Light2D
-- [ ] **F152** 🟢 Sterne/Konfetti beim Rundensieg
+- [x] **F152** 🟢 Sterne/Konfetti beim Rundensieg
 - [ ] **F153** 🟡 Umgebungs-Animationen (schwankende Bäume)
 - [x] **F154** 🟢 Treffer-Hitstop (kurzer Freeze-Frame) – Queue Delete mit Delay
 - [ ] **F155** 🟡 Anpassbare Geschoss-Spuren (Skins)
@@ -195,7 +195,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## 🕹️ 10. Steuerung & Eingabe (F157–F166)
 
-- [ ] **F157** 🟢 Haptisches Feedback (Vibration) bei Treffer
+- [x] **F157** 🟢 Haptisches Feedback (Vibration) bei Treffer
 - [ ] **F158** 🟡 Links-/Rechtshänder-Modus (Schleuder spiegeln)
 - [ ] **F159** 🟡 Multi-Touch: zwei Schleudern gleichzeitig
 - [x] **F160** 🟢 Empfindlichkeit der Zugweite einstellbar – max_drag_distance Export (350 px default)

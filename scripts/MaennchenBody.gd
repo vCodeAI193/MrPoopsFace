@@ -40,6 +40,15 @@ func _draw() -> void:
 	draw_line(hip, Vector2(-18 * s + swing, 55 * s), col, w)
 	draw_line(hip, Vector2(18 * s - swing, 55 * s), col, w)
 
+	# --- Regenschirm über dem Kopf (F026) ---
+	if _maennchen.has_umbrella:
+		var umb_col: Color = Color(0.85, 0.25, 0.3)
+		var umb_top: Vector2 = Vector2(0, -125 * s)
+		# Schirmdach als gefüllter Halbkreis
+		_draw_half_disc(umb_top, 42 * s, umb_col)
+		# Schirmstiel vom Dach zur Hand
+		draw_line(umb_top, Vector2(0, -95 * s), Color(0.35, 0.25, 0.2), w * 0.6)
+
 	# --- Schild-Anzeige (F023) ---
 	if _maennchen.has_shield:
 		# Schild-Balkens unter dem Kopf
@@ -61,3 +70,13 @@ func _draw() -> void:
 	else:
 		draw_circle(head_center + Vector2(-7 * s, -3 * s), 3 * s, col)
 		draw_circle(head_center + Vector2(7 * s, -3 * s), 3 * s, col)
+
+
+## Zeichnet einen gefüllten, nach oben gewölbten Halbkreis (Schirmdach, F026).
+func _draw_half_disc(center: Vector2, radius: float, color: Color) -> void:
+	var points: PackedVector2Array = PackedVector2Array()
+	const SEGMENTS: int = 16
+	for i in SEGMENTS + 1:
+		var angle: float = PI + PI * float(i) / SEGMENTS
+		points.append(center + Vector2(cos(angle), sin(angle)) * radius)
+	draw_colored_polygon(points, color)

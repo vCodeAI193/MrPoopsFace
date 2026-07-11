@@ -25,6 +25,8 @@ const VARIANTS: Array = [
 	{"scale": 1.05, "speed": 0.0, "color": Color(0.2, 0.22, 0.32), "mult": 4, "weight": 8, "jump_height": 0.0, "sleeping": true, "has_shield": false},     # schlafend (F032)
 	{"scale": 1.15, "speed": 50.0, "color": Color(0.35, 0.35, 0.35), "mult": 2, "weight": 8, "jump_height": 0.0, "sleeping": false, "has_shield": true},   # Schild (F023)
 	{"scale": 1.0, "speed": 80.0, "color": Color(0.65, 0.08, 0.08), "mult": 0, "weight": 10, "jump_height": 0.0, "sleeping": false, "has_shield": false, "is_bomb": true},  # Bombe (F029)
+	{"scale": 1.0, "speed": 55.0, "color": Color(0.45, 0.15, 0.55), "mult": 3, "weight": 8, "jump_height": 0.0, "sleeping": false, "has_shield": false, "has_umbrella": true},  # Regenschirm (F026)
+	{"scale": 0.95, "speed": 90.0, "color": Color(0.85, 0.45, 0.1), "mult": 3, "weight": 10, "jump_height": 0.0, "sleeping": false, "has_shield": false, "dodges": true},  # ausweichend (F027)
 ]
 
 @onready var _spawn_timer: Timer = $SpawnTimer
@@ -37,6 +39,7 @@ const VARIANTS: Array = [
 @onready var _mute_button: Button = $HUD/MuteButton
 @onready var _countdown_label: Label = $HUD/CountdownLabel
 @onready var _streak_label: Label = $HUD/TopBar/StreakLabel
+@onready var _ammo_label: Label = $HUD/TopBar/AmmoLabel
 @onready var _pause_menu: PauseMenu = $PauseMenu
 @onready var _camera: Camera2D = $Camera2D
 
@@ -52,6 +55,12 @@ var _last_shown_second: int = -1
 
 # F075 – Animierte Wolken
 var _clouds: Array = []
+
+# F123 – Toast-Benachrichtigungen
+var _toast_label: Label
+
+# F149 – Bildschirm-Aufblitzen bei Mega-Combo
+var _flash_rect: ColorRect
 
 
 func _ready() -> void:
@@ -72,6 +81,8 @@ func _ready() -> void:
 	GameManager.combo_changed.connect(_on_combo_changed)
 	GameManager.streak_changed.connect(_on_streak_changed)
 	GameManager.hit_registered.connect(_on_hit_registered)
+	GameManager.powerup_activated.connect(_on_powerup_activated)
+	GameManager.ammo_changed.connect(_on_ammo_changed)
 
 	# Pause-Knopf verbinden (F114)
 	_pause_button.pressed.connect(_on_pause_pressed)
@@ -97,6 +108,26 @@ func _ready() -> void:
 
 	# Wolken initialisieren (F075)
 	_init_clouds()
+
+	# Toast-Label für Benachrichtigungen erstellen (F123)
+	_toast_label = Label.new()
+	_toast_label.visible = false
+	_toast_label.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	_toast_label.offset_top = 200.0
+	_toast_label.offset_bottom = 280.0
+	_toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_toast_label.add_theme_font_size_override("font_size", 52)
+	_toast_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.6))
+	_toast_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+	_toast_label.add_theme_constant_override("outline_size", 10)
+	$HUD.add_child(_toast_label)
+
+	# Vollbild-Flash-Overlay für Mega-Combos erstellen (F149)
+	_flash_rect = ColorRect.new()
+	_flash_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_flash_rect.color = Color(1, 1, 1, 0)
+	_flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	$HUD.add_child(_flash_rect)
 
 	# Wellen-Schwierigkeit alle 15 Sekunden erhöhen (F036)
 	var wave_timer: Timer = Timer.new()
@@ -146,6 +177,8 @@ func _process(delta: float) -> void:
 		pu_text += "❄ Eingefroren (%.1fs)\n" % GameManager.get_powerup_remaining("freeze")
 	if "magnet" in GameManager.active_powerups:
 		pu_text += "Magnet (%.1fs)\n" % GameManager.get_powerup_remaining("magnet")
+	if "bomb_shield" in GameManager.active_powerups:
+		pu_text += "Bomben-Schutz (%.1fs)\n" % GameManager.get_powerup_remaining("bomb_shield")
 	# Wind-Anzeige (F007)
 	if GameManager.game_active and abs(GameManager.wind_force.x) > 10.0:
 		var wind_dir: String = ">" if GameManager.wind_force.x > 0 else "<"
@@ -224,6 +257,8 @@ func _apply_variant(maennchen: Maennchen) -> void:
 	maennchen.sleeping = variant.get("sleeping", false)
 	maennchen.has_shield = variant.get("has_shield", false)
 	maennchen.is_bomb = variant.get("is_bomb", false)
+	maennchen.has_umbrella = variant.get("has_umbrella", false)
+	maennchen.dodges = variant.get("dodges", false)
 
 
 ## Liefert eine zufällige Variante entsprechend ihrer Gewichtung.
@@ -269,8 +304,58 @@ func _on_combo_changed(new_combo: int) -> void:
 		_pop_label(_combo_label, 1.5)          # animierter Combo-Zähler (F115)
 		if new_combo == 2 or new_combo % 5 == 0:  # Jingle bei 2+ und alle 5er (F135)
 			play_combo_jingle()
+		# Bildschirm-Aufblitzen bei Mega-Combo ab x5 (F149)
+		if new_combo >= 5:
+			_flash_screen()
 	else:
 		_combo_label.visible = false
+
+
+## Kurzes weißes Aufblitzen des Bildschirms (F149).
+func _flash_screen() -> void:
+	_flash_rect.color = Color(1, 1, 1, 0.3)
+	var tween: Tween = create_tween()
+	tween.tween_property(_flash_rect, "color:a", 0.0, 0.35)
+
+
+## Zeigt eine Toast-Benachrichtigung oben in der Mitte (F123).
+func show_toast(text: String) -> void:
+	_toast_label.text = text
+	_toast_label.visible = true
+	_toast_label.modulate.a = 0.0
+	var tween: Tween = create_tween()
+	tween.tween_property(_toast_label, "modulate:a", 1.0, 0.2)
+	tween.tween_interval(1.8)
+	tween.tween_property(_toast_label, "modulate:a", 0.0, 0.4)
+	tween.tween_callback(func() -> void: _toast_label.visible = false)
+
+
+## Toast beim Einsammeln eines Power-Ups (F123).
+func _on_powerup_activated(type: String) -> void:
+	const NAMES: Dictionary = {
+		"time_bonus": "⏱ Zeit-Bonus!",
+		"big_projectile": "Riesen-Haufen!",
+		"points_double": "Doppelte Punkte!",
+		"multi_shot": "Mehrfach-Wurf!",
+		"freeze": "❄ Einfrieren!",
+		"magnet": "Magnet!",
+		"bomb_shield": "Bomben-Schutz!",
+	}
+	show_toast(NAMES.get(type, type))
+
+
+## Aktualisiert die Munitionsanzeige (F004).
+func _on_ammo_changed(ammo_left: int) -> void:
+	if ammo_left < 0:
+		_ammo_label.visible = false
+	else:
+		_ammo_label.visible = true
+		_ammo_label.text = "Würfe: %d" % ammo_left
+		if ammo_left == 0:
+			_ammo_label.modulate = Color(1.0, 0.3, 0.25)
+			show_toast("Keine Munition mehr!")
+		else:
+			_ammo_label.modulate = Color.WHITE
 
 
 ## Zeigt die Treffer-Streak an (F126)
@@ -299,6 +384,7 @@ func _on_wave_tick() -> void:
 	max_maennchen = mini(max_maennchen + 1, 20)
 	spawn_rate = maxf(spawn_rate * 0.9, 0.5)
 	_spawn_timer.wait_time = spawn_rate
+	show_toast("Neue Welle!")  # F123
 
 
 # --- Wolken (F075) ---

@@ -85,8 +85,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.pressed and not _aiming:
 			# Doppeltipp-Erkennung (F013)
 			var current_time: float = Time.get_ticks_msec() / 1000.0
-			if current_time - _last_tap_time < DOUBLE_TAP_WINDOW and _last_drag.length() > 50.0:
-				# Doppeltipp erkannt: Letzten Wurf wiederholen
+			if current_time - _last_tap_time < DOUBLE_TAP_WINDOW and _last_drag.length() > 50.0 \
+					and GameManager.consume_ammo():
+				# Doppeltipp erkannt: Letzten Wurf wiederholen (verbraucht Munition, F004)
 				_spawn_projectile(-_last_drag * throw_power)
 				if _whoosh_player.stream != null:
 					_whoosh_player.play()
@@ -136,7 +137,8 @@ func _release_throw() -> void:
 	if launch_impulse.length() > 50.0:
 		# Limite für gleichzeitige Geschosse prüfen (F003)
 		var active_projectiles: int = get_tree().get_nodes_in_group("projectile").size()
-		if active_projectiles < max_projectiles:
+		# Munition prüfen und verbrauchen (F004)
+		if active_projectiles < max_projectiles and GameManager.consume_ammo():
 			# Mehrfach-Wurf Power-Up (F043)
 			for i in GameManager.multi_shot_count:
 				var spread: float = float(i) - (GameManager.multi_shot_count - 1) * 0.5

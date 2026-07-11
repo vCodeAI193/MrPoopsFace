@@ -95,6 +95,16 @@ func _draw() -> void:
 			draw_arc(Vector2.ZERO, r * 0.75, PI, TAU, 16, col, 5.5)
 			draw_line(Vector2(-r * 0.75, 0), Vector2(-r * 0.75, r * 0.65), col, 5.5)
 			draw_line(Vector2(r * 0.75, 0), Vector2(r * 0.75, r * 0.65), col, 5.5)
+		"bomb_shield":
+			# Wappenschild-Form gegen Bomben-Strafe (F048)
+			var col: Color = Color(0.25, 0.55, 0.95)
+			var pts: PackedVector2Array = PackedVector2Array([
+				Vector2(-r * 0.7, -r * 0.7), Vector2(r * 0.7, -r * 0.7),
+				Vector2(r * 0.7, r * 0.15), Vector2(0, r * 0.9),
+				Vector2(-r * 0.7, r * 0.15),
+			])
+			draw_colored_polygon(pts, col)
+			draw_circle(Vector2(0, -r * 0.1), r * 0.3, Color(0.9, 0.95, 1.0))
 
 	# Countdown-Ring um den Pickup (F055)
 	var start_angle: float = -PI / 2.0

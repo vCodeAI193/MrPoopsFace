@@ -14,6 +14,8 @@ signal hit                                     ## Wird gesendet, wenn getroffen
 @export var sleeping: bool = false                       ## Steht still und schläft (F032)
 @export var has_shield: bool = false                     ## Schild-Männchen braucht 2 Treffer (F023)
 @export var is_bomb: bool = false                        ## Bomben-Männchen gibt Minuspunkte (F029)
+@export var has_umbrella: bool = false                   ## Regenschirm blockt Treffer von oben (F026)
+@export var dodges: bool = false                         ## Weicht Geschossen zur Seite aus (F027)
 
 var _is_hit: bool = false
 var _shield_hits: int = 0                                ## Verbleibende Schildtreffer (F023)
@@ -26,6 +28,9 @@ var _jump_phase: float = 0.0
 
 # F032 – Schlafendes Männchen
 var _zzz_timer: float = 1.5
+
+# F027 – Ausweichendes Männchen
+var _dodge_cooldown: float = 0.0
 
 # Vorgeladene Effekt-Szenen
 const FLOATING_TEXT_SCENE: PackedScene = preload("res://scenes/FloatingText.tscn")
@@ -79,6 +84,14 @@ func _process(delta: float) -> void:
 			_zzz_timer = 2.0
 			_spawn_zzz()
 
+	# Ausweichen: springt zur Seite, wenn ein Geschoss näher kommt (F027)
+	_dodge_cooldown = maxf(_dodge_cooldown - delta, 0.0)
+	if dodges and _dodge_cooldown <= 0.0:
+		for p in get_tree().get_nodes_in_group("projectile"):
+			if p.global_position.distance_to(global_position) < 250.0:
+				_do_dodge(p.global_position)
+				break
+
 	_body.queue_redraw()
 
 
@@ -86,6 +99,18 @@ func _process(delta: float) -> void:
 func _on_body_entered(body: Node) -> void:
 	# Nur auf Projektile reagieren
 	if not body.is_in_group("projectile"):
+		return
+
+	# Regenschirm-Männchen (F026): fallende Treffer von oben werden geblockt
+	if has_umbrella and body is RigidBody2D \
+			and body.global_position.y < global_position.y - 40.0 \
+			and body.linear_velocity.y > 0.0:
+		# Geschoss abprallen lassen und Block anzeigen
+		body.linear_velocity.y = -absf(body.linear_velocity.y) * 0.6
+		var ft: FloatingText = FLOATING_TEXT_SCENE.instantiate()
+		ft.setup("Geblockt!", Color(0.7, 0.85, 1.0))
+		ft.global_position = global_position + Vector2(0, -160)
+		get_parent().add_child(ft)
 		return
 
 	# Schild-Männchen (F023): 2 Treffer nötig
@@ -111,9 +136,11 @@ func _trigger_hit(zone_multiplier: float = 1.0) -> void:
 	_is_hit = true
 	var points: int = 0
 	if is_bomb:
-		# Bomben-Männchen: Punkteabzug statt Gewinn (F029)
-		GameManager.register_bomb_hit(50)
-		points = -50
+		# Bomben-Männchen: Punkteabzug statt Gewinn (F029),
+		# außer der Bomben-Schutz (F048) ist aktiv
+		if not GameManager.bomb_shield_active:
+			GameManager.register_bomb_hit(50)
+			points = -50
 	else:
 		var effective_mult: int = int(point_multiplier * zone_multiplier)
 		points = GameManager.register_hit(effective_mult)
@@ -133,6 +160,12 @@ func _trigger_hit(zone_multiplier: float = 1.0) -> void:
 	# Schwebenden Punkte-Text und Partikel-Spritzer erzeugen (F116, F143)
 	_spawn_floating_text(points)
 	_spawn_hit_particles()
+
+	# Stink-Wölkchen aufsteigen lassen (F148)
+	_spawn_stink_cloud()
+
+	# Haptisches Feedback auf Android (F157); am Desktop wirkungslos
+	Input.vibrate_handheld(60)
 
 	# Zufälliger Power-Up-Drop (F041/F044/F052 – 15% Chance)
 	if randf() < 0.15:
@@ -202,9 +235,45 @@ func _spawn_hit_particles() -> void:
 	get_parent().add_child(fx)
 
 
+## Lässt grüne Stink-Wölkchen über dem getroffenen Männchen aufsteigen (F148).
+func _spawn_stink_cloud() -> void:
+	var stink: CPUParticles2D = CPUParticles2D.new()
+	stink.one_shot = true
+	stink.emitting = true
+	stink.amount = 10
+	stink.lifetime = 1.4
+	stink.explosiveness = 0.4
+	stink.direction = Vector2(0, -1)
+	stink.spread = 25.0
+	stink.gravity = Vector2(0, -140)
+	stink.initial_velocity_min = 30.0
+	stink.initial_velocity_max = 70.0
+	stink.scale_amount_min = 2.5
+	stink.scale_amount_max = 5.5
+	stink.color = Color(0.45, 0.75, 0.2, 0.55)
+	stink.global_position = global_position + Vector2(0, -90)
+	get_parent().add_child(stink)
+	# Nach dem Ausklingen automatisch aufräumen
+	get_tree().create_timer(2.0).timeout.connect(stink.queue_free)
+
+
+## Seitlicher Ausweichsprung mit Abklingzeit (F027).
+func _do_dodge(threat_pos: Vector2) -> void:
+	_dodge_cooldown = 1.5
+	# Vom Geschoss weg ausweichen; am Bildschirmrand in die Gegenrichtung
+	var away: float = signf(global_position.x - threat_pos.x)
+	if away == 0.0:
+		away = 1.0
+	var view_width: float = get_viewport_rect().size.x
+	var target_x: float = clampf(position.x + away * 140.0, 80.0, view_width - 80.0)
+	var tween: Tween = create_tween()
+	tween.tween_property(self, "position:x", target_x, 0.25) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+
 ## Spawnt ein zufälliges Power-Up (F041/F042/F043/F044/F045/F047/F052).
 func _spawn_powerup() -> void:
-	var types: Array = ["time_bonus", "big_projectile", "points_double", "multi_shot", "freeze", "magnet"]
+	var types: Array = ["time_bonus", "big_projectile", "points_double", "multi_shot", "freeze", "magnet", "bomb_shield"]
 	var pu: Area2D = POWERUP_SCENE.instantiate()
 	pu.powerup_type = types[randi() % types.size()]
 	pu.global_position = global_position + Vector2(randf_range(-30, 30), -80)
