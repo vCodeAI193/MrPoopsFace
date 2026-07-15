@@ -102,6 +102,11 @@ func _on_body_entered(body: Node) -> void:
 	if not body.is_in_group("projectile"):
 		return
 
+	# Wurf hat ein Männchen erreicht → kein Fehlwurf (F077/F083);
+	# gilt auch für geblockte/abgeschirmte Treffer
+	if "hit_target" in body:
+		body.hit_target = true
+
 	# Regenschirm-Männchen (F026): fallende Treffer von oben werden geblockt
 	if has_umbrella and body is RigidBody2D \
 			and body.global_position.y < global_position.y - 40.0 \

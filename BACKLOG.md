@@ -100,14 +100,14 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## 🎮 5. Spielmodi (F077–F094)
 
-- [ ] **F077** 🟡 Endlos-Modus ohne Timer (bis 3 Fehlwürfe)
+- [x] **F077** 🟡 Endlos-Modus ohne Timer (bis 3 Fehlwürfe)
 - [ ] **F078** 🟡 Zeitrennen: möglichst schnell X Männchen treffen
 - [ ] **F079** 🟡 Präzisions-Modus mit begrenzter Munition
 - [ ] **F080** 🔴 Story-/Kampagnen-Modus mit Leveln
 - [ ] **F081** 🟡 Herausforderungs-Modus mit Tagesaufgaben
 - [ ] **F082** 🔴 Lokaler 2-Spieler-Wettkampf (geteilter Bildschirm)
-- [ ] **F083** 🟡 Überlebens-Modus mit Männchen-Wellen
-- [ ] **F084** 🟡 Bonus-Runde (Goldregen)
+- [x] **F083** 🟡 Überlebens-Modus mit Männchen-Wellen
+- [x] **F084** 🟡 Bonus-Runde (Goldregen)
 - [x] **F085** 🟢 Übungsmodus ohne Zeitdruck – practice mode mit 999s Timer
 - [ ] **F086** 🔴 Boss-Rush-Modus
 - [ ] **F087** 🟡 Modifikator-Modus (Mutatoren wählbar)
@@ -115,9 +115,9 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F089** 🟢 Schwierigkeitsgrade (leicht/mittel/schwer) – easy/normal/hard mit unterschiedlichen Einstellungen
 - [ ] **F090** 🔴 Wöchentliche Sonder-Events
 - [ ] **F091** 🟡 Ziel-Quoten-Modus (genau X treffen, nicht mehr)
-- [ ] **F092** 🟡 Combo-Jagd-Modus (höchste Combo zählt)
-- [ ] **F093** 🟢 Zen-Modus (entspannt, keine Wertung)
-- [ ] **F094** 🔴 Modus-Auswahl-Menü mit Vorschau
+- [x] **F092** 🟡 Combo-Jagd-Modus (höchste Combo zählt)
+- [x] **F093** 🟢 Zen-Modus (entspannt, keine Wertung)
+- [x] **F094** 🔴 Modus-Auswahl-Menü mit Vorschau
 
 ## 📈 6. Progression & Wirtschaft (F095–F112)
 

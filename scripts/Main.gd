@@ -40,6 +40,7 @@ const VARIANTS: Array = [
 @onready var _countdown_label: Label = $HUD/CountdownLabel
 @onready var _streak_label: Label = $HUD/TopBar/StreakLabel
 @onready var _ammo_label: Label = $HUD/TopBar/AmmoLabel
+@onready var _miss_label: Label = $HUD/TopBar/MissLabel
 @onready var _pause_menu: PauseMenu = $PauseMenu
 @onready var _settings: SettingsOverlay = $Settings
 @onready var _settings_button: Button = $HUD/SettingsButton
@@ -64,6 +65,13 @@ var _toast_label: Label
 # F149 – Bildschirm-Aufblitzen bei Mega-Combo
 var _flash_rect: ColorRect
 
+# F083 – Wellenzähler im Überlebens-Modus
+var _wave_count: int = 0
+
+# F084 – Bonus-Runde Goldregen
+var _bonus_done: bool = false
+var _bonus_active: bool = false
+
 
 func _ready() -> void:
 	randomize()
@@ -85,6 +93,7 @@ func _ready() -> void:
 	GameManager.hit_registered.connect(_on_hit_registered)
 	GameManager.powerup_activated.connect(_on_powerup_activated)
 	GameManager.ammo_changed.connect(_on_ammo_changed)
+	GameManager.misses_changed.connect(_on_misses_changed)
 
 	# Pause-Knopf verbinden (F114)
 	_pause_button.pressed.connect(_on_pause_pressed)
@@ -109,6 +118,9 @@ func _ready() -> void:
 	_on_score_changed(0)
 	_on_combo_changed(0)
 	_time_label.text = "Zeit: %d" % int(GameManager.round_duration)
+
+	# HUD an den Spielmodus anpassen (F077/F083/F092/F093)
+	_apply_mode_hud()
 
 	# Wolken initialisieren (F075)
 	_init_clouds()
@@ -254,7 +266,11 @@ func _on_spawn_timer_timeout() -> void:
 
 ## Wählt per Gewichtung eine Variante und überträgt ihre Werte auf das Männchen.
 func _apply_variant(maennchen: Maennchen) -> void:
-	var variant: Dictionary = _pick_weighted_variant()
+	_apply_variant_dict(maennchen, _pick_weighted_variant())
+
+
+## Überträgt die Werte eines Varianten-Dictionaries auf das Männchen.
+func _apply_variant_dict(maennchen: Maennchen, variant: Dictionary) -> void:
 	var s: float = variant["scale"]
 	maennchen.scale = Vector2(s, s)            # skaliert Optik UND Trefferbereich
 	maennchen.walk_speed = variant["speed"]
@@ -284,12 +300,24 @@ func _pick_weighted_variant() -> Dictionary:
 # --- HUD-Aktualisierungen ---
 
 func _on_score_changed(new_score: int) -> void:
-	_score_label.text = "Punkte: %d" % new_score
+	# Combo-Jagd (F092): Der Punktestand IST die beste Combo
+	if GameManager.game_mode == "combo_hunt":
+		_score_label.text = "Beste Combo: %d" % new_score
+	else:
+		_score_label.text = "Punkte: %d" % new_score
 
 
 func _on_time_changed(seconds_left: float) -> void:
 	var secs: int = int(ceil(seconds_left))
 	_time_label.text = "Zeit: %d" % secs
+
+	# Bonus-Runde Goldregen (F084): einmal pro Runde ab der Hälfte der Zeit,
+	# nur in Modi mit echtem Timer
+	if not _bonus_done and GameManager.game_active \
+			and GameManager.game_mode in ["normal", "easy", "hard", "combo_hunt"] \
+			and seconds_left <= GameManager.round_duration * 0.5:
+		_bonus_done = true
+		_start_bonus_round()
 
 	# Letzte 10 Sekunden: Timer rot färben und pro Sekunde pulsieren (F118)
 	if seconds_left <= 10.0 and GameManager.game_active:
@@ -391,14 +419,76 @@ func _pop_label(label: Control, from_scale: float, pivot: Vector2 = Vector2(-1, 
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
+## Passt die HUD-Anzeigen an den gewählten Spielmodus an (F077/F083/F092/F093).
+func _apply_mode_hud() -> void:
+	match GameManager.game_mode:
+		"zen":
+			# Zen (F093): keine Wertung, keine Zeit
+			_score_label.visible = false
+			_time_label.visible = false
+		"endless", "survival":
+			# Endlos/Überleben (F077/F083): kein Timer, Fehlwurf-Zähler
+			_time_label.visible = false
+			_miss_label.visible = true
+			_on_misses_changed(0)
+		"combo_hunt":
+			# Combo-Jagd (F092): Punkteanzeige führt die beste Combo
+			_score_label.text = "Beste Combo: 0"
+		"practice":
+			_time_label.visible = false
+
+
+## Aktualisiert den Fehlwurf-Zähler (F077/F083); kurz vor dem Limit rot.
+func _on_misses_changed(new_misses: int) -> void:
+	if GameManager.miss_limit < 0:
+		return
+	_miss_label.text = "Fehlwürfe: %d/%d" % [new_misses, GameManager.miss_limit]
+	if new_misses >= GameManager.miss_limit - 1:
+		_miss_label.modulate = Color(1.0, 0.3, 0.25)
+	else:
+		_miss_label.modulate = Color.WHITE
+
+
 ## Erhöht alle 15 Sekunden Schwierigkeit: mehr Männchen und schnellerer Spawn (F036).
+## Im Überlebens-Modus (F083) härter und mit Wellenzähler; im Zen-Modus keine Wellen.
 func _on_wave_tick() -> void:
 	if not GameManager.game_active:
+		return
+	if GameManager.game_mode == "zen":
+		return
+	if GameManager.game_mode == "survival":
+		_wave_count += 1
+		max_maennchen = mini(max_maennchen + 2, 24)
+		spawn_rate = maxf(spawn_rate * 0.85, 0.4)
+		_spawn_timer.wait_time = spawn_rate
+		show_toast("Welle %d!" % (_wave_count + 1))
 		return
 	max_maennchen = mini(max_maennchen + 1, 20)
 	spawn_rate = maxf(spawn_rate * 0.9, 0.5)
 	_spawn_timer.wait_time = spawn_rate
 	show_toast("Neue Welle!")  # F123
+
+
+## Bonus-Runde Goldregen (F084): 6 Sekunden lang regnet es Gold-Männchen.
+func _start_bonus_round() -> void:
+	_bonus_active = true
+	show_toast("🌟 Goldregen!")
+	_run_gold_rain()
+
+
+## Spawnt während der Bonus-Runde alle 0,35s ein Gold-Männchen (F084).
+func _run_gold_rain() -> void:
+	var elapsed: float = 0.0
+	while elapsed < 6.0 and GameManager.game_active:
+		if maennchen_scene != null \
+				and get_tree().get_nodes_in_group("maennchen").size() < max_maennchen + 6:
+			var maennchen: Maennchen = maennchen_scene.instantiate()
+			maennchen.position = Vector2(randf_range(spawn_x_min, spawn_x_max), ground_y)
+			_apply_variant_dict(maennchen, VARIANTS[3])  # Index 3 = Gold-Männchen
+			add_child(maennchen)
+		await get_tree().create_timer(0.35).timeout
+		elapsed += 0.35
+	_bonus_active = false
 
 
 # --- Wolken (F075) ---

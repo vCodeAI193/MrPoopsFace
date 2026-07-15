@@ -68,3 +68,91 @@ text = "Beenden"
 theme_override_font_sizes/font_size = 48
 
 [node name="Settings" parent="." instance=ExtResource("2_settings")]
+
+[node name="ModeCenter" type="CenterContainer" parent="."]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ModePanel" type="PanelContainer" parent="ModeCenter"]
+custom_minimum_size = Vector2(920, 900)
+
+[node name="ModeVBox" type="VBoxContainer" parent="ModeCenter/ModePanel"]
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="ModeTitle" type="Label" parent="ModeCenter/ModePanel/ModeVBox"]
+text = "Modus wählen"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 64
+
+[node name="NormalButton" type="Button" parent="ModeCenter/ModePanel/ModeVBox"]
+custom_minimum_size = Vector2(0, 90)
+text = "Klassisch"
+theme_override_font_sizes/font_size = 44
+
+[node name="NormalDesc" type="Label" parent="ModeCenter/ModePanel/ModeVBox"]
+text = "60 Sekunden, so viele Punkte wie möglich"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 28
+
+[node name="EndlessButton" type="Button" parent="ModeCenter/ModePanel/ModeVBox"]
+custom_minimum_size = Vector2(0, 90)
+text = "Endlos"
+theme_override_font_sizes/font_size = 44
+
+[node name="EndlessDesc" type="Label" parent="ModeCenter/ModePanel/ModeVBox"]
+text = "Kein Timer – 3 Fehlwürfe beenden die Runde"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 28
+
+[node name="SurvivalButton" type="Button" parent="ModeCenter/ModePanel/ModeVBox"]
+custom_minimum_size = Vector2(0, 90)
+text = "Überleben"
+theme_override_font_sizes/font_size = 44
+
+[node name="SurvivalDesc" type="Label" parent="ModeCenter/ModePanel/ModeVBox"]
+text = "Immer härtere Wellen – 5 Fehlwürfe erlaubt"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 28
+
+[node name="ComboHuntButton" type="Button" parent="ModeCenter/ModePanel/ModeVBox"]
+custom_minimum_size = Vector2(0, 90)
+text = "Combo-Jagd"
+theme_override_font_sizes/font_size = 44
+
+[node name="ComboHuntDesc" type="Label" parent="ModeCenter/ModePanel/ModeVBox"]
+text = "60 Sekunden – nur die höchste Combo zählt"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 28
+
+[node name="ZenButton" type="Button" parent="ModeCenter/ModePanel/ModeVBox"]
+custom_minimum_size = Vector2(0, 90)
+text = "Zen"
+theme_override_font_sizes/font_size = 44
+
+[node name="ZenDesc" type="Label" parent="ModeCenter/ModePanel/ModeVBox"]
+text = "Entspannt werfen – ohne Zeit und Wertung"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 28
+
+[node name="PracticeButton" type="Button" parent="ModeCenter/ModePanel/ModeVBox"]
+custom_minimum_size = Vector2(0, 90)
+text = "Übung"
+theme_override_font_sizes/font_size = 44
+
+[node name="PracticeDesc" type="Label" parent="ModeCenter/ModePanel/ModeVBox"]
+text = "Zielen und Werfen lernen, ohne Zeitdruck"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 28
+
+[node name="BackButton" type="Button" parent="ModeCenter/ModePanel/ModeVBox"]
+custom_minimum_size = Vector2(0, 80)
+text = "Zurück"
+theme_override_font_sizes/font_size = 36

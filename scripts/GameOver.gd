@@ -17,8 +17,16 @@ func _ready() -> void:
 
 
 ## Zeigt den Endbildschirm mit dem erreichten Punktestand.
+## Text passt sich dem Spielmodus an (F077/F083/F092).
 func _on_game_over(final_score: int) -> void:
-	_score_label.text = "Endpunktzahl: %d" % final_score
+	match GameManager.game_mode:
+		"combo_hunt":
+			_score_label.text = "Beste Combo: %d" % final_score
+		"endless", "survival":
+			_score_label.text = "Endpunktzahl: %d\n(%d Fehlwürfe)" % [
+				final_score, GameManager.misses]
+		_:
+			_score_label.text = "Endpunktzahl: %d" % final_score
 	# Neuen Rekord hervorheben bzw. den besten Wert anzeigen (F168)
 	if GameManager.last_was_highscore:
 		_best_label.text = "🏆 Neuer Rekord!"

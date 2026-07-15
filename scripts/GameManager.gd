@@ -13,6 +13,7 @@ signal game_started()                          ## Wird beim Rundenstart gesendet
 signal hit_registered(points: int)             ## Wird bei jedem Treffer gesendet (für Effekte)
 signal powerup_activated(type: String)         ## Wird beim Einsammeln eines Power-Ups gesendet (F123)
 signal ammo_changed(ammo_left: int)            ## Wird bei Munitionsänderung gesendet (F004)
+signal misses_changed(new_misses: int)         ## Wird bei Fehlwurf gesendet (F077/F083)
 
 # --- Einstellbare Werte (im Inspector / per Code anpassbar) ---
 @export var round_duration: float = 60.0       ## Rundenlänge in Sekunden
@@ -57,6 +58,10 @@ var bomb_shield_active: bool = false          ## Schutz vor Bomben-Strafe aktiv 
 # --- Munition (F004) ---
 var ammo_per_round: int = -1                  ## Würfe pro Runde; -1 = unbegrenzt
 var ammo_left: int = -1                       ## Verbleibende Würfe in dieser Runde
+
+# --- Fehlwürfe (F077/F083) ---
+var miss_limit: int = -1                      ## Erlaubte Fehlwürfe; -1 = unbegrenzt
+var misses: int = 0                           ## Fehlwürfe in dieser Runde
 
 # --- Game Modes & Einstellungen ---
 var game_mode: String = "normal"               ## "normal", "practice" (F085), "hard" (F089)
@@ -122,8 +127,9 @@ func start_game() -> void:
 	combo = 0
 	streak = 0
 	_combo_timer = 0.0
-	# Übungsmodus (F085): extrem lange Zeit (praktisch unbegrenzt)
-	time_left = round_duration if game_mode != "practice" else 3600.0
+	# Modi ohne Timer (F085/F077/F083/F093): extrem lange Zeit (praktisch unbegrenzt)
+	var timerless_modes: Array = ["practice", "endless", "survival", "zen"]
+	time_left = 3600.0 if game_mode in timerless_modes else round_duration
 	game_active = true
 	# Statistiken zurücksetzen (F130)
 	best_combo = 0
@@ -140,6 +146,9 @@ func start_game() -> void:
 	# Munition auffüllen (F004)
 	ammo_left = ammo_per_round
 	ammo_changed.emit(ammo_left)
+	# Fehlwürfe zurücksetzen (F077/F083)
+	misses = 0
+	misses_changed.emit(misses)
 	score_changed.emit(score)
 	combo_changed.emit(combo)
 	streak_changed.emit(streak)
@@ -148,13 +157,18 @@ func start_game() -> void:
 
 
 ## Beendet die laufende Runde und meldet den Endpunktestand.
+## Highscores werden nur in wertenden Modi eingetragen (F092/F093).
 func end_game() -> void:
 	if not game_active:
 		return
 	game_active = false
-	# Prüfen, ob es ein neuer Rekord ist, bevor der Score eingetragen wird
-	last_was_highscore = score > 0 and (highscores.is_empty() or score > int(highscores[0]))
-	_record_highscore(score)
+	var scoring_modes: Array = ["normal", "easy", "hard", "endless", "survival"]
+	if game_mode in scoring_modes:
+		# Prüfen, ob es ein neuer Rekord ist, bevor der Score eingetragen wird
+		last_was_highscore = score > 0 and (highscores.is_empty() or score > int(highscores[0]))
+		_record_highscore(score)
+	else:
+		last_was_highscore = false
 	game_over.emit(score)
 
 
@@ -175,7 +189,11 @@ func register_hit(type_multiplier: int = 1) -> int:
 
 	# Punkte = Grundpunkte * Combo-Multiplikator * Typ-Multiplikator * Power-Up-Multiplikator (F042)
 	var points: int = int(base_hit_points * combo * type_multiplier * points_multiplier)
-	score += points
+	if game_mode == "combo_hunt":
+		# Combo-Jagd (F092): Die Punkteanzeige führt die höchste erreichte Combo
+		score = maxi(score, combo)
+	else:
+		score += points
 
 	# Statistiken aktualisieren (F130)
 	best_combo = maxi(best_combo, combo)
@@ -220,6 +238,17 @@ func add_ammo(amount: int) -> void:
 		return
 	ammo_left += amount
 	ammo_changed.emit(ammo_left)
+
+
+## Registriert einen Fehlwurf (F077/F083). Beendet die Runde,
+## wenn das Fehlwurf-Limit des Modus erreicht ist.
+func register_miss() -> void:
+	if not game_active or miss_limit < 0:
+		return
+	misses += 1
+	misses_changed.emit(misses)
+	if misses >= miss_limit:
+		end_game()
 
 
 ## Trägt einen Punktestand in die Bestenliste ein und speichert.
@@ -329,18 +358,42 @@ func set_game_mode(mode: String) -> void:
 			round_duration = 999.0
 			base_hit_points = 10
 			ammo_per_round = -1
+			miss_limit = -1
 		"easy":  # Einfach (F089)
 			round_duration = 90.0
 			base_hit_points = 15
 			ammo_per_round = -1
+			miss_limit = -1
 		"hard":  # Schwer (F089): begrenzte Munition (F004)
 			round_duration = 45.0
 			base_hit_points = 5
 			ammo_per_round = 30
+			miss_limit = -1
+		"endless":  # Endlos ohne Timer, 3 Fehlwürfe = Ende (F077)
+			round_duration = 999.0
+			base_hit_points = 10
+			ammo_per_round = -1
+			miss_limit = 3
+		"survival":  # Überleben mit Wellen, 5 Fehlwürfe = Ende (F083)
+			round_duration = 999.0
+			base_hit_points = 10
+			ammo_per_round = -1
+			miss_limit = 5
+		"combo_hunt":  # Combo-Jagd: höchste Combo zählt (F092)
+			round_duration = 60.0
+			base_hit_points = 10
+			ammo_per_round = -1
+			miss_limit = -1
+		"zen":  # Zen: entspannt, keine Wertung, kein Ende (F093)
+			round_duration = 999.0
+			base_hit_points = 10
+			ammo_per_round = -1
+			miss_limit = -1
 		_:  # Normal
 			round_duration = 60.0
 			base_hit_points = 10
 			ammo_per_round = -1
+			miss_limit = -1
 
 
 ## Setzt die Combo zurück (z. B. wenn das Zeitfenster abläuft).

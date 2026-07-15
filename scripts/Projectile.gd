@@ -12,6 +12,7 @@ const SPLAT_DECAL_SCENE: PackedScene = preload("res://scenes/SplatDecal.tscn")
 @export var has_explosion: bool = false        ## Explosion beim Aufprall? (F010)
 @export var explosion_radius: float = 150.0    ## Radius der Explosion (F010)
 
+var hit_target: bool = false                   ## Hat ein Männchen getroffen? (F077/F083)
 var _alive_time: float = 0.0
 var _has_splatted: bool = false
 var _stuck_to: Node2D = null
@@ -114,6 +115,9 @@ func _process(delta: float) -> void:
 	# Den Haufen nach einer Weile aufräumen, damit die Szene nicht vollläuft
 	_alive_time += delta
 	if _alive_time >= lifetime:
+		# Ohne Treffer zählt der Wurf als Fehlwurf (F077/F083)
+		if not hit_target:
+			GameManager.register_miss()
 		queue_free()
 
 
