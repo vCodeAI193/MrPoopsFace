@@ -62,8 +62,11 @@ func _on_body_entered(body: Node) -> void:
 	if _splat_player.stream != null:
 		_splat_player.play()
 
-	# Schmierfleck-Decal am Boden (F015)
+	# Schmierfleck-Decal am Boden (F015); Limit gegen Ruckler auf Tablets
 	if body is StaticBody2D and SPLAT_DECAL_SCENE != null:
+		var decals: Array = get_tree().get_nodes_in_group("splat_decal")
+		if decals.size() >= 12:
+			decals[0].queue_free()             # ältestes Decal entfernen
 		var decal: Node2D = SPLAT_DECAL_SCENE.instantiate()
 		if get_parent():
 			get_parent().add_child(decal)

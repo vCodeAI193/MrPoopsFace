@@ -200,7 +200,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F159** 🟡 Multi-Touch: zwei Schleudern gleichzeitig
 - [x] **F160** 🟢 Empfindlichkeit der Zugweite einstellbar – max_drag_distance Export (350 px default)
 - [ ] **F161** 🟡 Alternative Tipp-zum-Zielen-Steuerung
-- [ ] **F162** 🟢 Touch-Bereich-Visualisierung im Tutorial
+- [x] **F162** 🟢 Touch-Bereich-Visualisierung im Tutorial
 - [ ] **F163** 🟡 Gamepad-Unterstützung (optional)
 - [x] **F164** 🟢 Abbruch des Wurfs durch Zurückziehen in den Anker – 30px proximity check
 - [ ] **F165** 🟡 Geste zum schnellen Power-Up-Einsatz

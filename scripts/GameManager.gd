@@ -73,6 +73,7 @@ var sfx_volume: float = 1.0                    ## Effektlautstärke 0..1 (F137)
 var screen_shake_enabled: bool = true          ## Bildschirm-Erschütterung an/aus (F181)
 var reduced_motion: bool = false               ## Reduzierte Bewegung (F183)
 var vibration_strength: float = 1.0            ## Vibrationsstärke 0..1 (F166)
+var tutorial_seen: bool = false                ## Erst-Start-Tutorial schon gezeigt? (F162)
 
 var _music_player: AudioStreamPlayer           ## Spielt den Hintergrund-Loop (F134)
 
@@ -272,6 +273,7 @@ func _save_game() -> void:
 	cfg.set_value("settings", "screen_shake_enabled", screen_shake_enabled)
 	cfg.set_value("settings", "reduced_motion", reduced_motion)
 	cfg.set_value("settings", "vibration_strength", vibration_strength)
+	cfg.set_value("settings", "tutorial_seen", tutorial_seen)
 	cfg.save(SAVE_PATH)
 
 
@@ -285,6 +287,7 @@ func _load_game() -> void:
 		screen_shake_enabled = cfg.get_value("settings", "screen_shake_enabled", true)
 		reduced_motion = cfg.get_value("settings", "reduced_motion", false)
 		vibration_strength = cfg.get_value("settings", "vibration_strength", 1.0)
+		tutorial_seen = cfg.get_value("settings", "tutorial_seen", false)
 
 
 # --- Audio-Setup & Optionen (F134, F137, F142, F179, F187) ---
@@ -329,6 +332,12 @@ func _start_music() -> void:
 
 ## Speichert die aktuellen Optionen (F179).
 func save_settings() -> void:
+	_save_game()
+
+
+## Merkt sich, dass das Erst-Start-Tutorial gezeigt wurde (F162).
+func mark_tutorial_seen() -> void:
+	tutorial_seen = true
 	_save_game()
 
 

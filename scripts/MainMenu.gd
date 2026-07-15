@@ -35,6 +35,23 @@ func _ready() -> void:
 	add_child(_ui_click_player)
 
 
+## Android-Zurück-Taste im Menü: offene Panels schließen, sonst Beenden-Dialog.
+func _notification(what: int) -> void:
+	if what != NOTIFICATION_WM_GO_BACK_REQUEST:
+		return
+	if _mode_center.visible:
+		_mode_center.visible = false
+		return
+	# Bestätigungsdialog vor dem Beenden (F120-Muster)
+	var dialog: ConfirmationDialog = ConfirmationDialog.new()
+	dialog.title = "Beenden?"
+	dialog.dialog_text = "Stinky Toss wirklich beenden?"
+	dialog.confirmed.connect(func() -> void: get_tree().quit())
+	dialog.canceled.connect(func() -> void: dialog.queue_free())
+	add_child(dialog)
+	dialog.popup_centered_ratio(0.35)
+
+
 ## Öffnet die Modus-Auswahl (F094).
 func _on_start_pressed() -> void:
 	_play_click_sound()

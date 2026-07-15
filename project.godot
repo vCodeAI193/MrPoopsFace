@@ -11,6 +11,9 @@ config/description="Wirf Kackhaufen auf Strichmännchen! Ein lustiges Casual-Phy
 run/main_scene="res://scenes/MainMenu.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
+; Android-Zurück-Taste beendet die App nicht mehr direkt;
+; Main/MainMenu behandeln NOTIFICATION_WM_GO_BACK_REQUEST selbst
+config/quit_on_go_back=false
 boot_splash/bg_color=Color(0.53, 0.81, 0.92, 1)
 
 [autoload]

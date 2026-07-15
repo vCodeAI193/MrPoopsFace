@@ -43,6 +43,7 @@ const VARIANTS: Array = [
 @onready var _miss_label: Label = $HUD/TopBar/MissLabel
 @onready var _pause_menu: PauseMenu = $PauseMenu
 @onready var _settings: SettingsOverlay = $Settings
+@onready var _tutorial: TutorialOverlay = $Tutorial
 @onready var _settings_button: Button = $HUD/SettingsButton
 @onready var _camera: Camera2D = $Camera2D
 
@@ -152,8 +153,26 @@ func _ready() -> void:
 	add_child(wave_timer)
 	wave_timer.start()
 
+	# Erst-Start-Tutorial vor dem Countdown zeigen (F162)
+	if not GameManager.tutorial_seen:
+		_tutorial.show_tutorial()
+		await _tutorial.tutorial_closed
+		GameManager.mark_tutorial_seen()
+
 	# Countdown abspielen, dann die Runde starten (F117)
 	_run_countdown()
+
+
+## Android-Lebenszyklus: bei Fokusverlust (Anruf, Home-Button) automatisch
+## pausieren; die Zurück-Taste öffnet das Pause-Menü statt die App zu beenden.
+func _notification(what: int) -> void:
+	match what:
+		NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_PAUSED:
+			if GameManager.game_active and not get_tree().paused:
+				_pause_menu.show_pause()
+		NOTIFICATION_WM_GO_BACK_REQUEST:
+			if not get_tree().paused:
+				_pause_menu.show_pause()
 
 
 func _process(delta: float) -> void:

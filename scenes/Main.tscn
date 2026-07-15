@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://a0main0stinkytoss0"]
+[gd_scene load_steps=14 format=3 uid="uid://a0main0stinkytoss0"]
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://d0player0slingshot0" path="res://scenes/Player.tscn" id="2_player"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://e0gameover0screen0" path="res://scenes/GameOver.tscn" id="4_over"]
 [ext_resource type="PackedScene" uid="uid://p0pausemenu0overlay0" path="res://scenes/PauseMenu.tscn" id="5_pause"]
 [ext_resource type="PackedScene" uid="uid://s0settings0overlay00" path="res://scenes/Settings.tscn" id="6_settings"]
+[ext_resource type="PackedScene" uid="uid://t0tutorial0overlay00" path="res://scenes/Tutorial.tscn" id="7_tutorial"]
 
 [sub_resource type="Gradient" id="Gradient_sky"]
 offsets = PackedFloat32Array(0, 1)
@@ -174,5 +175,7 @@ theme_override_font_sizes/font_size = 280
 [node name="PauseMenu" parent="." instance=ExtResource("5_pause")]
 
 [node name="Settings" parent="." instance=ExtResource("6_settings")]
+
+[node name="Tutorial" parent="." instance=ExtResource("7_tutorial")]
 
 [node name="GameOver" parent="." instance=ExtResource("4_over")]

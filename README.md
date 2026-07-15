@@ -69,7 +69,18 @@ scripts/
 ## 📦 Android-Export
 
 1. In Godot: **Editor → Verwalte Export-Vorlagen** installieren.
-2. **Projekt → Exportieren → Android** (Vorlage liegt bereits als `export_presets.cfg` vor).
-3. Paketname: `com.yourname.stinkytoss`, Min-SDK 21, nur Landscape.
+2. Unter **Editor → Editor-Einstellungen → Export → Android** die Pfade zum Android SDK
+   und zu einem Debug-Keystore setzen (für Release-Builds eigenen Keystore anlegen).
+3. **Projekt → Exportieren → Android** (Vorlage liegt bereits als `export_presets.cfg` vor).
+4. Paketname: `com.vcodeai.stinkytoss`, Min-SDK 21, nur Landscape,
+   Vibrations-Berechtigung ist gesetzt (für haptisches Feedback).
+5. Optional: Launcher-Icons (PNG, 192×192 und adaptiv 432×432) aus `icon.svg`
+   exportieren und im Preset unter `launcher_icons/` eintragen.
+
+## 📱 Verhalten auf dem Gerät
+
+- **Zurück-Taste**: öffnet im Spiel das Pause-Menü, im Hauptmenü einen Beenden-Dialog.
+- **Fokusverlust** (Anruf, Home-Button): laufende Runden pausieren automatisch.
+- **Erster Start**: kurzes Tutorial erklärt die Schleuder-Steuerung (einmalig).
 
 Alle Grafiken und der Furzsound werden **prozedural im Code erzeugt** – es sind keine externen Assets nötig.

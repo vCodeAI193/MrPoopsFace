@@ -7,6 +7,7 @@ var _splat_seed: int = 0
 
 
 func setup(pos: Vector2, radius: float) -> void:
+	add_to_group("splat_decal")                # für das Decal-Limit (Performance)
 	global_position = pos
 	_radius = radius * randf_range(0.6, 1.1)
 	_splat_seed = randi()

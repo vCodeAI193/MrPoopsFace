@@ -1,0 +1,42 @@
+[gd_scene load_steps=2 format=3 uid="uid://t0tutorial0overlay00"]
+
+[ext_resource type="Script" path="res://scripts/Tutorial.gd" id="1_tutorial"]
+
+[node name="Tutorial" type="CanvasLayer"]
+layer = 12
+script = ExtResource("1_tutorial")
+
+[node name="Dim" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.6)
+
+[node name="Center" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Panel" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(900, 760)
+
+[node name="VBox" type="VBoxContainer" parent="Center/Panel"]
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="Title" type="Label" parent="Center/Panel/VBox"]
+text = "So geht's!"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 72
+
+[node name="HintLabel" type="Label" parent="Center/Panel/VBox"]
+text = "Ziehe vom Anker nach hinten
+und lass los, um zu werfen!"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 40
+
+[node name="Demo" type="Control" parent="Center/Panel/VBox"]
+custom_minimum_size = Vector2(0, 340)
+
+[node name="StartButton" type="Button" parent="Center/Panel/VBox"]
+custom_minimum_size = Vector2(0, 110)
+text = "Los geht's!"
+theme_override_font_sizes/font_size = 52
