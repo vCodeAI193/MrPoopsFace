@@ -195,7 +195,10 @@ func _trigger_hit(zone_multiplier: float = 1.0) -> void:
 func _spawn_floating_text(points: int) -> void:
 	var color: Color
 	var text: String
-	if is_bomb:
+	if is_bomb and points == 0:
+		color = Color(0.5, 0.8, 1.0)              # Bombe geblockt (F048)
+		text = "Geblockt!"
+	elif is_bomb:
 		color = Color(1.0, 0.2, 0.2)              # Bombe: rot
 		text = "%d" % points
 	elif point_multiplier >= 5:

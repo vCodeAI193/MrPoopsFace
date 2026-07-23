@@ -47,10 +47,19 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	# Nachlade-Animation verwalten (F005)
+	# Nachlade-Animation verwalten (F005): Das zuletzt geworfene Geschoss
+	# kehrt zum Anker zurück, sobald es nach dem Aufprall ausgerollt ist.
+	# So bleibt die Abprall-Physik (F006) unangetastet.
+	if _last_projectile and not is_instance_valid(_last_projectile):
+		_last_projectile = null
+		_projectile_returning = false
 	if _projectile_returning and _last_projectile:
 		_projectile_return_progress += delta * 3.0
 		if _projectile_return_progress >= 1.0:
+			# Angekommen: Fehlwurf-Semantik wie beim Lifetime-Ablauf, dann entfernen
+			if not _last_projectile.hit_target:
+				GameManager.register_miss()
+			_last_projectile.queue_free()
 			_projectile_returning = false
 			_last_projectile = null
 		else:
@@ -58,6 +67,13 @@ func _process(delta: float) -> void:
 			var end_pos: Vector2 = global_position
 			_last_projectile.global_position = start_pos.lerp(end_pos, _projectile_return_progress)
 			_last_projectile.rotation_degrees += 360.0 * delta * 5.0
+	elif _last_projectile and not _last_projectile.freeze \
+			and _last_projectile.has_splatted() \
+			and _last_projectile.linear_velocity.length() < 30.0:
+		# Ausgerollt: einfrieren und Rückkehr starten
+		_last_projectile.freeze = true
+		_projectile_returning = true
+		_projectile_return_progress = 0.0
 
 	# Doppeltipp-Fenster abklingen lassen (F013)
 	_last_tap_time += delta
@@ -174,22 +190,10 @@ func _spawn_projectile(impulse: Vector2) -> void:
 	else:
 		poop.call("launch", impulse)
 
-	# Für Nachlade-Animation speichern (F005)
+	# Für Nachlade-Animation speichern (F005); Start der Rückkehr
+	# übernimmt _process() über die Ruhe-Erkennung
 	_last_projectile = poop
 	_projectile_returning = false
-	poop.body_entered.connect(_on_projectile_hit.bindv([poop]))
-
-
-## Startet die Nachlade-Animation nach Treffer (F005).
-func _on_projectile_hit(poop: Node2D) -> void:
-	if not is_instance_valid(poop) or poop != _last_projectile:
-		return
-	# Physik deaktivieren, um die Rückkehr-Tween-Animation zu ermöglichen
-	if poop is RigidBody2D:
-		poop.set_physics_process(false)
-		poop.freeze = true
-	_projectile_returning = true
-	_projectile_return_progress = 0.0
 
 
 ## Schneller Wurf-Wiederholung durch Doppeltipp (F013).

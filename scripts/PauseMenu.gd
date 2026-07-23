@@ -24,7 +24,9 @@ func _ready() -> void:
 
 
 ## Pausiert das Spiel und zeigt das Overlay.
+## Setzt dabei eine evtl. laufende Ziel-Zeitlupe zurück (F012).
 func show_pause() -> void:
+	Engine.time_scale = 1.0
 	get_tree().paused = true
 	visible = true
 

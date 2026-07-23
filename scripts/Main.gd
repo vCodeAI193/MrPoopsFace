@@ -62,6 +62,7 @@ var _clouds: Array = []
 
 # F123 – Toast-Benachrichtigungen
 var _toast_label: Label
+var _toast_tween: Tween
 
 # F149 – Bildschirm-Aufblitzen bei Mega-Combo
 var _flash_rect: ColorRect
@@ -161,6 +162,12 @@ func _ready() -> void:
 
 	# Countdown abspielen, dann die Runde starten (F117)
 	_run_countdown()
+
+
+## Zeitlupe nie in andere Szenen mitnehmen (F012-Sicherheitsnetz):
+## greift bei Neustart und Wechsel ins Hauptmenü.
+func _exit_tree() -> void:
+	Engine.time_scale = 1.0
 
 
 ## Android-Lebenszyklus: bei Fokusverlust (Anruf, Home-Button) automatisch
@@ -376,15 +383,19 @@ func _flash_screen() -> void:
 
 
 ## Zeigt eine Toast-Benachrichtigung oben in der Mitte (F123).
+## Ein evtl. noch laufender Toast wird abgebrochen, damit er den
+## neuen nicht vorzeitig ausblendet.
 func show_toast(text: String) -> void:
+	if _toast_tween and _toast_tween.is_valid():
+		_toast_tween.kill()
 	_toast_label.text = text
 	_toast_label.visible = true
 	_toast_label.modulate.a = 0.0
-	var tween: Tween = create_tween()
-	tween.tween_property(_toast_label, "modulate:a", 1.0, 0.2)
-	tween.tween_interval(1.8)
-	tween.tween_property(_toast_label, "modulate:a", 0.0, 0.4)
-	tween.tween_callback(func() -> void: _toast_label.visible = false)
+	_toast_tween = create_tween()
+	_toast_tween.tween_property(_toast_label, "modulate:a", 1.0, 0.2)
+	_toast_tween.tween_interval(1.8)
+	_toast_tween.tween_property(_toast_label, "modulate:a", 0.0, 0.4)
+	_toast_tween.tween_callback(func() -> void: _toast_label.visible = false)
 
 
 ## Toast beim Einsammeln eines Power-Ups (F123).

@@ -52,22 +52,22 @@ func _sync_from_settings() -> void:
 	_motion_check.set_pressed_no_signal(GameManager.reduced_motion)
 
 
+# Die Slider ändern nur die Laufzeitwerte; gespeichert wird gesammelt
+# beim Schließen, um Disk-Schreibvorgänge pro Wisch-Geste zu vermeiden.
+
 func _on_music_changed(value: float) -> void:
 	GameManager.music_volume = value
 	GameManager.apply_audio_settings()
-	GameManager.save_settings()
 
 
 func _on_sfx_changed(value: float) -> void:
 	GameManager.sfx_volume = value
 	GameManager.apply_audio_settings()
-	GameManager.save_settings()
 	_play_click_sound()                          # direkt hörbares Feedback
 
 
 func _on_vibration_changed(value: float) -> void:
 	GameManager.vibration_strength = value
-	GameManager.save_settings()
 	# Probe-Vibration als Feedback (F166)
 	if value > 0.0:
 		Input.vibrate_handheld(int(60 * value))
@@ -94,6 +94,7 @@ func _on_reset_pressed() -> void:
 
 func _on_close_pressed() -> void:
 	_play_click_sound()
+	GameManager.save_settings()                  # Slider-Werte gesammelt sichern
 	if _paused_by_settings:
 		get_tree().paused = false
 		_paused_by_settings = false

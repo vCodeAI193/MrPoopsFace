@@ -249,7 +249,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F196** 🔴 Belohnungs-Werbung (Rewarded Ads) Integration
 - [ ] **F197** 🟡 Banner-/Interstitial-Werbung (optional, abschaltbar)
 - [ ] **F198** 🟡 Performance-Optimierung: Objekt-Pooling für Geschosse/Männchen
-- [ ] **F199** 🟡 Unit-Tests für GameManager (Score/Combo/Timer) via GUT
+- [x] **F199** 🟡 Unit-Tests für GameManager (Score/Combo/Timer) – headless-Testskript + CI, ohne GUT-Abhängigkeit
 - [ ] **F200** 🟢 Analytics-Events (Rundenstart, Score, Modus) – datenschutzkonform
 
 ---

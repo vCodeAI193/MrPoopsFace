@@ -124,6 +124,11 @@ func _process(delta: float) -> void:
 		queue_free()
 
 
+## Hatte der Haufen schon seinen ersten Aufprall? (für die Nachlade-Animation, F005)
+func has_splatted() -> bool:
+	return _has_splatted
+
+
 ## Gibt dem Haufen einen Anfangsimpuls (wird vom Player beim Loslassen aufgerufen).
 ## spin: Drehmoment basierend auf Wischrichtung (F011)
 func launch(impulse: Vector2, spin: float = 0.0) -> void:

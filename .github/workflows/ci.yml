@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  test:
+    name: Godot-Headless-Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Godot 4.3 herunterladen
+        run: |
+          curl -sSL -o godot.zip \
+            https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
+          unzip -q godot.zip
+          mv Godot_v4.3-stable_linux.x86_64 godot
+          chmod +x godot
+
+      - name: Ressourcen importieren
+        run: ./godot --headless --path . --import || true
+
+      - name: Tests ausführen
+        run: ./godot --headless --path . --script tests/run_tests.gd
