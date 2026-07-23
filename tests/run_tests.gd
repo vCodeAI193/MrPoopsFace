@@ -21,6 +21,8 @@ func _initialize() -> void:
 	_test_settings_reset()
 	_test_highscores()
 	_test_stars()
+	_test_coins()
+	_test_shop()
 	print("---")
 	print("%d Tests bestanden, %d fehlgeschlagen" % [_passes, _failures])
 	quit(1 if _failures > 0 else 0)
@@ -227,3 +229,45 @@ func _test_stars() -> void:
 	zen.end_game()
 	_check(zen.last_stars == 0, "zen: keine Sterne-Wertung")
 	zen.free()
+
+
+## Münzvergabe pro Treffer inkl. Combo-/Gold-Bonus (F095).
+func _test_coins() -> void:
+	var gm: Node = _new_gm()
+	gm.set_game_mode("normal")
+	gm.start_game()
+	gm.coins = 0
+	gm.register_hit(1)                          # Combo 1: 1 Münze
+	_check(gm.coins == 1, "1. Treffer: 1 Münze")
+	gm.register_hit(1)                          # Combo 2: 1 Münze
+	gm.register_hit(1)                          # Combo 3: 2 Münzen (Combo-Bonus)
+	_check(gm.coins == 4, "Combo-Bonus ab Combo 3")
+	gm.register_hit(5)                          # Gold: 2+2 Münzen (Combo 4 + Gold)
+	_check(gm.coins == 8, "Gold-Bonus: +2 Münzen extra")
+	_check(gm.coins_earned_round == 8, "Rundenzähler stimmt")
+	gm.free()
+
+	var zen: Node = _new_gm()
+	zen.set_game_mode("zen")
+	zen.start_game()
+	zen.coins = 0
+	zen.register_hit(1)
+	_check(zen.coins == 0, "zen: keine Münzen")
+	zen.free()
+
+
+## Skin-Kauf und -Auswahl (F096/F098).
+func _test_shop() -> void:
+	var gm: Node = _new_gm()
+	gm.coins = 100
+	gm.owned_skins = ["classic"]
+	_check(not gm.buy_skin("gold"), "Kauf scheitert bei zu wenig Münzen (150)")
+	gm.coins = 200
+	_check(gm.buy_skin("gold"), "Kauf klappt mit genug Münzen")
+	_check(gm.coins == 50, "Preis wurde abgezogen")
+	_check(not gm.buy_skin("gold"), "Doppelkauf wird verweigert")
+	_check(not gm.select_skin("rainbow"), "Anlegen ohne Besitz verweigert")
+	_check(gm.select_skin("gold"), "Anlegen mit Besitz klappt")
+	_check(gm.selected_skin == "gold", "Skin ist aktiv")
+	_check(not gm.buy_skin("gibtsnicht"), "unbekannte Skin-ID verweigert")
+	gm.free()

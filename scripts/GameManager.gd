@@ -15,6 +15,7 @@ signal powerup_activated(type: String)         ## Wird beim Einsammeln eines Pow
 signal ammo_changed(ammo_left: int)            ## Wird bei Munitionsänderung gesendet (F004)
 signal misses_changed(new_misses: int)         ## Wird bei Fehlwurf gesendet (F077/F083)
 signal combo_broken_by_miss(lost_combo: int)   ## Fehlwurf hat eine Combo >= 3 gebrochen
+signal coins_changed(total: int)               ## Wird bei Münzänderung gesendet (F095)
 
 # --- Einstellbare Werte (im Inspector / per Code anpassbar) ---
 @export var round_duration: float = 60.0       ## Rundenlänge in Sekunden
@@ -50,6 +51,21 @@ const STAR_THRESHOLDS: Dictionary = {
 	"combo_hunt": [5, 10, 15],
 }
 var last_stars: int = 0               ## Sterne der letzten Runde (0–3)
+
+# --- Münzen & Skins (F095/F096/F098) ---
+## Skin-Katalog: id -> {name, price}; Zeichnung siehe Projectile.draw_poop_shape()
+const SKINS: Dictionary = {
+	"classic": {"name": "Klassik", "price": 0},
+	"fussball": {"name": "Fußball", "price": 200},
+	"ice": {"name": "Eiscreme", "price": 200},
+	"alien": {"name": "Alien", "price": 250},
+	"gold": {"name": "Gold", "price": 150},
+	"rainbow": {"name": "Regenbogen", "price": 300},
+}
+var coins: int = 0                    ## Gesamtmünzen (persistiert, F095)
+var coins_earned_round: int = 0       ## In dieser Runde verdiente Münzen
+var owned_skins: Array = ["classic"]  ## Gekaufte Skins (persistiert, F096)
+var selected_skin: String = "classic" ## Aktiver Geschoss-Skin (F098)
 
 var _combo_timer: float = 0.0                  ## Restzeit, in der die Combo gültig bleibt
 var combo_timer_pct: float = 0.0              ## Verhältnis 0..1 für den Fortschrittsbalken (F119)
@@ -150,6 +166,7 @@ func start_game() -> void:
 	best_combo = 0
 	hits_total = 0
 	avg_points_per_hit = 0.0
+	coins_earned_round = 0
 	wind_force = Vector2(randf_range(-120.0, 120.0), 0.0)  # Wind randomisieren (F007)
 	freeze_active = false
 	magnet_active = false
@@ -186,6 +203,8 @@ func end_game() -> void:
 		last_was_highscore = false
 	# Sterne-Bewertung berechnen (F105)
 	last_stars = _compute_stars()
+	# Verdiente Münzen sichern (F095)
+	_save_game()
 	game_over.emit(score)
 
 
@@ -235,6 +254,18 @@ func register_hit(type_multiplier: int = 1) -> int:
 	best_combo = maxi(best_combo, combo)
 	hits_total += 1
 	avg_points_per_hit = float(score) / float(hits_total)
+
+	# Münzen verdienen (F095): 1 pro Treffer, +1 ab Combo 3, +2 bei Gold;
+	# in Zen/Übung gibt es keine Münzen
+	if game_mode not in ["zen", "practice"]:
+		var earned: int = 1
+		if combo >= 3:
+			earned += 1
+		if type_multiplier >= 5:
+			earned += 2
+		coins += earned
+		coins_earned_round += earned
+		coins_changed.emit(coins)
 
 	score_changed.emit(score)
 	combo_changed.emit(combo)
@@ -323,6 +354,9 @@ func _save_game() -> void:
 	cfg.set_value("settings", "reduced_motion", reduced_motion)
 	cfg.set_value("settings", "vibration_strength", vibration_strength)
 	cfg.set_value("settings", "tutorial_seen", tutorial_seen)
+	cfg.set_value("progress", "coins", coins)
+	cfg.set_value("progress", "owned_skins", owned_skins)
+	cfg.set_value("progress", "selected_skin", selected_skin)
 	cfg.save(SAVE_PATH)
 
 
@@ -337,6 +371,9 @@ func _load_game() -> void:
 		reduced_motion = cfg.get_value("settings", "reduced_motion", false)
 		vibration_strength = cfg.get_value("settings", "vibration_strength", 1.0)
 		tutorial_seen = cfg.get_value("settings", "tutorial_seen", false)
+		coins = cfg.get_value("progress", "coins", 0)
+		owned_skins = cfg.get_value("progress", "owned_skins", ["classic"])
+		selected_skin = cfg.get_value("progress", "selected_skin", "classic")
 
 
 # --- Audio-Setup & Optionen (F134, F137, F142, F179, F187) ---
@@ -388,6 +425,31 @@ func save_settings() -> void:
 func mark_tutorial_seen() -> void:
 	tutorial_seen = true
 	_save_game()
+
+
+# --- Shop & Skins (F096/F098) ---
+
+## Kauft einen Skin, falls genug Münzen da sind. Gibt Erfolg zurück.
+func buy_skin(id: String) -> bool:
+	if id not in SKINS or id in owned_skins:
+		return false
+	var price: int = int(SKINS[id]["price"])
+	if coins < price:
+		return false
+	coins -= price
+	owned_skins.append(id)
+	coins_changed.emit(coins)
+	_save_game()
+	return true
+
+
+## Legt einen besessenen Skin an. Gibt Erfolg zurück.
+func select_skin(id: String) -> bool:
+	if id not in owned_skins:
+		return false
+	selected_skin = id
+	_save_game()
+	return true
 
 
 ## Setzt alle Optionen auf die Standardwerte zurück (F187).

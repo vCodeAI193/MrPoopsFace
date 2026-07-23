@@ -121,10 +121,10 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 ## 📈 6. Progression & Wirtschaft (F095–F112)
 
-- [ ] **F095** 🟡 Münzwährung für Treffer sammeln
-- [ ] **F096** 🟡 Shop zum Kauf von Skins/Power-Ups
+- [x] **F095** 🟡 Münzwährung für Treffer sammeln
+- [x] **F096** 🟡 Shop zum Kauf von Skins/Power-Ups – Geschoss-Skins mit Vorschau
 - [ ] **F097** 🔴 XP- und Spielerlevel-System
-- [ ] **F098** 🟡 Freischaltbare Geschoss-Skins (Mais, Wurst …)
+- [x] **F098** 🟡 Freischaltbare Geschoss-Skins (Mais, Wurst …) – Gold/Regenbogen/Eis/Alien/Fußball
 - [ ] **F099** 🟡 Freischaltbare Schleuder-Designs
 - [ ] **F100** 🔴 Skill-Tree für permanente Boni
 - [ ] **F101** 🟢 Tägliche Login-Belohnung

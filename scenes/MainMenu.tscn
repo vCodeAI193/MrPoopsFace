@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://m0mainmenu0start0"]
+[gd_scene load_steps=6 format=3 uid="uid://m0mainmenu0start0"]
 
 [ext_resource type="Script" path="res://scripts/MainMenu.gd" id="1_menu"]
 [ext_resource type="PackedScene" uid="uid://s0settings0overlay00" path="res://scenes/Settings.tscn" id="2_settings"]
+[ext_resource type="PackedScene" uid="uid://sh0shop0overlay0000" path="res://scenes/Shop.tscn" id="3_shop"]
 
 [sub_resource type="Gradient" id="Gradient_menu"]
 offsets = PackedFloat32Array(0, 1)
@@ -52,10 +53,21 @@ text = "Bester: 0"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 48
 
+[node name="CoinsLabel" type="Label" parent="Center/VBox"]
+text = "🪙 0"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(1, 0.84, 0, 1)
+theme_override_font_sizes/font_size = 42
+
 [node name="StartButton" type="Button" parent="Center/VBox"]
 custom_minimum_size = Vector2(0, 130)
 text = "Spielen"
 theme_override_font_sizes/font_size = 60
+
+[node name="ShopButton" type="Button" parent="Center/VBox"]
+custom_minimum_size = Vector2(0, 110)
+text = "🛒 Shop"
+theme_override_font_sizes/font_size = 48
 
 [node name="OptionsButton" type="Button" parent="Center/VBox"]
 custom_minimum_size = Vector2(0, 110)
@@ -68,6 +80,8 @@ text = "Beenden"
 theme_override_font_sizes/font_size = 48
 
 [node name="Settings" parent="." instance=ExtResource("2_settings")]
+
+[node name="Shop" parent="." instance=ExtResource("3_shop")]
 
 [node name="ModeCenter" type="CenterContainer" parent="."]
 visible = false

@@ -131,6 +131,9 @@ func _process(delta: float) -> void:
 		queue_free()
 		return
 
+	# Neu zeichnen für animierte Skins (Regenbogen) und Gesichtswechsel
+	queue_redraw()
+
 	# Den Haufen nach einer Weile aufräumen, damit die Szene nicht vollläuft
 	_alive_time += delta
 	if _alive_time >= lifetime:
@@ -161,23 +164,82 @@ func launch(impulse: Vector2, spin: float = 0.0) -> void:
 
 
 func _draw() -> void:
-	var r: float = poop_radius
-	var brown: Color = Color(0.45, 0.27, 0.12)
-	var brown_dark: Color = Color(0.36, 0.21, 0.09)
+	# Skin-Körper zeichnen (F098); danach das Gesicht je nach Flugzustand
+	draw_poop_shape(self, poop_radius, GameManager.selected_skin, _alive_time)
+	_draw_face()
+
+
+## Zeichnet den Haufen-Körper im gewählten Skin auf ein beliebiges CanvasItem.
+## Wird auch von der Shop-Vorschau genutzt (F096/F098).
+## t: Zeit für animierte Skins (Regenbogen).
+static func draw_poop_shape(canvas: CanvasItem, r: float, skin: String, t: float = 0.0) -> void:
+	var base: Color
+	var dark: Color
+	match skin:
+		"gold":
+			base = Color(0.95, 0.78, 0.15)
+			dark = Color(0.8, 0.6, 0.05)
+		"rainbow":
+			base = Color.from_hsv(fmod(t * 0.4, 1.0), 0.75, 0.95)
+			dark = base.darkened(0.25)
+		"ice":
+			base = Color(0.72, 0.88, 1.0)
+			dark = Color(0.5, 0.72, 0.95)
+		"alien":
+			base = Color(0.35, 0.85, 0.25)
+			dark = Color(0.2, 0.6, 0.15)
+		"fussball":
+			base = Color(0.95, 0.95, 0.95)
+			dark = Color(0.8, 0.8, 0.8)
+		_:
+			base = Color(0.45, 0.27, 0.12)
+			dark = Color(0.36, 0.21, 0.09)
 
 	# --- Drei gestapelte Kugeln als klassischer Emoji-Kackhaufen ---
-	# Unterste, breiteste Schicht
-	draw_circle(Vector2(0, r * 0.55), r, brown_dark)
-	# Mittlere Schicht
-	draw_circle(Vector2(-r * 0.15, -r * 0.05), r * 0.72, brown)
-	# Obere Spitze
-	draw_circle(Vector2(r * 0.1, -r * 0.55), r * 0.45, brown)
+	canvas.draw_circle(Vector2(0, r * 0.55), r, dark)
+	canvas.draw_circle(Vector2(-r * 0.15, -r * 0.05), r * 0.72, base)
+	canvas.draw_circle(Vector2(r * 0.1, -r * 0.55), r * 0.45, base)
 
-	# --- Augen (weißes Oval + schwarze Pupille) ---
+	# --- Skin-spezifische Extras ---
+	match skin:
+		"gold":
+			# Funkel-Sterne als kleine weiße Kreuze
+			for p in [Vector2(-r * 0.6, -r * 0.3), Vector2(r * 0.55, r * 0.2), Vector2(r * 0.05, -r * 0.85)]:
+				canvas.draw_line(p + Vector2(-r * 0.1, 0), p + Vector2(r * 0.1, 0), Color.WHITE, 2.0)
+				canvas.draw_line(p + Vector2(0, -r * 0.1), p + Vector2(0, r * 0.1), Color.WHITE, 2.0)
+		"ice":
+			# Eiscreme-Wirbel an der Spitze
+			canvas.draw_arc(Vector2(r * 0.1, -r * 0.55), r * 0.3, 0, TAU * 0.75, 12, Color.WHITE, 3.0)
+		"alien":
+			# Stielaugen oben
+			for sx in [-1.0, 1.0]:
+				var stalk_top: Vector2 = Vector2(sx * r * 0.35, -r * 1.05)
+				canvas.draw_line(Vector2(sx * r * 0.2, -r * 0.6), stalk_top, dark, 3.5)
+				canvas.draw_circle(stalk_top, r * 0.14, Color.WHITE)
+				canvas.draw_circle(stalk_top, r * 0.07, Color.BLACK)
+		"fussball":
+			# Schwarze Tupfer wie Fußball-Flicken
+			for p in [Vector2(-r * 0.4, r * 0.4), Vector2(r * 0.45, r * 0.15), Vector2(-r * 0.1, -r * 0.45)]:
+				canvas.draw_circle(p, r * 0.16, Color(0.1, 0.1, 0.1))
+
+
+## Gesicht: fröhlich im Flug, benommen nach dem Aufprall (Kinder-Charakter).
+func _draw_face() -> void:
+	var r: float = poop_radius
 	var eye_y: float = -r * 0.1
 	var eye_dx: float = r * 0.28
 	var eye_r: float = r * 0.18
-	for sx in [-1.0, 1.0]:
-		var eye_pos: Vector2 = Vector2(sx * eye_dx, eye_y)
-		draw_circle(eye_pos, eye_r, Color.WHITE)
-		draw_circle(eye_pos + Vector2(0, eye_r * 0.15), eye_r * 0.5, Color.BLACK)
+	if _has_splatted:
+		# X-Augen: benommen nach der Landung
+		for sx in [-1.0, 1.0]:
+			var c: Vector2 = Vector2(sx * eye_dx, eye_y)
+			var d: float = eye_r * 0.7
+			draw_line(c + Vector2(-d, -d), c + Vector2(d, d), Color.BLACK, 3.0)
+			draw_line(c + Vector2(-d, d), c + Vector2(d, -d), Color.BLACK, 3.0)
+	else:
+		# Fröhlich aufgerissene Augen + offener Lach-Mund ("Wheee!")
+		for sx in [-1.0, 1.0]:
+			var eye_pos: Vector2 = Vector2(sx * eye_dx, eye_y)
+			draw_circle(eye_pos, eye_r, Color.WHITE)
+			draw_circle(eye_pos + Vector2(0, eye_r * 0.15), eye_r * 0.5, Color.BLACK)
+		draw_arc(Vector2(0, r * 0.28), r * 0.22, 0.15 * PI, 0.85 * PI, 12, Color.BLACK, 3.0)

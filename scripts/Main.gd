@@ -41,6 +41,7 @@ const VARIANTS: Array = [
 @onready var _streak_label: Label = $HUD/TopBar/StreakLabel
 @onready var _ammo_label: Label = $HUD/TopBar/AmmoLabel
 @onready var _miss_label: Label = $HUD/TopBar/MissLabel
+@onready var _coins_label: Label = $HUD/TopBar/CoinsLabel
 @onready var _pause_menu: PauseMenu = $PauseMenu
 @onready var _settings: SettingsOverlay = $Settings
 @onready var _tutorial: TutorialOverlay = $Tutorial
@@ -98,6 +99,8 @@ func _ready() -> void:
 	GameManager.misses_changed.connect(_on_misses_changed)
 	GameManager.combo_broken_by_miss.connect(
 		func(lost: int) -> void: show_toast("Combo x%d verloren!" % lost))
+	GameManager.coins_changed.connect(_on_coins_changed)
+	_coins_label.text = "🪙 %d" % GameManager.coins
 
 	# Pause-Knopf verbinden (F114)
 	_pause_button.pressed.connect(_on_pause_pressed)
@@ -387,8 +390,27 @@ func _on_combo_changed(new_combo: int) -> void:
 		# Bildschirm-Aufblitzen bei Mega-Combo ab x5 (F149)
 		if new_combo >= 5:
 			_flash_screen()
+		# Große Lobwörter für Kinder bei Combo-Meilensteinen
+		_spawn_praise_word(new_combo)
 	else:
 		_combo_label.visible = false
+
+
+## Feiert Combo-Meilensteine mit großen bunten Lobwörtern (Kinder-Feedback).
+func _spawn_praise_word(combo: int) -> void:
+	const PRAISE: Dictionary = {
+		3: ["SUPER!", Color(0.3, 0.9, 0.3)],
+		5: ["MEGA!", Color(1.0, 0.6, 0.1)],
+		8: ["WAHNSINN!", Color(1.0, 0.3, 0.6)],
+		12: ["UNGLAUBLICH!", Color(0.5, 0.4, 1.0)],
+	}
+	if combo not in PRAISE:
+		return
+	var ft: FloatingText = preload("res://scenes/FloatingText.tscn").instantiate()
+	ft.setup(PRAISE[combo][0], PRAISE[combo][1])
+	ft.scale = Vector2(2.2, 2.2)
+	ft.position = Vector2(960, 420)
+	add_child(ft)
 
 
 ## Kurzes weißes Aufblitzen des Bildschirms (F149).
@@ -485,6 +507,12 @@ func _apply_mode_hud() -> void:
 			_score_label.text = "Beste Combo: 0"
 		"practice":
 			_time_label.visible = false
+
+
+## Aktualisiert die Münz-Anzeige mit kleinem Pop (F095).
+func _on_coins_changed(total: int) -> void:
+	_coins_label.text = "🪙 %d" % total
+	_pop_label(_coins_label, 1.25)
 
 
 ## Aktualisiert den Fehlwurf-Zähler (F077/F083); kurz vor dem Limit rot.

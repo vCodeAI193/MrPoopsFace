@@ -4,6 +4,7 @@ extends CanvasLayer
 @onready var _score_label: Label = $Center/Panel/VBox/ScoreLabel
 @onready var _stars_label: Label = $Center/Panel/VBox/StarsLabel
 @onready var _goal_label: Label = $Center/Panel/VBox/GoalLabel
+@onready var _coins_earned_label: Label = $Center/Panel/VBox/CoinsEarnedLabel
 @onready var _best_label: Label = $Center/Panel/VBox/BestLabel
 @onready var _stats_label: Label = $Center/Panel/VBox/StatsLabel
 @onready var _replay_button: Button = $Center/Panel/VBox/ReplayButton
@@ -46,6 +47,13 @@ func _on_game_over(final_score: int) -> void:
 		# Zen/Übung: keine Wertung, keine Sterne
 		_stars_label.visible = false
 		_goal_label.visible = false
+
+	# Verdiente Münzen anzeigen (F095)
+	if GameManager.coins_earned_round > 0:
+		_coins_earned_label.text = "+%d 🪙 verdient!" % GameManager.coins_earned_round
+		_coins_earned_label.visible = true
+	else:
+		_coins_earned_label.visible = false
 	# Neuen Rekord hervorheben bzw. den besten Wert anzeigen (F168)
 	if GameManager.last_was_highscore:
 		_best_label.text = "🏆 Neuer Rekord!"
