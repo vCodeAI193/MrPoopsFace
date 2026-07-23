@@ -2,6 +2,8 @@ extends CanvasLayer
 ## GameOver – Endbildschirm mit Punktestand und Wiederholen-Knopf.
 
 @onready var _score_label: Label = $Center/Panel/VBox/ScoreLabel
+@onready var _stars_label: Label = $Center/Panel/VBox/StarsLabel
+@onready var _goal_label: Label = $Center/Panel/VBox/GoalLabel
 @onready var _best_label: Label = $Center/Panel/VBox/BestLabel
 @onready var _stats_label: Label = $Center/Panel/VBox/StatsLabel
 @onready var _replay_button: Button = $Center/Panel/VBox/ReplayButton
@@ -27,6 +29,23 @@ func _on_game_over(final_score: int) -> void:
 				final_score, GameManager.misses]
 		_:
 			_score_label.text = "Endpunktzahl: %d" % final_score
+
+	# Sterne-Bewertung + nächstes Ziel anzeigen (F105)
+	if GameManager.game_mode in GameManager.STAR_THRESHOLDS:
+		_stars_label.visible = true
+		_stars_label.text = "★".repeat(GameManager.last_stars) \
+			+ "☆".repeat(3 - GameManager.last_stars)
+		var goal: int = GameManager.next_star_goal()
+		if goal > 0:
+			var unit: String = "Combo" if GameManager.game_mode == "combo_hunt" else "Punkte"
+			_goal_label.text = "Nächstes Ziel: %d %s" % [goal, unit]
+			_goal_label.visible = true
+		else:
+			_goal_label.visible = false
+	else:
+		# Zen/Übung: keine Wertung, keine Sterne
+		_stars_label.visible = false
+		_goal_label.visible = false
 	# Neuen Rekord hervorheben bzw. den besten Wert anzeigen (F168)
 	if GameManager.last_was_highscore:
 		_best_label.text = "🏆 Neuer Rekord!"

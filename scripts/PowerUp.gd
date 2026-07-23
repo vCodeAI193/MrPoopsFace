@@ -19,19 +19,28 @@ func _ready() -> void:
 	_collect_player.bus = "SFX"  # F137/F142
 	_collect_player.stream = SoundGen.whoosh()
 	add_to_group("powerup")
+	# Antippen zum Einsammeln (F052): Touch-Events auf die Kollisionsform
+	input_pickable = true
+	input_event.connect(_on_input_event)
 	queue_redraw()
 
 
 func _process(delta: float) -> void:
-	# Nach unten fallen (F052 – Drop-Animation)
+	# Nach unten fallen (F052 – Drop-Animation), am Boden liegen bleiben,
+	# damit Zeit zum Antippen bleibt
 	_fall_velocity += 500.0 * delta
-	position.y += _fall_velocity * delta
+	position.y = minf(position.y + _fall_velocity * delta, 1050.0)
 
-	# Auto-Einsammlung durch Nähe zum Player (wenn der Player nahe genug ist)
 	if not _collected:
+		# Einsammeln durch Nähe zum Player (selten, aber möglich)
 		var player: Node2D = get_tree().get_first_node_in_group("player")
 		if player and global_position.distance_to(player.global_position) < 80.0:
 			_on_pickup_collected()
+		# Einsammeln durch Abschießen: vorbeifliegendes Geschoss reicht
+		for p in get_tree().get_nodes_in_group("projectile"):
+			if p.global_position.distance_to(global_position) < 60.0:
+				_on_pickup_collected()
+				break
 
 	# Nach Lifetime verschwinden
 	_alive_time += delta
@@ -39,6 +48,12 @@ func _process(delta: float) -> void:
 		queue_free()
 
 	queue_redraw()
+
+
+## Antippen sammelt das Power-Up ein (F052).
+func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if event is InputEventScreenTouch and event.pressed:
+		_on_pickup_collected()
 
 
 ## Wird aufgerufen, wenn das Power-Up eingesammelt wird.

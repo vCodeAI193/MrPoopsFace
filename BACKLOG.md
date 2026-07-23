@@ -131,7 +131,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F102** 🟡 Sammelkarten/Sticker für getroffene Männchen-Typen
 - [ ] **F103** 🔴 Battle-Pass-/Season-System
 - [ ] **F104** 🟡 Münz-Verdopplung nach Runde (Werbung optional)
-- [ ] **F105** 🟢 Sternebewertung pro Level (1–3 Sterne)
+- [x] **F105** 🟢 Sternebewertung pro Level (1–3 Sterne) – pro Runde mit "Nächstes Ziel"-Anzeige
 - [ ] **F106** 🟡 Meilenstein-Belohnungen (Gesamttreffer)
 - [ ] **F107** 🔴 Prestige-/Neustart-System mit Bonus
 - [ ] **F108** 🟡 Truhen/Lootboxen mit Zufallsinhalt

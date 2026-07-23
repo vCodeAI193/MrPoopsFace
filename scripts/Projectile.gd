@@ -2,6 +2,7 @@ extends RigidBody2D
 ## Projectile – der Kackhaufen, den der Spieler wirft.
 
 const SPLAT_DECAL_SCENE: PackedScene = preload("res://scenes/SplatDecal.tscn")
+const FLOATING_TEXT_SCENE: PackedScene = preload("res://scenes/FloatingText.tscn")
 ## Ein RigidBody2D mit Schwerkraft, der per _draw() als brauner Haufen
 ## mit Emoji-Augen gezeichnet wird (keine externen Grafiken nötig).
 
@@ -15,6 +16,7 @@ const SPLAT_DECAL_SCENE: PackedScene = preload("res://scenes/SplatDecal.tscn")
 var hit_target: bool = false                   ## Hat ein Männchen getroffen? (F077/F083)
 var _alive_time: float = 0.0
 var _has_splatted: bool = false
+var _nearest_approach: float = INF             ## Kleinste Distanz zu einem Männchen (Near-Miss)
 var _stuck_to: Node2D = null
 var _stuck_timer: float = 0.0
 
@@ -62,6 +64,14 @@ func _on_body_entered(body: Node) -> void:
 	if _splat_player.stream != null:
 		_splat_player.play()
 
+	# Near-Miss-Feedback: knapp verfehlt fühlt sich anders an als weit daneben
+	if not hit_target and _nearest_approach < 110.0 and FLOATING_TEXT_SCENE != null:
+		var ft: Node2D = FLOATING_TEXT_SCENE.instantiate()
+		ft.setup("Knapp!", Color(0.85, 0.85, 0.85, 0.9))
+		ft.global_position = global_position + Vector2(0, -60)
+		if get_parent():
+			get_parent().add_child(ft)
+
 	# Schmierfleck-Decal am Boden (F015); Limit gegen Ruckler auf Tablets
 	if body is StaticBody2D and SPLAT_DECAL_SCENE != null:
 		var decals: Array = get_tree().get_nodes_in_group("splat_decal")
@@ -89,6 +99,12 @@ func _on_body_entered(body: Node) -> void:
 
 
 func _process(delta: float) -> void:
+	# Kleinste Männchen-Distanz für das Near-Miss-Feedback mitführen
+	if not hit_target and not _has_splatted:
+		for m in get_tree().get_nodes_in_group("maennchen"):
+			_nearest_approach = minf(
+				_nearest_approach, global_position.distance_to(m.global_position))
+
 	# Magnet: Geschoss wird zu nächstem Männchen gezogen (F047)
 	if GameManager.magnet_active and not freeze and _stuck_to == null:
 		var nearest: Node2D = null

@@ -23,8 +23,8 @@ const VARIANTS: Array = [
 	{"scale": 1.0, "speed": 45.0, "color": Color(0.95, 0.75, 0.05), "mult": 5, "weight": 5, "jump_height": 0.0, "sleeping": false, "has_shield": false},    # gold
 	{"scale": 0.88, "speed": 75.0, "color": Color(0.1, 0.55, 0.15), "mult": 2, "weight": 18, "jump_height": 110.0, "sleeping": false, "has_shield": false}, # springend (F022)
 	{"scale": 1.05, "speed": 0.0, "color": Color(0.2, 0.22, 0.32), "mult": 4, "weight": 8, "jump_height": 0.0, "sleeping": true, "has_shield": false},     # schlafend (F032)
-	{"scale": 1.15, "speed": 50.0, "color": Color(0.35, 0.35, 0.35), "mult": 2, "weight": 8, "jump_height": 0.0, "sleeping": false, "has_shield": true},   # Schild (F023)
-	{"scale": 1.0, "speed": 80.0, "color": Color(0.65, 0.08, 0.08), "mult": 0, "weight": 10, "jump_height": 0.0, "sleeping": false, "has_shield": false, "is_bomb": true},  # Bombe (F029)
+	{"scale": 1.15, "speed": 50.0, "color": Color(0.35, 0.35, 0.35), "mult": 2, "weight": 8, "ramp_weight": 8, "jump_height": 0.0, "sleeping": false, "has_shield": true},   # Schild (F023)
+	{"scale": 1.0, "speed": 80.0, "color": Color(0.65, 0.08, 0.08), "mult": 0, "weight": 10, "ramp_weight": 12, "jump_height": 0.0, "sleeping": false, "has_shield": false, "is_bomb": true},  # Bombe (F029)
 	{"scale": 1.0, "speed": 55.0, "color": Color(0.45, 0.15, 0.55), "mult": 3, "weight": 8, "jump_height": 0.0, "sleeping": false, "has_shield": false, "has_umbrella": true},  # Regenschirm (F026)
 	{"scale": 0.95, "speed": 90.0, "color": Color(0.85, 0.45, 0.1), "mult": 3, "weight": 10, "jump_height": 0.0, "sleeping": false, "has_shield": false, "dodges": true},  # ausweichend (F027)
 ]
@@ -78,8 +78,8 @@ var _bonus_active: bool = false
 func _ready() -> void:
 	randomize()
 
-	# Schwierigkeitsmultiplikatoren anwenden (F089)
-	match GameManager.difficulty:
+	# Schwierigkeitsanpassung über den Spielmodus (F089)
+	match GameManager.game_mode:
 		"easy":
 			max_maennchen = 5
 			spawn_rate = 2.0
@@ -96,6 +96,8 @@ func _ready() -> void:
 	GameManager.powerup_activated.connect(_on_powerup_activated)
 	GameManager.ammo_changed.connect(_on_ammo_changed)
 	GameManager.misses_changed.connect(_on_misses_changed)
+	GameManager.combo_broken_by_miss.connect(
+		func(lost: int) -> void: show_toast("Combo x%d verloren!" % lost))
 
 	# Pause-Knopf verbinden (F114)
 	_pause_button.pressed.connect(_on_pause_pressed)
@@ -311,16 +313,33 @@ func _apply_variant_dict(maennchen: Maennchen, variant: Dictionary) -> void:
 
 
 ## Liefert eine zufällige Variante entsprechend ihrer Gewichtung.
+## Risiko-Kurve: Varianten mit "ramp_weight" (Bombe, Schild) werden im
+## Rundenverlauf wahrscheinlicher — die Runde wird zum Ende hin spannender.
 func _pick_weighted_variant() -> Dictionary:
+	var p: float = _round_progress()
 	var total: int = 0
 	for v in VARIANTS:
-		total += int(v["weight"])
+		total += int(v["weight"]) + int(v.get("ramp_weight", 0) * p)
 	var roll: int = randi() % total
 	for v in VARIANTS:
-		roll -= int(v["weight"])
+		roll -= int(v["weight"]) + int(v.get("ramp_weight", 0) * p)
 		if roll < 0:
 			return v
 	return VARIANTS[0]
+
+
+## Rundenfortschritt 0..1 für die Risiko-Kurve: Timer-Modi über die
+## Restzeit, Survival über die Wellenzahl, sonst 0.
+func _round_progress() -> float:
+	match GameManager.game_mode:
+		"normal", "easy", "hard", "combo_hunt":
+			if GameManager.round_duration > 0.0:
+				return clampf(1.0 - GameManager.time_left / GameManager.round_duration, 0.0, 1.0)
+			return 0.0
+		"survival":
+			return clampf(_wave_count / 8.0, 0.0, 1.0)
+		_:
+			return 0.0
 
 
 # --- HUD-Aktualisierungen ---

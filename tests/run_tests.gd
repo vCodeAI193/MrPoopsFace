@@ -16,9 +16,11 @@ func _initialize() -> void:
 	_test_ammo()
 	_test_hits_and_combo()
 	_test_misses()
+	_test_miss_breaks_combo()
 	_test_bomb()
 	_test_settings_reset()
 	_test_highscores()
+	_test_stars()
 	print("---")
 	print("%d Tests bestanden, %d fehlgeschlagen" % [_passes, _failures])
 	quit(1 if _failures > 0 else 0)
@@ -127,6 +129,28 @@ func _test_misses() -> void:
 	zen.free()
 
 
+## Fehlwurf bricht Combo und Streak, außer im Zen-Modus (Risk/Reward).
+func _test_miss_breaks_combo() -> void:
+	var gm: Node = _new_gm()
+	gm.set_game_mode("normal")
+	gm.start_game()
+	gm.register_hit(1)
+	gm.register_hit(1)
+	_check(gm.combo == 2 and gm.streak == 2, "Combo/Streak vor dem Fehlwurf")
+	gm.register_miss()
+	_check(gm.combo == 0 and gm.streak == 0, "Fehlwurf bricht Combo und Streak")
+	_check(gm.game_active, "normal: Fehlwurf beendet die Runde nicht")
+	gm.free()
+
+	var zen: Node = _new_gm()
+	zen.set_game_mode("zen")
+	zen.start_game()
+	zen.register_hit(1)
+	zen.register_miss()
+	_check(zen.combo == 1, "zen: Fehlwurf bricht die Combo nicht")
+	zen.free()
+
+
 ## Bomben-Strafe und Bomben-Schutz (F029/F048).
 func _test_bomb() -> void:
 	var gm: Node = _new_gm()
@@ -174,3 +198,32 @@ func _test_highscores() -> void:
 	_check(gm.highscores.size() == 10, "Top-10-Kappung greift")
 	_check(int(gm.highscores[0]) == 314, "höchster Wert steht oben")
 	gm.free()
+
+
+## Sterne-Bewertung an den Schwellen (F105).
+func _test_stars() -> void:
+	var gm: Node = _new_gm()
+	gm.set_game_mode("normal")
+	gm.start_game()
+	gm.score = 499
+	gm.end_game()
+	_check(gm.last_stars == 0, "499 Punkte: 0 Sterne")
+	gm.start_game()
+	gm.score = 500
+	gm.end_game()
+	_check(gm.last_stars == 1, "500 Punkte: 1 Stern")
+	_check(gm.next_star_goal() == 1500, "nächstes Ziel: 1500")
+	gm.start_game()
+	gm.score = 3000
+	gm.end_game()
+	_check(gm.last_stars == 3, "3000 Punkte: 3 Sterne")
+	_check(gm.next_star_goal() == -1, "3 Sterne: kein weiteres Ziel")
+	gm.free()
+
+	var zen: Node = _new_gm()
+	zen.set_game_mode("zen")
+	zen.start_game()
+	zen.score = 9999
+	zen.end_game()
+	_check(zen.last_stars == 0, "zen: keine Sterne-Wertung")
+	zen.free()

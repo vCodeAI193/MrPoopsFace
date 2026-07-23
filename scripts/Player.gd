@@ -250,15 +250,29 @@ func _draw() -> void:
 	draw_line(Vector2.ZERO, _drag_current, Color(0.3, 0.2, 0.1), 6.0)
 
 	# --- Vorschau der Flugbahn als gepunktete Parabel ---
+	# Länge hängt vom Modus ab: lernfreundliche Modi zeigen alles,
+	# schwere Modi fordern echtes Zielgefühl.
+	var visible_points: int = _visible_trajectory_points()
 	# Bei Masse 1 entspricht der zentrale Impuls direkt der Startgeschwindigkeit
 	var start_vel: Vector2 = -_drag_current * throw_power
 	var gravity: float = float(ProjectSettings.get_setting(
 		"physics/2d/default_gravity", 980.0))
 	var pos: Vector2 = Vector2.ZERO
 	var vel: Vector2 = start_vel
-	for i in trajectory_points:
+	for i in visible_points:
 		pos += vel * trajectory_step
 		vel.y += gravity * trajectory_step
 		vel += GameManager.wind_force * trajectory_step  # Wind-Abweichung (F007)
-		var alpha: float = 1.0 - float(i) / trajectory_points
+		var alpha: float = 1.0 - float(i) / visible_points
 		draw_circle(pos, 6.0, Color(1, 1, 1, alpha * 0.7))
+
+
+## Anzahl sichtbarer Vorschaupunkte je nach Spielmodus.
+func _visible_trajectory_points() -> int:
+	match GameManager.game_mode:
+		"practice", "zen", "easy":
+			return trajectory_points               # volle Vorschau
+		"hard":
+			return 6                               # fast blind zielen
+		_:
+			return 12                              # halbe Parabel

@@ -14,6 +14,7 @@ signal hit_registered(points: int)             ## Wird bei jedem Treffer gesende
 signal powerup_activated(type: String)         ## Wird beim Einsammeln eines Power-Ups gesendet (F123)
 signal ammo_changed(ammo_left: int)            ## Wird bei Munitionsänderung gesendet (F004)
 signal misses_changed(new_misses: int)         ## Wird bei Fehlwurf gesendet (F077/F083)
+signal combo_broken_by_miss(lost_combo: int)   ## Fehlwurf hat eine Combo >= 3 gebrochen
 
 # --- Einstellbare Werte (im Inspector / per Code anpassbar) ---
 @export var round_duration: float = 60.0       ## Rundenlänge in Sekunden
@@ -37,6 +38,18 @@ var last_was_highscore: bool = false           ## Letzte Runde war neuer Rekord?
 var best_combo: int = 0               ## Beste Combo in dieser Runde
 var hits_total: int = 0               ## Gesamtzahl Treffer
 var avg_points_per_hit: float = 0.0   ## Durchschnitt Punkte/Treffer
+
+# --- Sterne-Bewertung pro Runde (F105) ---
+## Schwellen für 1/2/3 Sterne; combo_hunt wertet die Combo statt Punkte
+const STAR_THRESHOLDS: Dictionary = {
+	"normal": [500, 1500, 3000],
+	"easy": [500, 1500, 3000],
+	"hard": [300, 900, 1800],
+	"endless": [500, 1500, 3000],
+	"survival": [500, 1500, 3000],
+	"combo_hunt": [5, 10, 15],
+}
+var last_stars: int = 0               ## Sterne der letzten Runde (0–3)
 
 var _combo_timer: float = 0.0                  ## Restzeit, in der die Combo gültig bleibt
 var combo_timer_pct: float = 0.0              ## Verhältnis 0..1 für den Fortschrittsbalken (F119)
@@ -64,8 +77,9 @@ var miss_limit: int = -1                      ## Erlaubte Fehlwürfe; -1 = unbeg
 var misses: int = 0                           ## Fehlwürfe in dieser Runde
 
 # --- Game Modes & Einstellungen ---
-var game_mode: String = "normal"               ## "normal", "practice" (F085), "hard" (F089)
-var difficulty: String = "medium"              ## "easy", "medium", "hard" (F089)
+## "normal", "practice" (F085), "easy"/"hard" (F089),
+## "endless"/"survival"/"combo_hunt"/"zen" (F077/F083/F092/F093)
+var game_mode: String = "normal"
 
 # --- Optionen (F179, F137, F181, F183, F166) ---
 var music_volume: float = 0.7                  ## Musiklautstärke 0..1 (F137)
@@ -170,7 +184,28 @@ func end_game() -> void:
 		_record_highscore(score)
 	else:
 		last_was_highscore = false
+	# Sterne-Bewertung berechnen (F105)
+	last_stars = _compute_stars()
 	game_over.emit(score)
+
+
+## Berechnet 0–3 Sterne für die abgelaufene Runde (F105).
+func _compute_stars() -> int:
+	if game_mode not in STAR_THRESHOLDS:
+		return 0
+	var thresholds: Array = STAR_THRESHOLDS[game_mode]
+	var stars: int = 0
+	for t in thresholds:
+		if score >= int(t):
+			stars += 1
+	return stars
+
+
+## Liefert die Schwelle für den nächsten Stern, oder -1 bei 3 Sternen (F105).
+func next_star_goal() -> int:
+	if game_mode not in STAR_THRESHOLDS or last_stars >= 3:
+		return -1
+	return int(STAR_THRESHOLDS[game_mode][last_stars])
 
 
 ## Registriert einen Treffer auf ein Strichmännchen und berechnet die Punkte
@@ -241,10 +276,24 @@ func add_ammo(amount: int) -> void:
 	ammo_changed.emit(ammo_left)
 
 
-## Registriert einen Fehlwurf (F077/F083). Beendet die Runde,
-## wenn das Fehlwurf-Limit des Modus erreicht ist.
+## Registriert einen Fehlwurf (F077/F083).
+## Bricht in allen wertenden Modi die Combo und Streak (Risk/Reward:
+## Präzision lohnt sich, Spammen kostet). Beendet die Runde, wenn das
+## Fehlwurf-Limit des Modus erreicht ist.
 func register_miss() -> void:
-	if not game_active or miss_limit < 0:
+	if not game_active:
+		return
+	# Combo & Streak brechen (außer im entspannten Zen-Modus)
+	if game_mode != "zen":
+		if combo >= 3:
+			combo_broken_by_miss.emit(combo)
+		if combo > 0:
+			_reset_combo()
+		if streak > 0:
+			streak = 0
+			streak_changed.emit(streak)
+	# Fehlwurf-Limit nur in Modi, die eines haben
+	if miss_limit < 0:
 		return
 	misses += 1
 	misses_changed.emit(misses)
