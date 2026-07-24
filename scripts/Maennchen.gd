@@ -73,10 +73,11 @@ func _process(delta: float) -> void:
 	elif position.x > view_width - 80.0 and _direction > 0:
 		_direction = -1
 
-	# Sprungbewegung (F022)
+	# Sprungbewegung (F022); Schatten schrumpft mit der Höhe → neu zeichnen
 	if jump_height > 0.0:
 		_jump_phase += delta * 2.8
 		position.y = _base_y - abs(sin(_jump_phase)) * jump_height
+		queue_redraw()
 
 	# Zzz-Effekt beim Schlafen (F032)
 	if sleeping:
@@ -94,6 +95,16 @@ func _process(delta: float) -> void:
 				break
 
 	_body.queue_redraw()
+
+
+## Schatten an den Füßen; bleibt beim Springen am Boden und schrumpft
+## mit der Höhe. Zeichnet auf dem Area2D selbst, damit er beim Umfallen
+## der Figur (nur _body rotiert) liegen bleibt.
+func _draw() -> void:
+	var jump_offset: float = maxf(_base_y - position.y, 0.0)
+	var shrink: float = clampf(1.0 - jump_offset / 260.0, 0.4, 1.0)
+	draw_set_transform(Vector2(0, 58.0 + jump_offset), 0.0, Vector2(shrink, 0.3 * shrink))
+	draw_circle(Vector2.ZERO, 30.0, Color(0, 0, 0, 0.16))
 
 
 ## Wird aufgerufen, wenn ein Körper (der Kackhaufen) das Männchen berührt.

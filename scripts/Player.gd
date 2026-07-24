@@ -83,6 +83,10 @@ func _process(delta: float) -> void:
 		_aura_phase += delta
 		queue_redraw()
 
+	# Beim Zielen jede Frame neu zeichnen, damit das Spann-Zittern läuft (F150)
+	if _aiming:
+		queue_redraw()
+
 
 ## Merkt sich den aktuellen Combo-Stand für die Aura-Darstellung.
 func _on_combo_changed(new_combo: int) -> void:
@@ -216,11 +220,30 @@ func _draw() -> void:
 		draw_circle(Vector2.ZERO, radius, col)
 		draw_arc(Vector2.ZERO, radius, 0, TAU, 32, Color(1.0, 0.8, 0.2, 0.5), 4.0)
 
-	# Anker der Schleuder (immer sichtbar)
-	draw_circle(Vector2.ZERO, 18.0, Color(0.4, 0.26, 0.13))
-	draw_arc(Vector2.ZERO, 18.0, 0, TAU, 24, Color(0.25, 0.16, 0.08), 4.0)
+	# --- Holz-Schleuder-Gabel mit Spann-Wackeln (F150) ---
+	var wood: Color = Color(0.42, 0.26, 0.1)
+	var wood_dark: Color = Color(0.28, 0.17, 0.07)
+	var tension: float = 0.0
+	if _aiming:
+		tension = clampf(_drag_current.length() / max_drag_distance, 0.0, 1.0)
+	# Zittern proportional zur Spannung (F150)
+	var wobble: float = sin(Time.get_ticks_msec() * 0.04) * 3.0 * tension
+	var tip_l: Vector2 = Vector2(-34.0 + wobble, -70.0)
+	var tip_r: Vector2 = Vector2(34.0 + wobble, -70.0)
+	# Stiel und Gabel-Arme
+	draw_line(Vector2(0, 62), Vector2(0, -10), wood, 15.0)
+	draw_line(Vector2(0, -10), tip_l, wood, 10.0)
+	draw_line(Vector2(0, -10), tip_r, wood, 10.0)
+	draw_circle(Vector2(0, 62), 9.0, wood_dark)
+	draw_circle(tip_l, 6.5, wood_dark)
+	draw_circle(tip_r, 6.5, wood_dark)
 
 	if not _aiming or _drag_current == Vector2.ZERO:
+		# Entspanntes Gummiband hängt leicht zwischen den Gabelspitzen durch
+		var band: Color = Color(0.5, 0.15, 0.12)
+		var mid: Vector2 = Vector2(0, -52)
+		draw_line(tip_l, mid, band, 5.0)
+		draw_line(mid, tip_r, band, 5.0)
 		return
 
 	# --- Wurf-Kraftanzeige (F001) und Mindest-/Höchstkraft-Markierungen (F002) ---
@@ -246,8 +269,13 @@ func _draw() -> void:
 	draw_line(Vector2(BAR_X - 5, BAR_Y), Vector2(BAR_X + BAR_W + 5, BAR_Y),
 		Color(1.0, 0.25, 0.1, 0.9), 3.0)
 
-	# Gummiband der Schleuder (vom Anker zur Zugposition)
-	draw_line(Vector2.ZERO, _drag_current, Color(0.3, 0.2, 0.1), 6.0)
+	# Zwei gespannte Gummibänder von den Gabelspitzen zum Leder-Pad (F150)
+	var band_col: Color = Color(0.5, 0.15, 0.12)
+	draw_line(tip_l, _drag_current, band_col, 6.0)
+	draw_line(tip_r, _drag_current, band_col, 6.0)
+	# Leder-Pad an der Zugposition
+	draw_circle(_drag_current, 15.0, Color(0.35, 0.22, 0.1))
+	draw_arc(_drag_current, 15.0, 0, TAU, 20, wood_dark, 3.0)
 
 	# --- Vorschau der Flugbahn als gepunktete Parabel ---
 	# Länge hängt vom Modus ab: lernfreundliche Modi zeigen alles,

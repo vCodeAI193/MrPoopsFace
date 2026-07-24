@@ -61,6 +61,31 @@ var _last_shown_second: int = -1
 # F075 – Animierte Wolken
 var _clouds: Array = []
 
+# F063 – Tageszeit-Stimmungen: Himmel, Sonne und Farb-Tint pro Runde
+const DAYTIMES: Dictionary = {
+	"morgen": {
+		"sky_top": Color(0.95, 0.72, 0.72), "sky_bottom": Color(0.78, 0.9, 1.0),
+		"sun": Color(1.0, 0.9, 0.55), "sun_pos": Vector2(1580, 330),
+		"green": 1.0, "cloud": Color(1.0, 0.94, 0.94),
+	},
+	"tag": {
+		"sky_top": Color(0.4, 0.7, 0.95), "sky_bottom": Color(0.82, 0.93, 1.0),
+		"sun": Color(1.0, 0.95, 0.4), "sun_pos": Vector2(1620, 210),
+		"green": 1.0, "cloud": Color(1.0, 1.0, 1.0),
+	},
+	"abend": {
+		"sky_top": Color(0.9, 0.5, 0.28), "sky_bottom": Color(0.6, 0.4, 0.62),
+		"sun": Color(1.0, 0.45, 0.2), "sun_pos": Vector2(1560, 480),
+		"green": 0.78, "cloud": Color(1.0, 0.82, 0.78),
+	},
+}
+var _daytime: String = "tag"
+var _sun_phase: float = 0.0
+
+# F065/F071/F153 – Landschafts-Deko und Bäume
+var _decorations: Array = []
+var _trees: Array = []
+
 # F123 – Toast-Benachrichtigungen
 var _toast_label: Label
 var _toast_tween: Tween
@@ -132,6 +157,11 @@ func _ready() -> void:
 	# Wolken initialisieren (F075)
 	_init_clouds()
 
+	# Tageszeit würfeln und Himmel umfärben (F063); Landschaft aufbauen (F065/F071/F153)
+	_daytime = DAYTIMES.keys()[randi() % DAYTIMES.size()]
+	_apply_daytime_sky()
+	_init_scenery()
+
 	# Toast-Label für Benachrichtigungen erstellen (F123)
 	_toast_label = Label.new()
 	_toast_label.visible = false
@@ -202,6 +232,11 @@ func _process(delta: float) -> void:
 		if cloud["pos"].x > 2200:
 			cloud["pos"].x = -280
 			cloud["pos"].y = randf_range(70, 330)
+
+	# Sonnenstrahlen rotieren (F063) und Bäume schwanken lassen (F153)
+	_sun_phase += delta * 0.3
+	for tree in _trees:
+		tree["phase"] += delta * 1.3
 	queue_redraw()
 
 	# Combo-Fortschrittsbalken aktualisieren (F119)
@@ -581,19 +616,151 @@ func _init_clouds() -> void:
 		})
 
 
-## Zeichnet alle Wolken hinter der Spielszene (F075).
+## Färbt den Himmel-Gradient passend zur Tageszeit um (F063).
+func _apply_daytime_sky() -> void:
+	var day: Dictionary = DAYTIMES[_daytime]
+	var sky: TextureRect = $BackgroundLayer/Sky
+	var tex: GradientTexture2D = sky.texture
+	if tex and tex.gradient:
+		tex.gradient.set_color(0, day["sky_top"])
+		tex.gradient.set_color(1, day["sky_bottom"])
+
+
+## Würfelt Blumen, Büsche, Zaunstücke und Bäume für die Landschaft (F065/F071/F153).
+func _init_scenery() -> void:
+	const FLOWER_COLORS: Array = [
+		Color(0.95, 0.5, 0.7), Color(1.0, 1.0, 1.0), Color(0.95, 0.6, 0.2),
+		Color(0.7, 0.5, 0.95),
+	]
+	for i in 7:
+		_decorations.append({
+			"type": "flower",
+			"pos": Vector2(randf_range(80, 1850), randf_range(1065, 1130)),
+			"color": FLOWER_COLORS[randi() % FLOWER_COLORS.size()],
+			"size": randf_range(8.0, 13.0),
+		})
+	for i in 3:
+		_decorations.append({
+			"type": "bush",
+			"pos": Vector2(randf_range(150, 1800), 1050.0),
+			"size": randf_range(30.0, 52.0),
+		})
+	_decorations.append({"type": "fence", "pos": Vector2(randf_range(560, 860), 1046.0), "size": 200.0})
+	_decorations.append({"type": "fence", "pos": Vector2(randf_range(1250, 1600), 1046.0), "size": 160.0})
+	# Bäume an den Bildrändern, damit die Spielfläche frei bleibt (F153)
+	for data in [[120.0, 260.0], [1755.0, 300.0], [1870.0, 210.0]]:
+		_trees.append({"x": data[0], "h": data[1], "phase": randf() * TAU})
+
+
+## Zeichnet Himmelskörper, Wolken und Landschaft hinter der Spielszene.
 func _draw() -> void:
+	var day: Dictionary = DAYTIMES[_daytime]
+	var g: float = day["green"]
+
+	# --- Sonne mit langsam rotierendem Strahlenkranz (F063) ---
+	var sun_pos: Vector2 = day["sun_pos"]
+	var sun_col: Color = day["sun"]
+	for i in 8:
+		var a: float = _sun_phase + TAU * float(i) / 8.0
+		var dir: Vector2 = Vector2(cos(a), sin(a))
+		draw_line(sun_pos + dir * 72.0, sun_pos + dir * 100.0,
+			Color(sun_col.r, sun_col.g, sun_col.b, 0.6), 5.0)
+	draw_circle(sun_pos, 62.0, sun_col)
+	draw_circle(sun_pos, 50.0, sun_col.lightened(0.2))
+
+	# --- Wolken (F075) ---
 	for c in _clouds:
-		_draw_cloud(c["pos"], c["size"], c["alpha"])
+		_draw_cloud(c["pos"], c["size"], c["alpha"], day["cloud"])
+
+	# --- Hügel in zwei Tiefenebenen (F065) ---
+	var hill_back: Color = Color(0.55 * g, 0.78 * g, 0.55 * g)
+	var hill_front: Color = Color(0.38 * g, 0.68 * g, 0.34 * g)
+	for i in 5:
+		draw_circle(Vector2(-100 + i * 520.0, 1050.0), 190.0, hill_back)
+	for i in 4:
+		draw_circle(Vector2(150 + i * 560.0, 1090.0), 160.0, hill_front)
+
+	# --- Boden: Gras + Erdstreifen (F065) ---
+	var grass: Color = Color(0.3 * g, 0.62 * g, 0.25 * g)
+	var earth: Color = Color(0.42 * g, 0.3 * g, 0.18 * g)
+	draw_rect(Rect2(0, 1050, 1920, 70), grass)
+	draw_rect(Rect2(0, 1120, 1920, 80), earth)
+	# Grashalme entlang der Oberkante (deterministisch aus dem Index)
+	var blade: Color = Color(0.24 * g, 0.55 * g, 0.2 * g)
+	for i in 48:
+		var x: float = i * 40.0 + fmod(i * 17.0, 23.0)
+		var h: float = 10.0 + 8.0 * absf(sin(i * 3.7))
+		draw_line(Vector2(x, 1052), Vector2(x + 4.0, 1052 - h), blade, 3.0)
+
+	# --- Deko: Zäune, Büsche, Blumen (F071) ---
+	for deco in _decorations:
+		match deco["type"]:
+			"fence":
+				_draw_fence(deco["pos"], deco["size"])
+			"bush":
+				_draw_bush(deco["pos"], deco["size"], g)
+			"flower":
+				_draw_flower(deco["pos"], deco["size"], deco["color"], g)
+
+	# --- Schwankende Bäume (F153) ---
+	for tree in _trees:
+		_draw_tree(tree, g)
 
 
-## Zeichnet eine einzelne Wolke aus drei überlappenden Kreisen.
-func _draw_cloud(pos: Vector2, size: float, alpha: float) -> void:
-	var col: Color = Color(1, 1, 1, alpha)
+## Zeichnet eine einzelne Wolke aus überlappenden Kreisen; Farbe je Tageszeit.
+func _draw_cloud(pos: Vector2, size: float, alpha: float, tint: Color = Color.WHITE) -> void:
+	var col: Color = Color(tint.r, tint.g, tint.b, alpha)
 	draw_circle(pos, size * 0.6, col)
 	draw_circle(pos + Vector2(size * 0.56, size * 0.08), size * 0.48, col)
 	draw_circle(pos + Vector2(-size * 0.46, size * 0.1), size * 0.44, col)
 	draw_circle(pos + Vector2(size * 0.18, -size * 0.32), size * 0.42, col)
+
+
+## Zaunstück aus Latten und zwei Querbalken (F071).
+func _draw_fence(pos: Vector2, width: float) -> void:
+	var wood: Color = Color(0.55, 0.4, 0.24)
+	var posts: int = int(width / 40.0)
+	for i in posts + 1:
+		var x: float = pos.x + i * 40.0
+		draw_line(Vector2(x, pos.y), Vector2(x, pos.y - 52.0), wood, 8.0)
+		draw_circle(Vector2(x, pos.y - 52.0), 4.0, wood)
+	for rail_y in [-38.0, -16.0]:
+		draw_line(Vector2(pos.x - 6, pos.y + rail_y),
+			Vector2(pos.x + posts * 40.0 + 6, pos.y + rail_y), wood, 6.0)
+
+
+## Busch aus drei dunkelgrünen Kreisen (F071).
+func _draw_bush(pos: Vector2, size: float, g: float) -> void:
+	var col: Color = Color(0.2 * g, 0.5 * g, 0.18 * g)
+	draw_circle(pos + Vector2(-size * 0.5, 0), size * 0.6, col)
+	draw_circle(pos + Vector2(size * 0.5, 0), size * 0.6, col)
+	draw_circle(pos + Vector2(0, -size * 0.35), size * 0.7, col)
+
+
+## Blume: Stiel, fünf Blütenblätter, gelbe Mitte (F071).
+func _draw_flower(pos: Vector2, size: float, color: Color, g: float) -> void:
+	draw_line(pos, pos + Vector2(0, size * 1.8), Color(0.25 * g, 0.5 * g, 0.2 * g), 3.0)
+	for i in 5:
+		var a: float = TAU * float(i) / 5.0 - PI / 2.0
+		draw_circle(pos + Vector2(cos(a), sin(a)) * size * 0.55, size * 0.42, color)
+	draw_circle(pos, size * 0.34, Color(1.0, 0.85, 0.2))
+
+
+## Baum mit Stamm und im Wind schwankender Krone (F153).
+func _draw_tree(tree: Dictionary, g: float) -> void:
+	var base: Vector2 = Vector2(tree["x"], 1060.0)
+	var h: float = tree["h"]
+	var sway: float = sin(tree["phase"]) * 7.0
+	var crown: Vector2 = base + Vector2(sway, -h)
+	var trunk: Color = Color(0.4, 0.26, 0.13)
+	var leaves: Color = Color(0.22 * g, 0.55 * g, 0.2 * g)
+	# Stamm folgt der Krone leicht
+	draw_line(base, base + Vector2(sway * 0.4, -h * 0.62), trunk, 16.0)
+	draw_line(base + Vector2(sway * 0.4, -h * 0.62), crown, trunk, 11.0)
+	# Krone aus drei Kreisen
+	draw_circle(crown, h * 0.3, leaves)
+	draw_circle(crown + Vector2(-h * 0.22, h * 0.12), h * 0.24, leaves)
+	draw_circle(crown + Vector2(h * 0.22, h * 0.12), h * 0.24, leaves)
 
 
 # --- Audio (F135, F136, F138, F140) ---

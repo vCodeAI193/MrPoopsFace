@@ -83,15 +83,15 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F060** 🟡 Parallax-Scrolling-Hintergrund
 - [ ] **F061** 🟡 Hindernisse im Level (Kisten, Mauern)
 - [ ] **F062** 🔴 Bewegliche Plattformen, auf denen Männchen laufen
-- [ ] **F063** 🟡 Tag-/Nacht-Wechsel mit Beleuchtung
+- [x] **F063** 🟡 Tag-/Nacht-Wechsel mit Beleuchtung – Morgen/Tag/Abend-Stimmungen pro Runde
 - [ ] **F064** 🟡 Wetter-Effekte (Regen, Schnee, Nebel)
-- [ ] **F065** 🟢 Bodentextur-Varianten pro Theme
+- [x] **F065** 🟢 Bodentextur-Varianten pro Theme – Gras/Erde/Halme mit Tageszeit-Tint
 - [ ] **F066** 🔴 Zerstörbare Umgebungsobjekte
 - [ ] **F067** 🟡 Trampoline, die Geschosse abfedern
 - [ ] **F068** 🟡 Wasser-/Lava-Zonen mit Spezialeffekt
 - [ ] **F069** 🔴 Level-Editor für eigene Anordnungen
 - [ ] **F070** 🟡 Scrollendes Level (Kamera folgt)
-- [ ] **F071** 🟢 Vordergrund-Deko-Schicht (Büsche, Zäune)
+- [x] **F071** 🟢 Vordergrund-Deko-Schicht (Büsche, Zäune) – plus Blumen
 - [ ] **F072** 🟡 Interaktive Schalter, die Fallen auslösen
 - [ ] **F073** 🟡 Windzonen-Bereiche im Level
 - [ ] **F074** 🔴 Prozedural generierte Level-Layouts
@@ -185,10 +185,10 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F147** 🟡 Geschoss-Trail mit Verblass-Effekt
 - [x] **F148** 🟡 Stink-Wölkchen über getroffenen Männchen
 - [x] **F149** 🟢 Aufblitzen des Bildschirms bei Mega-Combo
-- [ ] **F150** 🟡 Animierter Wackel-Effekt der Schleuder beim Spannen
+- [x] **F150** 🟡 Animierter Wackel-Effekt der Schleuder beim Spannen – plus Holz-Gabel mit zwei Bändern
 - [ ] **F151** 🔴 Beleuchtung/Schatten via CanvasModulate + Light2D
 - [x] **F152** 🟢 Sterne/Konfetti beim Rundensieg
-- [ ] **F153** 🟡 Umgebungs-Animationen (schwankende Bäume)
+- [x] **F153** 🟡 Umgebungs-Animationen (schwankende Bäume)
 - [x] **F154** 🟢 Treffer-Hitstop (kurzer Freeze-Frame) – Queue Delete mit Delay
 - [ ] **F155** 🟡 Anpassbare Geschoss-Spuren (Skins)
 - [ ] **F156** 🟡 Shader-basierter Hitze-/Stink-Verzerrungseffekt
