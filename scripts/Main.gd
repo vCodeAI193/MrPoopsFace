@@ -42,6 +42,7 @@ const VARIANTS: Array = [
 @onready var _ammo_label: Label = $HUD/TopBar/AmmoLabel
 @onready var _miss_label: Label = $HUD/TopBar/MissLabel
 @onready var _coins_label: Label = $HUD/TopBar/CoinsLabel
+@onready var _mission_label: Label = $HUD/MissionLabel
 @onready var _pause_menu: PauseMenu = $PauseMenu
 @onready var _settings: SettingsOverlay = $Settings
 @onready var _tutorial: TutorialOverlay = $Tutorial
@@ -100,6 +101,9 @@ var _wave_count: int = 0
 var _bonus_done: bool = false
 var _bonus_active: bool = false
 
+# F145 – Slow-Motion beim letzten Treffer der Runde
+var _final_slowmo_done: bool = false
+
 
 func _ready() -> void:
 	randomize()
@@ -126,6 +130,9 @@ func _ready() -> void:
 		func(lost: int) -> void: show_toast("Combo x%d verloren!" % lost))
 	GameManager.coins_changed.connect(_on_coins_changed)
 	_coins_label.text = "🪙 %d" % GameManager.coins
+	GameManager.mission_changed.connect(_on_mission_changed)
+	GameManager.mission_completed.connect(_on_mission_completed)
+	GameManager.multi_hit.connect(_on_multi_hit)
 
 	# Pause-Knopf verbinden (F114)
 	_pause_button.pressed.connect(_on_pause_pressed)
@@ -297,10 +304,24 @@ func _run_countdown() -> void:
 
 ## Reagiert auf einen Treffer mit einer Kamera-Erschütterung (F144).
 ## Abschaltbar in den Optionen (F181); bei reduzierter Bewegung aus (F183).
+## In den letzten 3 Sekunden: einmalige Finale-Zeitlupe (F145).
 func _on_hit_registered(_points: int) -> void:
+	if not _final_slowmo_done and GameManager.time_left <= 3.0 \
+			and GameManager.game_mode in ["normal", "easy", "hard", "combo_hunt"] \
+			and not GameManager.reduced_motion:
+		_final_slowmo_done = true
+		_run_final_slowmo()
 	if not GameManager.screen_shake_enabled or GameManager.reduced_motion:
 		return
 	_shake_strength = minf(_shake_strength + shake_per_hit, shake_max)
+
+
+## Kurze Zeitlupe für den letzten Treffer der Runde (F145).
+func _run_final_slowmo() -> void:
+	Engine.time_scale = 0.3
+	# 0,7s Echtzeit = 0,21s skalierte Zeit
+	await get_tree().create_timer(0.21).timeout
+	Engine.time_scale = 1.0
 
 
 ## Öffnet das Pause-Overlay (F114).
@@ -542,6 +563,36 @@ func _apply_mode_hud() -> void:
 			_score_label.text = "Beste Combo: 0"
 		"practice":
 			_time_label.visible = false
+
+
+## Zeigt die Runden-Mission mit Fortschritt an (F081).
+func _on_mission_changed(mission: Dictionary) -> void:
+	if mission.is_empty():
+		_mission_label.visible = false
+		return
+	_mission_label.visible = true
+	if mission["done"]:
+		_mission_label.text = "🎯 %s ✔" % mission["text"]
+		_mission_label.modulate = Color(0.5, 1.0, 0.5)
+	else:
+		_mission_label.text = "🎯 %s (%d/%d)" % [
+			mission["text"], int(mission["progress"]), int(mission["target"])]
+		_mission_label.modulate = Color.WHITE
+
+
+## Feiert die erfüllte Mission (F081).
+func _on_mission_completed(reward: int) -> void:
+	show_toast("Mission geschafft! +%d 🪙" % reward)
+
+
+## Feiert mehrere Treffer mit einem Wurf (F017).
+func _on_multi_hit(count: int, bonus: int) -> void:
+	var word: String = "DOPPELT!" if count == 2 else "DREIFACH!" if count == 3 else "x%d WAHNSINN!" % count
+	var ft: FloatingText = preload("res://scenes/FloatingText.tscn").instantiate()
+	ft.setup("%s +%d" % [word, bonus], Color(1.0, 0.85, 0.1))
+	ft.scale = Vector2(2.0, 2.0)
+	ft.position = Vector2(960, 520)
+	add_child(ft)
 
 
 ## Aktualisiert die Münz-Anzeige mit kleinem Pop (F095).

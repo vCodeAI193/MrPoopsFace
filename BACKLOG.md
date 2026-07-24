@@ -28,7 +28,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F014** 🟡 Zwei-Finger-Zoom der Wurf-Vorschau
 - [x] **F015** 🟡 Aufprall hinterlässt Schmierfleck-Decals am Boden
 - [x] **F016** 🟢 Trefferzonen (Kopf = Bonus, Körper = normal)
-- [ ] **F017** 🔴 Ricochet-Combo (ein Wurf trifft mehrere Männchen)
+- [x] **F017** 🔴 Ricochet-Combo (ein Wurf trifft mehrere Männchen) – Bonuspunkte + "DOPPELT!"-Feier
 - [ ] **F018** 🟡 Magnet-Geschoss, das leicht zum nächsten Ziel zieht
 - [x] **F019** 🟡 Geschoss-Gewicht beeinflusst Reichweite/Bogen
 - [x] **F020** 🟢 Konfetti-/Partikel-Schweif hinter dem fliegenden Haufen – Particle Trail
@@ -104,7 +104,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [ ] **F078** 🟡 Zeitrennen: möglichst schnell X Männchen treffen
 - [ ] **F079** 🟡 Präzisions-Modus mit begrenzter Munition
 - [ ] **F080** 🔴 Story-/Kampagnen-Modus mit Leveln
-- [ ] **F081** 🟡 Herausforderungs-Modus mit Tagesaufgaben
+- [x] **F081** 🟡 Herausforderungs-Modus mit Tagesaufgaben – als zufällige Runden-Mission mit Münz-Belohnung
 - [ ] **F082** 🔴 Lokaler 2-Spieler-Wettkampf (geteilter Bildschirm)
 - [x] **F083** 🟡 Überlebens-Modus mit Männchen-Wellen
 - [x] **F084** 🟡 Bonus-Runde (Goldregen)
@@ -127,7 +127,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 - [x] **F098** 🟡 Freischaltbare Geschoss-Skins (Mais, Wurst …) – Gold/Regenbogen/Eis/Alien/Fußball
 - [ ] **F099** 🟡 Freischaltbare Schleuder-Designs
 - [ ] **F100** 🔴 Skill-Tree für permanente Boni
-- [ ] **F101** 🟢 Tägliche Login-Belohnung
+- [x] **F101** 🟢 Tägliche Login-Belohnung – +50 Münzen einmal pro Tag im Menü
 - [ ] **F102** 🟡 Sammelkarten/Sticker für getroffene Männchen-Typen
 - [ ] **F103** 🔴 Battle-Pass-/Season-System
 - [ ] **F104** 🟡 Münz-Verdopplung nach Runde (Werbung optional)
@@ -180,7 +180,7 @@ Jedes Feature hat eine ID (`F001`–`F200`), eine Kurzbeschreibung und Aufwands-
 
 - [x] **F143** 🟢 Treffer-Partikel (braune Spritzer) – HitEffect.tscn
 - [x] **F144** 🟢 Screen-Shake bei Treffer – shake_strength mit decay
-- [ ] **F145** 🟡 Slow-Motion-Effekt beim letzten Treffer der Runde
+- [x] **F145** 🟡 Slow-Motion-Effekt beim letzten Treffer der Runde
 - [x] **F146** 🟢 Combo-Aura/Glow um den Spieler – _aura_phase Sine-Animation
 - [ ] **F147** 🟡 Geschoss-Trail mit Verblass-Effekt
 - [x] **F148** 🟡 Stink-Wölkchen über getroffenen Männchen

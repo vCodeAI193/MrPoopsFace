@@ -147,6 +147,12 @@ func _on_body_entered(body: Node) -> void:
 		hit_multiplier = 1.3
 	_trigger_hit(hit_multiplier)
 
+	# Multi-Treffer mit einem Wurf zählen und belohnen (F017)
+	if "hits_scored" in body and not is_bomb:
+		body.hits_scored += 1
+		if body.hits_scored >= 2:
+			GameManager.register_multi_hit(body.hits_scored)
+
 
 ## Löst die Treffer-Reaktion aus: Punkte, Sound, Effekte und Umfall-Animation.
 func _trigger_hit(zone_multiplier: float = 1.0) -> void:

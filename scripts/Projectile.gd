@@ -14,6 +14,7 @@ const FLOATING_TEXT_SCENE: PackedScene = preload("res://scenes/FloatingText.tscn
 @export var explosion_radius: float = 150.0    ## Radius der Explosion (F010)
 
 var hit_target: bool = false                   ## Hat ein Männchen getroffen? (F077/F083)
+var hits_scored: int = 0                       ## Getroffene Männchen dieses Wurfs (F017)
 var _alive_time: float = 0.0
 var _has_splatted: bool = false
 var _nearest_approach: float = INF             ## Kleinste Distanz zu einem Männchen (Near-Miss)

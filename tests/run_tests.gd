@@ -23,6 +23,9 @@ func _initialize() -> void:
 	_test_stars()
 	_test_coins()
 	_test_shop()
+	_test_missions()
+	_test_multi_hit()
+	_test_daily_bonus()
 	print("---")
 	print("%d Tests bestanden, %d fehlgeschlagen" % [_passes, _failures])
 	quit(1 if _failures > 0 else 0)
@@ -270,4 +273,62 @@ func _test_shop() -> void:
 	_check(gm.select_skin("gold"), "Anlegen mit Besitz klappt")
 	_check(gm.selected_skin == "gold", "Skin ist aktiv")
 	_check(not gm.buy_skin("gibtsnicht"), "unbekannte Skin-ID verweigert")
+	gm.free()
+
+
+## Runden-Missionen: Fortschritt, Abschluss und Belohnung (F081).
+func _test_missions() -> void:
+	var gm: Node = _new_gm()
+	gm.set_game_mode("normal")
+	gm.start_game()
+	# Deterministische Mission setzen (statt der gewürfelten)
+	gm.current_mission = {
+		"type": "hits", "target": 3, "reward": 40,
+		"text": "Test", "progress": 0, "done": false,
+	}
+	gm.coins = 0
+	gm.register_hit(1)
+	gm.register_hit(1)
+	_check(int(gm.current_mission["progress"]) == 2, "Missions-Fortschritt zählt Treffer")
+	_check(not gm.current_mission["done"], "Mission vor dem Ziel nicht erfüllt")
+	var coins_before: int = gm.coins
+	gm.register_hit(1)
+	_check(gm.current_mission["done"], "Mission beim Ziel erfüllt")
+	# 3. Treffer bringt 2 Münzen (Combo-Bonus ab Combo 3) + 40 Belohnung
+	_check(gm.coins == coins_before + 2 + 40, "Belohnung gutgeschrieben (Treffer + 40)")
+	# Kein Doppel-Reward nach Erfüllung
+	var coins_done: int = gm.coins
+	gm.register_hit(1)
+	_check(gm.coins == coins_done + 2, "keine zweite Belohnung (nur Treffer-Münzen)")
+	gm.free()
+
+	var zen: Node = _new_gm()
+	zen.set_game_mode("zen")
+	zen.start_game()
+	_check(zen.current_mission.is_empty(), "zen: keine Mission")
+	zen.free()
+
+
+## Multi-Treffer-Bonus (F017).
+func _test_multi_hit() -> void:
+	var gm: Node = _new_gm()
+	gm.set_game_mode("normal")
+	gm.start_game()
+	gm.score = 100
+	gm.register_multi_hit(2)
+	_check(gm.score == 150, "Doppel-Treffer: +50 Bonus")
+	gm.register_multi_hit(1)
+	_check(gm.score == 150, "Einzeltreffer: kein Bonus")
+	gm.free()
+
+
+## Tagesbonus nur einmal pro Tag (F101).
+func _test_daily_bonus() -> void:
+	var gm: Node = _new_gm()
+	gm.coins = 0
+	gm.last_daily_bonus = ""
+	_check(gm.claim_daily_bonus() == 50, "erster Abruf: 50 Münzen")
+	_check(gm.coins == 50, "Münzen gutgeschrieben")
+	_check(gm.claim_daily_bonus() == 0, "zweiter Abruf am selben Tag: nichts")
+	_check(gm.coins == 50, "Münzstand unverändert")
 	gm.free()

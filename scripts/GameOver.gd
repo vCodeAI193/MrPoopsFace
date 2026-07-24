@@ -67,6 +67,14 @@ func _on_game_over(final_score: int) -> void:
 		GameManager.hits_total,
 		GameManager.avg_points_per_hit
 	]
+	# Missions-Ergebnis anhängen (F081)
+	var mission: Dictionary = GameManager.current_mission
+	if not mission.is_empty():
+		if mission["done"]:
+			stats_text += "\n🎯 Mission geschafft!"
+		else:
+			stats_text += "\n🎯 Mission: %d/%d" % [
+				int(mission["progress"]), int(mission["target"])]
 	_stats_label.text = stats_text
 	visible = true
 

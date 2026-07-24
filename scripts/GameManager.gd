@@ -16,6 +16,9 @@ signal ammo_changed(ammo_left: int)            ## Wird bei Munitionsänderung ge
 signal misses_changed(new_misses: int)         ## Wird bei Fehlwurf gesendet (F077/F083)
 signal combo_broken_by_miss(lost_combo: int)   ## Fehlwurf hat eine Combo >= 3 gebrochen
 signal coins_changed(total: int)               ## Wird bei Münzänderung gesendet (F095)
+signal mission_changed(mission: Dictionary)    ## Missions-Fortschritt geändert (F081)
+signal mission_completed(reward: int)          ## Runden-Mission erfüllt (F081)
+signal multi_hit(count: int, bonus: int)       ## Mehrere Treffer mit einem Wurf (F017)
 
 # --- Einstellbare Werte (im Inspector / per Code anpassbar) ---
 @export var round_duration: float = 60.0       ## Rundenlänge in Sekunden
@@ -66,6 +69,17 @@ var coins: int = 0                    ## Gesamtmünzen (persistiert, F095)
 var coins_earned_round: int = 0       ## In dieser Runde verdiente Münzen
 var owned_skins: Array = ["classic"]  ## Gekaufte Skins (persistiert, F096)
 var selected_skin: String = "classic" ## Aktiver Geschoss-Skin (F098)
+var last_daily_bonus: String = ""     ## Datum des letzten Tagesbonus (F101)
+
+# --- Runden-Missionen (F081) ---
+## Missions-Vorlagen: Typ, Ziel, Belohnung und Anzeigetext
+const MISSIONS: Array = [
+	{"type": "gold_hits", "target": 2, "reward": 60, "text": "Triff 2 Gold-Männchen!"},
+	{"type": "combo", "target": 6, "reward": 50, "text": "Erreiche Combo x6!"},
+	{"type": "hits", "target": 20, "reward": 40, "text": "Triff 20 Männchen!"},
+	{"type": "score", "target": 1200, "reward": 50, "text": "Hole 1200 Punkte!"},
+]
+var current_mission: Dictionary = {}  ## Aktive Mission mit progress/done; leer = keine
 
 var _combo_timer: float = 0.0                  ## Restzeit, in der die Combo gültig bleibt
 var combo_timer_pct: float = 0.0              ## Verhältnis 0..1 für den Fortschrittsbalken (F119)
@@ -167,6 +181,14 @@ func start_game() -> void:
 	hits_total = 0
 	avg_points_per_hit = 0.0
 	coins_earned_round = 0
+	# Runden-Mission würfeln (F081); nur in wertenden Modi
+	if game_mode not in ["zen", "practice"]:
+		current_mission = MISSIONS[randi() % MISSIONS.size()].duplicate()
+		current_mission["progress"] = 0
+		current_mission["done"] = false
+	else:
+		current_mission = {}
+	mission_changed.emit(current_mission)
 	wind_force = Vector2(randf_range(-120.0, 120.0), 0.0)  # Wind randomisieren (F007)
 	freeze_active = false
 	magnet_active = false
@@ -267,6 +289,9 @@ func register_hit(type_multiplier: int = 1) -> int:
 		coins_earned_round += earned
 		coins_changed.emit(coins)
 
+	# Missions-Fortschritt aktualisieren (F081)
+	_update_mission(type_multiplier)
+
 	score_changed.emit(score)
 	combo_changed.emit(combo)
 	streak_changed.emit(streak)
@@ -277,6 +302,53 @@ func register_hit(type_multiplier: int = 1) -> int:
 ## Gibt den höchsten gespeicherten Punktestand zurück (0, falls keiner).
 func get_high_score() -> int:
 	return int(highscores[0]) if highscores.size() > 0 else 0
+
+
+## Aktualisiert den Fortschritt der Runden-Mission nach einem Treffer (F081).
+func _update_mission(type_multiplier: int) -> void:
+	if current_mission.is_empty() or current_mission["done"]:
+		return
+	match current_mission["type"]:
+		"gold_hits":
+			if type_multiplier >= 5:
+				current_mission["progress"] += 1
+		"combo":
+			current_mission["progress"] = maxi(current_mission["progress"], combo)
+		"hits":
+			current_mission["progress"] = hits_total
+		"score":
+			current_mission["progress"] = score
+	if current_mission["progress"] >= int(current_mission["target"]):
+		current_mission["done"] = true
+		var reward: int = int(current_mission["reward"])
+		coins += reward
+		coins_earned_round += reward
+		coins_changed.emit(coins)
+		mission_completed.emit(reward)
+	mission_changed.emit(current_mission)
+
+
+## Bonuspunkte, wenn ein Wurf mehrere Männchen trifft (F017).
+func register_multi_hit(count: int) -> void:
+	if not game_active or count < 2:
+		return
+	var bonus: int = int(25 * count * points_multiplier)
+	score += bonus
+	score_changed.emit(score)
+	multi_hit.emit(count, bonus)
+
+
+## Tagesbonus einmal pro Kalendertag: +50 Münzen (F101).
+## Gibt die Bonushöhe zurück, 0 wenn heute schon abgeholt.
+func claim_daily_bonus() -> int:
+	var today: String = Time.get_date_string_from_system()
+	if last_daily_bonus == today:
+		return 0
+	last_daily_bonus = today
+	coins += 50
+	coins_changed.emit(coins)
+	_save_game()
+	return 50
 
 
 ## Zieht Punkte für ein Bomben-Männchen ab (F029).
@@ -357,6 +429,7 @@ func _save_game() -> void:
 	cfg.set_value("progress", "coins", coins)
 	cfg.set_value("progress", "owned_skins", owned_skins)
 	cfg.set_value("progress", "selected_skin", selected_skin)
+	cfg.set_value("progress", "last_daily_bonus", last_daily_bonus)
 	cfg.save(SAVE_PATH)
 
 
@@ -374,6 +447,7 @@ func _load_game() -> void:
 		coins = cfg.get_value("progress", "coins", 0)
 		owned_skins = cfg.get_value("progress", "owned_skins", ["classic"])
 		selected_skin = cfg.get_value("progress", "selected_skin", "classic")
+		last_daily_bonus = cfg.get_value("progress", "last_daily_bonus", "")
 
 
 # --- Audio-Setup & Optionen (F134, F137, F142, F179, F187) ---

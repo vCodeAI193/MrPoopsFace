@@ -36,6 +36,17 @@ func _ready() -> void:
 	# Maskottchen links neben dem Menü aufbauen
 	_create_mascot()
 
+	# Tagesbonus einmal pro Tag beim Menü-Besuch (F101)
+	var daily: int = GameManager.claim_daily_bonus()
+	if daily > 0:
+		var ft: FloatingText = FLOATING_TEXT_SCENE.instantiate()
+		ft.setup("+%d 🪙 Tagesbonus!" % daily, Color(1.0, 0.84, 0.0))
+		ft.scale = Vector2(1.6, 1.6)
+		ft.position = Vector2(960, 300)
+		add_child(ft)
+		# Das Maskottchen freut sich mit
+		_on_mascot_tapped()
+
 	# Modus-Buttons verbinden (F094)
 	_mode_vbox.get_node("NormalButton").pressed.connect(_start_mode.bind("normal"))
 	_mode_vbox.get_node("EndlessButton").pressed.connect(_start_mode.bind("endless"))
